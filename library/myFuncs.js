@@ -8,7 +8,8 @@ const V3_POOL_ABI = require('@uniswap/v3-core/artifacts/contracts/UniswapV3Pool.
 const minABI = require('../library/minABI.json')
 const baseTokens = require('../library/baseTokens.json')
 
-const web3 = new Web3(new Web3.providers.HttpProvider('https://mainnet.infura.io/v3/9ea3677d970d4dc99f3f559768b0176c'))
+//const web3 = new Web3(new Web3.providers.HttpProvider('https://mainnet.infura.io/v3/9ea3677d970d4dc99f3f559768b0176c'))
+const web3 = new Web3(new Web3.providers.HttpProvider('https://eth-mainnet.alchemyapi.io/v2/I8IUQHQ-q9Wb5nDDcco__u0bPhqYDUjr'))
 const V3_FACTORY_ADDRESS = "0x1F98431c8aD98523631AE4a59f267346ea31F984"
 const V2_FACTORY_ADDRESS = "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f"
 const USDC_ADDRESS = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
@@ -217,7 +218,7 @@ module.exports.getPriceOfToken = async function getPriceOfToken(tokenAddress) {
         return {
             'status': 'fail',
             'data': {
-                
+
             }
         }
     }

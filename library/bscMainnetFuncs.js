@@ -29,7 +29,7 @@ module.exports.getPriceOfTwoTokens = async function getPriceOfTwoTokens(token0Ad
         var balance0 = await this.getTokenBalanceOf(token0Address, pair_address)
         var balance1 = await this.getTokenBalanceOf(token1Address, pair_address)
 
-        if (balance1 == 0 || balance0 == 0) {
+        if (balance1 < 0.1 || balance0 < 0.1) {
             return [0, 0, 0]
         }
 

@@ -35,7 +35,7 @@ module.exports.getPriceOfTwoTokensV2 = async function getPriceOfTwoTokensV2(toke
         var balance0 = await this.getTokenBalanceOf(token0Address, pair_address)
         var balance1 = await this.getTokenBalanceOf(token1Address, pair_address)
 
-        if (balance1 == 0 || balance0 == 0) {
+        if (balance1 < 0.1 || balance0 < 0.1) {
             return [0, 0, 0]
         }
 
@@ -88,6 +88,10 @@ module.exports.getFeePriceOfTwoTokensV3 = async function getFeePriceOfTwoTokensV
         var pool_balance = await pool_1.methods.slot0().call()
         var sqrtPriceX96 = pool_balance[0]
         var price = (JSBI.BigInt(sqrtPriceX96) * JSBI.BigInt(sqrtPriceX96)) / JSBI.BigInt(2) ** JSBI.BigInt(192)
+
+        if (balance0 < 0.1 || balance1 < 0.1) {
+            return [0, 0, 0]
+        }
 
         if (token0Address < token1Address) {
             price = price * 10 ** (token0Decimals - token1Decimals);

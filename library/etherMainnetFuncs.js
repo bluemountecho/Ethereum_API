@@ -204,12 +204,12 @@ module.exports.getPriceOfToken = async function getPriceOfToken(tokenAddress) {
         return {
             'status': 'success',
             'data': {
-                price: price,
-                priceV2: res[0][0],
-                totalVolumeV2: res[0][1],
-                priceV3: res[1][0],
-                totalVolumeV3: res[1][1],
-                totalVolume: total
+                price: price.toFixed(20),
+                priceV2: res[0][0].toFixed(20),
+                totalVolumeV2: res[0][1].toFixed(20),
+                priceV3: res[1][0].toFixed(20),
+                totalVolumeV3: res[1][1].toFixed(20),
+                totalVolume: total.toFixed(20)
             }
         }
     } catch (e) {

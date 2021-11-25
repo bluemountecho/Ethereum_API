@@ -90,8 +90,8 @@ module.exports.getPriceOfToken = async function getPriceOfToken(tokenAddress) {
         return {
             'status': 'success',
             'data': {
-                price: res[0],
-                totalVolume: res[1]
+                price: res[0].toFixed(20),
+                totalVolume: res[1].toFixed(20)
             }
         }
     } catch (e) {

@@ -205,6 +205,10 @@ module.exports.getPriceOfToken = async function getPriceOfToken(tokenAddress) {
         var total = res[0][1] + res[1][1]
         var price = res[0][0] * res[0][1] / total + res[1][0] * res[1][1] / total
 
+        if (total == 0) {
+            price = 0
+        }
+
         return {
             'status': 'success',
             'data': {

@@ -8,6 +8,7 @@
   "dependencies": {
     "@gnosis.pm/safe-apps-web3-react": "^0.6.5",
     "@openzeppelin/contracts": "^3.4.1",
+    "@pancakeswap-libs/pancake-swap-core": "^0.1.0",
     "@reduxjs/toolkit": "^1.6.2",
     "@uniswap/governance": "^1.0.2",
     "@uniswap/liquidity-staker": "^1.0.2",

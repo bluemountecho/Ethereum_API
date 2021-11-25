@@ -1,9 +1,9 @@
 var express = require('express')
 var router = express.Router()
-var myFuncs = require('../library/myFuncs')
+var etherMainnetFuncs = require('../library/etherMainnetFuncs')
 
 router.get('/usd_price/:tokenAddr', function(req, res, next) {
-  myFuncs.getPriceOfToken(req.params.tokenAddr)
+  etherMainnetFuncs.getPriceOfToken(req.params.tokenAddr)
   .then((data) => {
     res.send(JSON.stringify(data))
   })

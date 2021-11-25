@@ -5,8 +5,8 @@ const V3_FACTORY_ABI = require('@uniswap/v3-core/artifacts/contracts/UniswapV3Fa
 const V2_FACTORY_ABI = require('@uniswap/v2-core/build/IUniswapV2Factory.json')
 const V3_POOL_ABI = require('@uniswap/v3-core/artifacts/contracts/UniswapV3Pool.sol/UniswapV3Pool.json')
 // const V2_PAIR_ABI = require('@uniswap/v2-core/build/IUniswapV2Pair.json')
-const minABI = require('../library/minABI.json')
-const baseTokens = require('../library/baseTokens.json')
+const minABI = require('./minABI.json')
+const baseTokens = require('./etherBaseTokens.json')
 
 //const web3 = new Web3(new Web3.providers.HttpProvider('https://mainnet.infura.io/v3/9ea3677d970d4dc99f3f559768b0176c'))
 const web3 = new Web3(new Web3.providers.HttpProvider('https://eth-mainnet.alchemyapi.io/v2/I8IUQHQ-q9Wb5nDDcco__u0bPhqYDUjr'))
@@ -64,13 +64,13 @@ module.exports.getPriceOfTwoTokensV3 = async function getPriceOfTwoTokensV3(toke
             price = res[0][0] * res[0][1] / total + res[1][0] * res[1][1] / total + res[2][0] * res[2][1] / total + res[3][0] * res[3][1] / total
         }
 
-        return [price, Number.parseFloat(total), Number.parseFloat(total1)]
+        return [price, total, total1]
     } catch (e) {
         return [0, 0, 0]
     }
 }
 
-    module.exports.getFeePriceOfTwoTokensV3 = async function getFeePriceOfTwoTokensV3(token0Address, token1Address, fee = 100) {
+module.exports.getFeePriceOfTwoTokensV3 = async function getFeePriceOfTwoTokensV3(token0Address, token1Address, fee = 100) {
     try {
         var token0Contract = new web3.eth.Contract(minABI, token0Address)
         var token1Contract = new web3.eth.Contract(minABI, token1Address)
@@ -84,8 +84,6 @@ module.exports.getPriceOfTwoTokensV3 = async function getPriceOfTwoTokensV3(toke
         var pool_1 = new web3.eth.Contract(V3_POOL_ABI.abi, pool_address)
         var balance0 = await this.getTokenBalanceOf(token0Address, pool_address)
         var balance1 = await this.getTokenBalanceOf(token1Address, pool_address)
-
-        if (balance0 < 2 || balance1 < 2) return [0, 0, 0]
 
         var pool_balance = await pool_1.methods.slot0().call()
         var sqrtPriceX96 = pool_balance[0]
@@ -103,7 +101,7 @@ module.exports.getPriceOfTwoTokensV3 = async function getPriceOfTwoTokensV3(toke
 
         price = price * 100 / (100 + fee / 10000)
 
-        return [price, Number.parseFloat(balance0), Number.parseFloat(balance1)]
+        return [price, balance0, balance1]
     } catch (e) {
         return [0, 0, 0]
     }

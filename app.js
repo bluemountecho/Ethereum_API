@@ -5,7 +5,8 @@ var http = require('http');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
-var router = require('./routes/routes');
+var ethRouter = require('./routes/ethRoutes');
+var bscRouter = require('./routes/bscRoutes');
 
 var app = express();
 
@@ -19,7 +20,8 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/ether_mainnet/api/v1', router);
+app.use('/ether_mainnet/api/v1', ethRouter);
+app.use('/bsc_mainnet/api/v1', bscRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

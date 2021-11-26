@@ -88,7 +88,7 @@ module.exports.getPriceOfTokenPancake = async function getPriceOfTokenPancake(to
         var price = 0
     
         for (var i = 0; i < res.length; i ++) {
-            if (res[i][0] != 0 && res[i][1] >= 100) {
+            if (res[i][0] != 0) {
                 total += res[i][1]
             }
         }
@@ -97,7 +97,7 @@ module.exports.getPriceOfTokenPancake = async function getPriceOfTokenPancake(to
         console.log(res)
     
         for (var i = 0; i < res.length; i ++) {
-            if (res[i][0] != 0 && res[i][1] >= 100) {
+            if (res[i][0] != 0) {
                 price += res[i][1] / total * res[i][0]
             }
         }

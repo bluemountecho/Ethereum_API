@@ -216,7 +216,7 @@ module.exports.getPriceOfTokenV2 = async function getPriceOfTokenV2(tokenAddress
         var price = 0
     
         for (var i = 0; i < res.length; i ++) {
-            if (res[i][0] != 0) {
+            if (res[i][0] != 0 && res[i][1] >= 100) {
                 total += res[i][1]
             }
         }
@@ -225,7 +225,7 @@ module.exports.getPriceOfTokenV2 = async function getPriceOfTokenV2(tokenAddress
         console.log(res)
     
         for (var i = 0; i < res.length; i ++) {
-            if (res[i][0] != 0) {
+            if (res[i][0] != 0 && res[i][1] >= 100) {
                 price += res[i][1] / total * res[i][0]
             }
         }

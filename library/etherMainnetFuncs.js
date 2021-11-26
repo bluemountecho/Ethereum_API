@@ -23,9 +23,14 @@ const factorySHIBA = new web3.eth.Contract(V2_FACTORY_ABI.abi, SHIBA_FACTORY_ADD
 module.exports.getTokenBalanceOf = async function getTokenBalanceOf(tokenAddress, balanceAddress) {
     try {
         var tokenContract = new web3.eth.Contract(minABI, tokenAddress)
+        var balance
+        var decimals
 
-        var balance = await tokenContract.methods.balanceOf(balanceAddress).call()
-        var decimals = await tokenContract.methods.decimals().call()
+        [balance, decimals] = await Promise.all([tokenContract.methods.balanceOf(balanceAddress).call(), tokenContract.methods.decimals().call()])
+
+        if (decimals == 0) {
+            return 0
+        }
 
         return balance / 10 ** decimals
     } catch (e) {
@@ -35,25 +40,28 @@ module.exports.getTokenBalanceOf = async function getTokenBalanceOf(tokenAddress
 
 module.exports.getPriceOfTwoTokensV2 = async function getPriceOfTwoTokensV2(token0Address, token1Address) {
     try {
-        var pair_address = await factoryV2.methods.getPair(token0Address, token1Address).call()
+        var pair_address, pair_address0, pair_address1, pair_address2
+        
+        [pair_address0, pair_address1, pair_address2] = await Promise.all([factoryV2.methods.getPair(token0Address, token1Address).call(), factorySUSHI.methods.getPair(token0Address, token1Address).call(), factorySHIBA.methods.getPair(token0Address, token1Address).call()])
 
-        if (pair_address == "0x0000000000000000000000000000000000000000") {
-            pair_address = await factorySUSHI.methods.getPair(token0Address, token1Address).call()
-        }
-
-        if (pair_address == "0x0000000000000000000000000000000000000000") {
-            pair_address = await factorySHIBA.methods.getPair(token0Address, token1Address).call()
+        if (pair_address0 != "0x0000000000000000000000000000000000000000") {
+            pair_address = pair_address0
+        } else if (pair_address1 != "0x0000000000000000000000000000000000000000") {
+            pair_address = pair_address1
+        } else {
+            pair_address = pair_address2
         }
 
         if (pair_address == "0x0000000000000000000000000000000000000000") {
             return [0, 0, 0]
         }
         
-        var balance0 = await this.getTokenBalanceOf(token0Address, pair_address)
-        var balance1 = await this.getTokenBalanceOf(token1Address, pair_address)
+        var balance0, balance1
+        
+        [balance0, balance1] = await Promise.all([this.getTokenBalanceOf(token0Address, pair_address), this.getTokenBalanceOf(token1Address, pair_address)])
 
-        if (balance1 < 0.1 || balance0 < 0.1) {
-            return [0, balance0, balance1]
+        if (balance1 == 0) {
+            return [0, 0, 0]
         }
 
         return [balance0 / balance1, balance0, balance1]
@@ -91,28 +99,28 @@ module.exports.getFeePriceOfTwoTokensV3 = async function getFeePriceOfTwoTokensV
     try {
         var token0Contract = new web3.eth.Contract(minABI, token0Address)
         var token1Contract = new web3.eth.Contract(minABI, token1Address)
-        var token0Decimals = 0
-        var token1Decimals = 0
+        var token0Decimals
+        var token1Decimals
+        var pool_address
 
-        token0Decimals = await token0Contract.methods.decimals().call()
-        token1Decimals = await token1Contract.methods.decimals().call()
-
-        var pool_address = await factoryV3.methods.getPool(token0Address, token1Address, fee).call()
+        [pool_address, token0Decimals, token1Decimals] = await Promise.all([factoryV3.methods.getPool(token0Address, token1Address, fee).call(), token0Contract.methods.decimals().call(), token1Contract.methods.decimals().call()])
 
         if (pool_address == "0x0000000000000000000000000000000000000000") {
             return [0, 0, 0]
         }
 
         var pool_1 = new web3.eth.Contract(V3_POOL_ABI.abi, pool_address)
-        var balance0 = await this.getTokenBalanceOf(token0Address, pool_address)
-        var balance1 = await this.getTokenBalanceOf(token1Address, pool_address)
+        var balance0
+        var balance1
+        var pool_balance
 
-        var pool_balance = await pool_1.methods.slot0().call()
+        [balance0, balance1, pool_balance] = await Promise.all([this.getTokenBalanceOf(token0Address, pool_address), this.getTokenBalanceOf(token1Address, pool_address), pool_1.methods.slot0().call()])
+        
         var sqrtPriceX96 = pool_balance[0]
         var price = (JSBI.BigInt(sqrtPriceX96) * JSBI.BigInt(sqrtPriceX96)) / JSBI.BigInt(2) ** JSBI.BigInt(192)
 
         if (balance0 < 0.1 || balance1 < 0.1) {
-            return [0, balance0, balance1]
+            return [0, 0, 0]
         }
 
         if (token0Address < token1Address) {

@@ -26,11 +26,16 @@ module.exports.getTokenBalanceOf = async function getTokenBalanceOf(tokenAddress
 module.exports.getPriceOfTwoTokens = async function getPriceOfTwoTokens(token0Address, token1Address) {
     try {
         var pair_address = await factory.methods.getPair(token0Address, token1Address).call()
+
+        if (pair_address == "0x0000000000000000000000000000000000000000") {
+            return [0, 0, 0]
+        }
+        
         var balance0 = await this.getTokenBalanceOf(token0Address, pair_address)
         var balance1 = await this.getTokenBalanceOf(token1Address, pair_address)
 
         if (balance1 < 0.1 || balance0 < 0.1) {
-            return [0, 0, 0]
+            return [0, balance0, balance1]
         }
 
         return [balance0 / balance1, balance0, balance1]
@@ -54,6 +59,9 @@ module.exports.getPriceOfTokenPancake = async function getPriceOfTokenPancake(to
     
         resTmp = await Promise.all(funcArray)
         res.push([resTmp[0][0], resTmp[0][2] * resTmp[0][0]])
+
+        console.log("=================== PancakeSwap ======================")
+        console.log(resTmp)
     
         for (var i = 0; i < baseTokens.length; i ++) {
             res.push([resTmp[1 + i * 2][0] * resTmp[2 + i * 2][0], resTmp[1 + i * 2][2] < resTmp[2 + i * 2][1] ? resTmp[1 + i * 2][0] * resTmp[1 + i * 2][2] : resTmp[1 + i * 2][0] * resTmp[2 + i * 2][1]])
@@ -68,6 +76,7 @@ module.exports.getPriceOfTokenPancake = async function getPriceOfTokenPancake(to
             }
         }
     
+        console.log("=================== PancakeSwap ======================")
         console.log(res)
     
         for (var i = 0; i < res.length; i ++) {

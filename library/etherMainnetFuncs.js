@@ -12,9 +12,13 @@ const baseTokens = require('./etherBaseTokens.json')
 const web3 = new Web3(new Web3.providers.HttpProvider('https://eth-mainnet.alchemyapi.io/v2/I8IUQHQ-q9Wb5nDDcco__u0bPhqYDUjr'))
 const V3_FACTORY_ADDRESS = "0x1F98431c8aD98523631AE4a59f267346ea31F984"
 const V2_FACTORY_ADDRESS = "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f"
+const SUSHI_FACTORY_ADDRESS = "0xC0AEe478e3658e2610c5F7A4A2E1777cE9e4f2Ac"
+const SHIBA_FACTORY_ADDRESS = "0x115934131916C8b277DD010Ee02de363c09d037c"
 const USDC_ADDRESS = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
 const factoryV3 = new web3.eth.Contract(V3_FACTORY_ABI.abi, V3_FACTORY_ADDRESS)
 const factoryV2 = new web3.eth.Contract(V2_FACTORY_ABI.abi, V2_FACTORY_ADDRESS)
+const factorySUSHI = new web3.eth.Contract(V2_FACTORY_ABI.abi, SUSHI_FACTORY_ADDRESS)
+const factorySHIBA = new web3.eth.Contract(V2_FACTORY_ABI.abi, SHIBA_FACTORY_ADDRESS)
 
 module.exports.getTokenBalanceOf = async function getTokenBalanceOf(tokenAddress, balanceAddress) {
     try {
@@ -32,11 +36,24 @@ module.exports.getTokenBalanceOf = async function getTokenBalanceOf(tokenAddress
 module.exports.getPriceOfTwoTokensV2 = async function getPriceOfTwoTokensV2(token0Address, token1Address) {
     try {
         var pair_address = await factoryV2.methods.getPair(token0Address, token1Address).call()
+
+        if (pair_address == "0x0000000000000000000000000000000000000000") {
+            pair_address = await factorySUSHI.methods.getPair(token0Address, token1Address).call()
+        }
+
+        if (pair_address == "0x0000000000000000000000000000000000000000") {
+            pair_address = await factorySHIBA.methods.getPair(token0Address, token1Address).call()
+        }
+
+        if (pair_address == "0x0000000000000000000000000000000000000000") {
+            return [0, 0, 0]
+        }
+        
         var balance0 = await this.getTokenBalanceOf(token0Address, pair_address)
         var balance1 = await this.getTokenBalanceOf(token1Address, pair_address)
 
         if (balance1 < 0.1 || balance0 < 0.1) {
-            return [0, 0, 0]
+            return [0, balance0, balance1]
         }
 
         return [balance0 / balance1, balance0, balance1]
@@ -81,6 +98,11 @@ module.exports.getFeePriceOfTwoTokensV3 = async function getFeePriceOfTwoTokensV
         token1Decimals = await token1Contract.methods.decimals().call()
 
         var pool_address = await factoryV3.methods.getPool(token0Address, token1Address, fee).call()
+
+        if (pool_address == "0x0000000000000000000000000000000000000000") {
+            return [0, 0, 0]
+        }
+
         var pool_1 = new web3.eth.Contract(V3_POOL_ABI.abi, pool_address)
         var balance0 = await this.getTokenBalanceOf(token0Address, pool_address)
         var balance1 = await this.getTokenBalanceOf(token1Address, pool_address)
@@ -90,7 +112,7 @@ module.exports.getFeePriceOfTwoTokensV3 = async function getFeePriceOfTwoTokensV
         var price = (JSBI.BigInt(sqrtPriceX96) * JSBI.BigInt(sqrtPriceX96)) / JSBI.BigInt(2) ** JSBI.BigInt(192)
 
         if (balance0 < 0.1 || balance1 < 0.1) {
-            return [0, 0, 0]
+            return [0, balance0, balance1]
         }
 
         if (token0Address < token1Address) {
@@ -127,6 +149,9 @@ module.exports.getPriceOfTokenV3 = async function getPriceOfTokenV3(tokenAddress
         resTmp = await Promise.all(funcArray)
         res.push([resTmp[0][0], resTmp[0][2] * resTmp[0][0]])
 
+        console.log("=================== Uniswap V3 ======================")
+        console.log(resTmp)
+
         for (var i = 0; i < baseTokens.length; i ++) {
             res.push([resTmp[1 + i * 2][0] * resTmp[2 + i * 2][0], resTmp[1 + i * 2][2] < resTmp[2 + i * 2][1] ? resTmp[1 + i * 2][0] * resTmp[1 + i * 2][2] : resTmp[1 + i * 2][0] * resTmp[2 + i * 2][1]])
         }
@@ -140,6 +165,7 @@ module.exports.getPriceOfTokenV3 = async function getPriceOfTokenV3(tokenAddress
             }
         }
 
+        console.log("=================== Uniswap V3 ======================")
         console.log(res)
 
         for (var i = 0; i < res.length; i ++) {
@@ -170,6 +196,9 @@ module.exports.getPriceOfTokenV2 = async function getPriceOfTokenV2(tokenAddress
     
         resTmp = await Promise.all(funcArray)
         res.push([resTmp[0][0], resTmp[0][2] * resTmp[0][0]])
+
+        console.log("=================== Uniswap V2 ======================")
+        console.log(resTmp)
     
         for (var i = 0; i < baseTokens.length; i ++) {
             res.push([resTmp[1 + i * 2][0] * resTmp[2 + i * 2][0], resTmp[1 + i * 2][2] < resTmp[2 + i * 2][1] ? resTmp[1 + i * 2][0] * resTmp[1 + i * 2][2] : resTmp[1 + i * 2][0] * resTmp[2 + i * 2][1]])
@@ -184,6 +213,7 @@ module.exports.getPriceOfTokenV2 = async function getPriceOfTokenV2(tokenAddress
             }
         }
     
+        console.log("=================== Uniswap V2 ======================")
         console.log(res)
     
         for (var i = 0; i < res.length; i ++) {

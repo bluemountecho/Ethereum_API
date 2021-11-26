@@ -7,6 +7,7 @@ var logger = require('morgan');
 
 var ethRouter = require('./routes/ethRoutes');
 var bscRouter = require('./routes/bscRoutes');
+var testRouter = require('./routes/testRoutes')
 
 var app = express();
 
@@ -22,6 +23,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/ether_mainnet/api/v1', ethRouter);
 app.use('/bsc_mainnet/api/v1', bscRouter);
+app.use('/test', testRouter)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

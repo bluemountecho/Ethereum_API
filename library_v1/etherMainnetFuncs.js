@@ -4,7 +4,7 @@ const JSBI = require('jsbi')
 const V3_FACTORY_ABI = require('@uniswap/v3-core/artifacts/contracts/UniswapV3Factory.sol/UniswapV3Factory.json')
 const V2_FACTORY_ABI = require('@uniswap/v2-core/build/IUniswapV2Factory.json')
 const V3_POOL_ABI = require('@uniswap/v3-core/artifacts/contracts/UniswapV3Pool.sol/UniswapV3Pool.json')
-const V2_PAIR_ABI = require('@uniswap/v2-core/build/IUniswapV2Pair.json')
+// const V2_PAIR_ABI = require('@uniswap/v2-core/build/IUniswapV2Pair.json')
 const minABI = require('./minABI.json')
 const baseTokens = require('./etherBaseTokens.json')
 
@@ -19,89 +19,6 @@ const factoryV3 = new web3.eth.Contract(V3_FACTORY_ABI.abi, V3_FACTORY_ADDRESS)
 const factoryV2 = new web3.eth.Contract(V2_FACTORY_ABI.abi, V2_FACTORY_ADDRESS)
 const factorySUSHI = new web3.eth.Contract(V2_FACTORY_ABI.abi, SUSHI_FACTORY_ADDRESS)
 const factorySHIBA = new web3.eth.Contract(V2_FACTORY_ABI.abi, SHIBA_FACTORY_ADDRESS)
-
-//0x8ad599c3A0ff1De082011EFDDc58f1908eb6e6D8
-
-module.exports.getPriceFromSwapEvent = async function getPriceFromSwapEvent(pairAddress, token0Address, token1Address, abi) {
-    var pairContract = new web3.eth.Contract(abi, pairAddress)
-    var token0Contract = new web3.eth.Contract(minABI, token0Address)
-    var token1Contract = new web3.eth.Contract(minABI, token1Address)
-    var topicPairAddress = "0x000000000000000000000000" + pairAddress.substring(2)
-    var decimals0, decimals1
-    var balance0, balance1
-    var toBlockNumber
-
-    [decimals0, decimals1, toBlockNumber, balance0, balance1] = await Promise.all([token0Contract.methods.decimals().call(), token1Contract.methods.decimals().call(), web3.eth.getBlockNumber(), this.getTokenBalanceOf(token0Address, pairAddress), this.getTokenBalanceOf(token1Address, pairAddress)])
-    
-    let options = {
-        fromBlock: toBlockNumber - 10000,
-        toBlock: 'latest'
-    };
-
-    var results
-    var transactionHash = ''
-    
-    try {
-        results = await pairContract.getPastEvents('Swap', options)
-
-        console.log(pairAddress, results.length)
-
-        if (results.length > 0) {
-            transactionHash = results[results.length - 1].transactionHash
-        }
-    } catch (e) {
-        
-    }
-
-    options.fromBlock = 0
-
-    if (transactionHash == '') {
-        options.toBlock = toBlockNumber - 10000
-
-        for (var from = 0; from < options.toBlock; ) {
-            try {
-                results = await pairContract.getPastEvents('Swap', options)
-        
-                console.log(pairAddress, results.length)
-        
-                if (results.length > 0) {
-                    transactionHash = results[results.length - 1].transactionHash
-                    break
-                } else {
-                    return [0, 0, 0]
-                }
-            } catch (e) {
-                console.log(pairAddress, from)
-                from = Math.floor((from + options.toBlock) / 2) + 1
-                options.fromBlock = from
-            }
-        }
-    }
-
-    if (transactionHash == '') {
-        return [0, 0, 0]
-    }
-
-    var res = await web3.eth.getTransactionReceipt(transactionHash)
-    var swap0, swap1
-    
-    for (var i = 0; i < res.logs.length; i ++) {
-        if (res.logs[i].topics[0] != "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef") continue
-        if (res.logs[i].topics[1].toLowerCase() != topicPairAddress.toLowerCase() && res.logs[i].topics[2].toLowerCase() != topicPairAddress.toLowerCase()) {
-            continue
-        }
-
-        if (res.logs[i].address.toLowerCase() == token0Address.toLowerCase()) {
-            swap0 = JSBI.BigInt(res.logs[i].data)
-        }
-
-        if (res.logs[i].address.toLowerCase() == token1Address.toLowerCase()) {
-            swap1 = JSBI.BigInt(res.logs[i].data)
-        }
-    }
-
-    return [swap0 / swap1 * 10 ** (decimals1 - decimals0), balance0, balance1]
-}
 
 module.exports.getTokenBalanceOf = async function getTokenBalanceOf(tokenAddress, balanceAddress) {
     try {
@@ -139,9 +56,15 @@ module.exports.getPriceOfTwoTokensV2 = async function getPriceOfTwoTokensV2(toke
             return [0, 0, 0]
         }
         
-        var res = await this.getPriceFromSwapEvent(pair_address, token0Address, token1Address, V2_PAIR_ABI.abi)
+        var balance0, balance1
+        
+        [balance0, balance1] = await Promise.all([this.getTokenBalanceOf(token0Address, pair_address), this.getTokenBalanceOf(token1Address, pair_address)])
 
-        return res
+        if (balance1 == 0) {
+            return [0, 0, 0]
+        }
+
+        return [balance0 / balance1, balance0, balance1]
     } catch (e) {
         return [0, 0, 0]
     }
@@ -174,17 +97,45 @@ module.exports.getPriceOfTwoTokensV3 = async function getPriceOfTwoTokensV3(toke
 
 module.exports.getFeePriceOfTwoTokensV3 = async function getFeePriceOfTwoTokensV3(token0Address, token1Address, fee = 100) {
     try {
+        var token0Contract = new web3.eth.Contract(minABI, token0Address)
+        var token1Contract = new web3.eth.Contract(minABI, token1Address)
+        var token0Decimals
+        var token1Decimals
         var pool_address
 
-        pool_address = await factoryV3.methods.getPool(token0Address, token1Address, fee).call()
+        [pool_address, token0Decimals, token1Decimals] = await Promise.all([factoryV3.methods.getPool(token0Address, token1Address, fee).call(), token0Contract.methods.decimals().call(), token1Contract.methods.decimals().call()])
 
         if (pool_address == "0x0000000000000000000000000000000000000000") {
             return [0, 0, 0]
         }
-        
-        var res = await this.getPriceFromSwapEvent(pool_address, token0Address, token1Address, V3_POOL_ABI.abi)
 
-        return res
+        var pool_1 = new web3.eth.Contract(V3_POOL_ABI.abi, pool_address)
+        var balance0
+        var balance1
+        var pool_balance
+
+        [balance0, balance1, pool_balance] = await Promise.all([this.getTokenBalanceOf(token0Address, pool_address), this.getTokenBalanceOf(token1Address, pool_address), pool_1.methods.slot0().call()])
+        
+        var sqrtPriceX96 = pool_balance[0]
+        var price = (JSBI.BigInt(sqrtPriceX96) * JSBI.BigInt(sqrtPriceX96)) / JSBI.BigInt(2) ** JSBI.BigInt(192)
+
+        if (balance0 < 0.1 || balance1 < 0.1) {
+            return [0, 0, 0]
+        }
+
+        if (token0Address < token1Address) {
+            price = price * 10 ** (token0Decimals - token1Decimals);
+        } else {
+            price = price * 10 ** (token1Decimals - token0Decimals);
+        }
+
+        if (token0Address < token1Address) {
+            price = 1 / price;
+        }
+
+        price = price * 100 / (100 + fee / 10000)
+
+        return [price, balance0, balance1]
     } catch (e) {
         return [0, 0, 0]
     }

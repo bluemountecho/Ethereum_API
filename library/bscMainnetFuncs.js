@@ -8,7 +8,8 @@ const minABI = require('./minABI.json')
 const minPairABI = require('./minPairABI.json')
 const baseTokens = require('./bscBaseTokens.json')
 
-const web3 = new Web3(new Web3.providers.HttpProvider('https://bsc-dataseed1.binance.org'))
+const web3 = new Web3(new Web3.providers.HttpProvider('https://bsc-dataseed1.ninicoin.io'))
+//const web3 = new Web3(new Web3.providers.WebsocketProvider('wss://bsc-ws-node.nariox.org:443'))
 const FACTORY_ADDRESS = "0xcA143Ce32Fe78f1f7019d7d551a6402fC5350c73"
 const SUSHI_FACTORY_ADDRESS = "0xc35DADB65012eC5796536bD9864eD8773aBc74C4"
 const BUSD_ADDRESS = "0xe9e7cea3dedca5984780bafc599bd69add087d56"
@@ -54,7 +55,7 @@ module.exports.getPriceFromSwapEvent = async function getPriceFromSwapEvent(pair
     }
     
     let options = {
-        fromBlock: toBlockNumber - 1000,
+        fromBlock: toBlockNumber,
         toBlock: toBlockNumber
     };
 
@@ -65,6 +66,7 @@ module.exports.getPriceFromSwapEvent = async function getPriceFromSwapEvent(pair
     var results
     var transactionHash = ''
     
+    /*
     try {
         results = await pairContract.getPastEvents('Swap', options)
 
@@ -72,7 +74,10 @@ module.exports.getPriceFromSwapEvent = async function getPriceFromSwapEvent(pair
             transactionHash = results[results.length - 1].transactionHash
         }
     } catch (e) {
+        console.log(e)
     }
+
+    console.log(options)
 
     if (transactionHash == '') {
         options.fromBlock = 0
@@ -86,8 +91,11 @@ module.exports.getPriceFromSwapEvent = async function getPriceFromSwapEvent(pair
                 return [0, 0, 0]
             }
         } catch (e) {
+            console.log(e)
         }
     }
+
+    console.log(options)
 
     if (transactionHash == '') {
         var from = 0
@@ -106,11 +114,30 @@ module.exports.getPriceFromSwapEvent = async function getPriceFromSwapEvent(pair
                     options.fromBlock = Math.floor((options.fromBlock + from) / 2)
                 }
             } catch (e) {
+                console.log(e)
                 from = options.fromBlock
                 options.fromBlock = Math.floor((options.fromBlock + options.toBlock) / 2) + 1
                 console.log(pairAddress, options)
             }
         }
+    } */
+
+    var to = toBlockNumber
+
+    for (var from = toBlockNumber - 1000; from >= 0; from -= 1000) {
+        options.fromBlock = from
+        options.toBlock = to
+
+        results = await pairContract.getPastEvents('Swap', options)
+
+        if (results.length > 0) {
+            transactionHash = results[results.length - 1].transactionHash
+            break
+        }
+
+        console.log(options)
+
+        to = from
     }
 
     if (transactionHash == '') {
@@ -119,8 +146,6 @@ module.exports.getPriceFromSwapEvent = async function getPriceFromSwapEvent(pair
 
     var res = await web3.eth.getTransactionReceipt(transactionHash)
     var swap0, swap1
-
-    console.log(res)
     
     for (var i = 0; i < res.logs.length; i ++) {
         if (res.logs[i].address.toLowerCase() != pairAddress.toLowerCase()) continue
@@ -263,6 +288,8 @@ module.exports.getLastPriceFromPair = async function getLastPriceFromPair(pairAd
         var result
 
         [token0Address, token1Address] = await Promise.all([pairContract.methods.token0().call(), pairContract.methods.token1().call()])
+
+        console.log(token0Address, token1Address)
         
         var res = await this.getPriceFromSwapEvent(pairAddress, token0Address, token1Address)
 
@@ -287,11 +314,11 @@ module.exports.getLastPriceFromPair = async function getLastPriceFromPair(pairAd
         var tmp = result[0]
         var price0, price1
         
-        if (token1Address.toLowerCase() == BNB_ADDRESS.toLocaleLowerCase()) {
+        if (token1Address.toLowerCase() == BNB_ADDRESS.toLowerCase()) {
             tmp = 1 / tmp
             price0 = (bnbPrice * tmp).toFixed(20)
             price1 = bnbPrice.toFixed(20)
-        } else if (token0Address.toLowerCase() == BNB_ADDRESS.toLocaleLowerCase()) {
+        } else if (token0Address.toLowerCase() == BNB_ADDRESS.toLowerCase()) {
             price1 = (bnbPrice * tmp).toFixed(20)
             price0 = bnbPrice.toFixed(20)
         } else {

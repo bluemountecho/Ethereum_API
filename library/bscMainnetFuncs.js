@@ -294,7 +294,7 @@ module.exports.getLastPriceFromPair = async function getLastPriceFromPair(pairAd
         var token0Price = res[1].data.price
         var token1Price = res[2].data.price
 
-        result = res
+        result = res[0]
 
         if (result[0] == 0) {
             return {
@@ -306,21 +306,29 @@ module.exports.getLastPriceFromPair = async function getLastPriceFromPair(pairAd
         }
 
         res = await this.getPriceFromSwapEvent("0x58F876857a02D6762E0101bb5C46A8c1ED44Dc16", BNB_ADDRESS, BUSD_ADDRESS, result[1])
-
-        var bnbPrice = 1 / res[0]
-        var tmp = result[0]
-        var price0, price1
         
-        if (token1Address.toLowerCase() == BNB_ADDRESS.toLowerCase()) {
-            tmp = 1 / tmp
-            price0 = (bnbPrice * tmp).toFixed(20)
-            price1 = bnbPrice.toFixed(20)
-        } else if (token0Address.toLowerCase() == BNB_ADDRESS.toLowerCase()) {
-            price1 = (bnbPrice * tmp).toFixed(20)
-            price0 = bnbPrice.toFixed(20)
-        } else {
-            price0 = Number.parseFloat(token0Price).toFixed(20)
-            price1 = Number.parseFloat(token1Price).toFixed(20)
+        var price0, price1
+
+        console.log(result, res)
+
+        try {
+            var bnbPrice = 1 / res[0]
+            var tmp = result[0]
+            
+            if (token1Address.toLowerCase() == BNB_ADDRESS.toLowerCase()) {
+                tmp = 1 / tmp
+                price0 = (bnbPrice * tmp).toFixed(20)
+                price1 = bnbPrice.toFixed(20)
+            } else if (token0Address.toLowerCase() == BNB_ADDRESS.toLowerCase()) {
+                price1 = (bnbPrice * tmp).toFixed(20)
+                price0 = bnbPrice.toFixed(20)
+            } else {
+                price0 = Number.parseFloat(token0Price).toFixed(20)
+                price1 = Number.parseFloat(token1Price).toFixed(20)
+            }
+        } catch (e) {
+            price0 = 0
+            price1 = 0
         }
 
         return {

@@ -6,6 +6,7 @@ const V2_FACTORY_ABI = require('@uniswap/v2-core/build/IUniswapV2Factory.json')
 const V3_POOL_ABI = require('@uniswap/v3-core/artifacts/contracts/UniswapV3Pool.sol/UniswapV3Pool.json')
 const V2_PAIR_ABI = require('@uniswap/v2-core/build/IUniswapV2Pair.json')
 const minABI = require('./minABI.json')
+const minPairABI = require('./minPairABI.json')
 const baseTokens = require('./etherBaseTokens.json')
 
 //const web3 = new Web3(new Web3.providers.HttpProvider('https://mainnet.infura.io/v3/9ea3677d970d4dc99f3f559768b0176c'))
@@ -15,28 +16,64 @@ const V2_FACTORY_ADDRESS = "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f"
 const SUSHI_FACTORY_ADDRESS = "0xC0AEe478e3658e2610c5F7A4A2E1777cE9e4f2Ac"
 const SHIBA_FACTORY_ADDRESS = "0x115934131916C8b277DD010Ee02de363c09d037c"
 const USDC_ADDRESS = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+const ETH_ADDRESS = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
 const factoryV3 = new web3.eth.Contract(V3_FACTORY_ABI.abi, V3_FACTORY_ADDRESS)
 const factoryV2 = new web3.eth.Contract(V2_FACTORY_ABI.abi, V2_FACTORY_ADDRESS)
 const factorySUSHI = new web3.eth.Contract(V2_FACTORY_ABI.abi, SUSHI_FACTORY_ADDRESS)
 const factorySHIBA = new web3.eth.Contract(V2_FACTORY_ABI.abi, SHIBA_FACTORY_ADDRESS)
 
-//0x8ad599c3A0ff1De082011EFDDc58f1908eb6e6D8
+function hexToBn(hex) {
+    if (hex.length % 2) {
+        hex = '0' + hex;
+    }
+  
+    var highbyte = parseInt(hex.slice(0, 2), 16)
+    var bn = BigInt('0x' + hex);
+  
+    if (0x80 & highbyte) {
+        // bn = ~bn; WRONG in JS (would work in other languages)
+    
+        // manually perform two's compliment (flip bits, add one)
+        // (because JS binary operators are incorrect for negatives)
+        bn = BigInt('0b' + bn.toString(2).split('').map(function (i) {
+            return '0' === i ? 1 : 0
+        }).join('')) + BigInt(1);
+        // add the sign character to output string (bytes are unaffected)
+        bn = -bn;
+    }
+  
+    return bn;
+}
 
-module.exports.getPriceFromSwapEvent = async function getPriceFromSwapEvent(pairAddress, token0Address, token1Address, abi) {
-    var pairContract = new web3.eth.Contract(abi, pairAddress)
-    var token0Contract = new web3.eth.Contract(minABI, token0Address)
-    var token1Contract = new web3.eth.Contract(minABI, token1Address)
-    var topicPairAddress = "0x000000000000000000000000" + pairAddress.substring(2)
+module.exports.getPriceFromSwapEvent = async function getPriceFromSwapEvent(pairAddress, token0Address, token1Address, isV2, customToBlock = 0) {
+    var pairContract, token0Contract, token1Contract
+    var abi
+
+    if (isV2) {
+        abi = V2_PAIR_ABI.abi
+    } else {
+        abi = V3_POOL_ABI.abi
+    }
+    
+    [pairContract, token0Contract, token1Contract] = await Promise.all([new web3.eth.Contract(abi, pairAddress), new web3.eth.Contract(minABI, token0Address), new web3.eth.Contract(minABI, token1Address)])
+
     var decimals0, decimals1
-    var balance0, balance1
     var toBlockNumber
 
-    [decimals0, decimals1, toBlockNumber, balance0, balance1] = await Promise.all([token0Contract.methods.decimals().call(), token1Contract.methods.decimals().call(), web3.eth.getBlockNumber(), this.getTokenBalanceOf(token0Address, pairAddress), this.getTokenBalanceOf(token1Address, pairAddress)])
+    [decimals0, decimals1, toBlockNumber] = await Promise.all([token0Contract.methods.decimals().call(), token1Contract.methods.decimals().call(), web3.eth.getBlockNumber()])
+
+    if (customToBlock != 0) {
+        toBlockNumber = customToBlock   
+    }
     
     let options = {
-        fromBlock: toBlockNumber - 10000,
-        toBlock: 'latest'
+        fromBlock: toBlockNumber - 3000,
+        toBlock: toBlockNumber
     };
+
+    if (options.fromBlock < 0) {
+        options.fromBlock = 0
+    }
 
     var results
     var transactionHash = ''
@@ -44,36 +81,47 @@ module.exports.getPriceFromSwapEvent = async function getPriceFromSwapEvent(pair
     try {
         results = await pairContract.getPastEvents('Swap', options)
 
-        console.log(pairAddress, results.length)
-
         if (results.length > 0) {
             transactionHash = results[results.length - 1].transactionHash
         }
     } catch (e) {
-        
     }
 
-    options.fromBlock = 0
+    if (transactionHash == '') {
+        options.fromBlock = 0
+
+        try {
+            results = await pairContract.getPastEvents('Swap', options)
+
+            if (results.length > 0) {
+                transactionHash = results[results.length - 1].transactionHash
+            } else {
+                return [0, 0, 0]
+            }
+        } catch (e) {
+        }
+    }
 
     if (transactionHash == '') {
-        options.toBlock = toBlockNumber - 10000
+        var from = 0
 
-        for (var from = 0; from < options.toBlock; ) {
+        while (true) {
+            if (from > options.toBlock) break
+
             try {
                 results = await pairContract.getPastEvents('Swap', options)
         
-                console.log(pairAddress, results.length)
-        
                 if (results.length > 0) {
                     transactionHash = results[results.length - 1].transactionHash
+                    console.log(results[results.length - 1])
                     break
                 } else {
-                    return [0, 0, 0]
+                    options.fromBlock = Math.floor((options.fromBlock + from) / 2)
                 }
             } catch (e) {
-                console.log(pairAddress, from)
-                from = Math.floor((from + options.toBlock) / 2) + 1
-                options.fromBlock = from
+                from = options.fromBlock
+                options.fromBlock = Math.floor((options.fromBlock + options.toBlock) / 2) + 1
+                console.log(pairAddress, options)
             }
         }
     }
@@ -86,21 +134,24 @@ module.exports.getPriceFromSwapEvent = async function getPriceFromSwapEvent(pair
     var swap0, swap1
     
     for (var i = 0; i < res.logs.length; i ++) {
-        if (res.logs[i].topics[0] != "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef") continue
-        if (res.logs[i].topics[1].toLowerCase() != topicPairAddress.toLowerCase() && res.logs[i].topics[2].toLowerCase() != topicPairAddress.toLowerCase()) {
-            continue
-        }
+        if (res.logs[i].address.toLowerCase() != pairAddress.toLowerCase()) continue
+        if (isV2 && res.logs[i].topics[0] == "0xd78ad95fa46c994b6551d0da85fc275fe613ce37657fb8d5e3d130840159d822") {
+            var amt0 = Number.parseInt(hexToBn(res.logs[i].data.substr(2, 64)))
+            var amt1 = Number.parseInt(hexToBn(res.logs[i].data.substr(66, 64)))
+            var amt2 = Number.parseInt(hexToBn(res.logs[i].data.substr(130, 64)))
+            var amt3 = Number.parseInt(hexToBn(res.logs[i].data.substr(194, 64)))
 
-        if (res.logs[i].address.toLowerCase() == token0Address.toLowerCase()) {
-            swap0 = JSBI.BigInt(res.logs[i].data)
-        }
-
-        if (res.logs[i].address.toLowerCase() == token1Address.toLowerCase()) {
-            swap1 = JSBI.BigInt(res.logs[i].data)
+            swap0 = amt0 + amt2
+            swap1 = amt1 + amt3
+            break
+        } else if (isV2 == false && res.logs[i].topics[0] == "0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67") {
+            swap0 = Number.parseInt(hexToBn(res.logs[i].data.substr(2, 64)))
+            swap1 = Number.parseInt(hexToBn(res.logs[i].data.substr(66, 64)))
+            break
         }
     }
 
-    return [swap0 / swap1 * 10 ** (decimals1 - decimals0), balance0, balance1]
+    return [Math.abs(swap0 / swap1 * 10 ** (decimals1 - decimals0)), res.blockNumber]
 }
 
 module.exports.getTokenBalanceOf = async function getTokenBalanceOf(tokenAddress, balanceAddress) {
@@ -139,9 +190,15 @@ module.exports.getPriceOfTwoTokensV2 = async function getPriceOfTwoTokensV2(toke
             return [0, 0, 0]
         }
         
-        var res = await this.getPriceFromSwapEvent(pair_address, token0Address, token1Address, V2_PAIR_ABI.abi)
+        var balance0, balance1
+        
+        [balance0, balance1] = await Promise.all([this.getTokenBalanceOf(token0Address, pair_address), this.getTokenBalanceOf(token1Address, pair_address)])
 
-        return res
+        if (balance1 == 0) {
+            return [0, 0, 0]
+        }
+
+        return [balance0 / balance1, balance0, balance1]
     } catch (e) {
         return [0, 0, 0]
     }
@@ -174,17 +231,45 @@ module.exports.getPriceOfTwoTokensV3 = async function getPriceOfTwoTokensV3(toke
 
 module.exports.getFeePriceOfTwoTokensV3 = async function getFeePriceOfTwoTokensV3(token0Address, token1Address, fee = 100) {
     try {
+        var token0Contract, token1Contract
+        [token0Contract, token1Contract] = await Promise.all([new web3.eth.Contract(minABI, token0Address), new web3.eth.Contract(minABI, token1Address)])
+        var token0Decimals
+        var token1Decimals
         var pool_address
 
-        pool_address = await factoryV3.methods.getPool(token0Address, token1Address, fee).call()
+        [pool_address, token0Decimals, token1Decimals] = await Promise.all([factoryV3.methods.getPool(token0Address, token1Address, fee).call(), token0Contract.methods.decimals().call(), token1Contract.methods.decimals().call()])
 
         if (pool_address == "0x0000000000000000000000000000000000000000") {
             return [0, 0, 0]
         }
-        
-        var res = await this.getPriceFromSwapEvent(pool_address, token0Address, token1Address, V3_POOL_ABI.abi)
 
-        return res
+        var pool_1 = new web3.eth.Contract(V3_POOL_ABI.abi, pool_address)
+        var balance0
+        var balance1
+        var pool_balance
+
+        [balance0, balance1, pool_balance] = await Promise.all([this.getTokenBalanceOf(token0Address, pool_address), this.getTokenBalanceOf(token1Address, pool_address), pool_1.methods.slot0().call()])
+        
+        var sqrtPriceX96 = pool_balance[0]
+        var price = (JSBI.BigInt(sqrtPriceX96) * JSBI.BigInt(sqrtPriceX96)) / JSBI.BigInt(2) ** JSBI.BigInt(192)
+
+        if (balance0 < 0.1 || balance1 < 0.1) {
+            return [0, 0, 0]
+        }
+
+        if (token0Address < token1Address) {
+            price = price * 10 ** (token0Decimals - token1Decimals);
+        } else {
+            price = price * 10 ** (token1Decimals - token0Decimals);
+        }
+
+        if (token0Address < token1Address) {
+            price = 1 / price;
+        }
+
+        price = price * 100 / (100 + fee / 10000)
+
+        return [price, balance0, balance1]
     } catch (e) {
         return [0, 0, 0]
     }
@@ -308,6 +393,75 @@ module.exports.getPriceOfToken = async function getPriceOfToken(tokenAddress) {
             }
         }
     } catch (e) {
+        return {
+            'status': 'fail',
+            'data': {
+
+            }
+        }
+    }
+}
+
+module.exports.getLastPriceFromPair = async function getLastPriceFromPair(pairAddress) {
+    try {
+        var pairContract = new web3.eth.Contract(minPairABI, pairAddress)
+        var token0Address, token1Address
+        var result
+
+        [token0Address, token1Address] = await Promise.all([pairContract.methods.token0().call(), pairContract.methods.token1().call()])
+        
+        var res = await Promise.all([this.getPriceFromSwapEvent(pairAddress, token0Address, token1Address, true), this.getPriceFromSwapEvent(pairAddress, token0Address, token1Address, false)])
+
+        result = res[0]
+
+        if (res[0][0] == 0) {
+            result = res[1]
+        }
+
+        if (result[0] == 0) {
+            return {
+                'status': 'fail',
+                'data': {
+    
+                }
+            }
+        }
+
+        res = await Promise.all([
+            this.getPriceFromSwapEvent("0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc", USDC_ADDRESS, ETH_ADDRESS, true, result[1]),
+            //this.getPriceFromSwapEvent("0xE0554a476A092703abdB3Ef35c80e0D76d32939F", USDC_ADDRESS, ETH_ADDRESS, false, result[1]),
+            //this.getPriceFromSwapEvent("0x88e6A0c2dDD26FEEb64F039a2c41296FcB3f5640", USDC_ADDRESS, ETH_ADDRESS, false, result[1]),
+            this.getPriceFromSwapEvent("0x8ad599c3A0ff1De082011EFDDc58f1908eb6e6D8", USDC_ADDRESS, ETH_ADDRESS, false, result[1]),
+            //this.getPriceFromSwapEvent("0x7BeA39867e4169DBe237d55C8242a8f2fcDcc387", USDC_ADDRESS, ETH_ADDRESS, false, result[1])
+        ])
+
+        var ethPrice = res[0][1] > res[1][1] ? res[0][0] : res[1][0]
+        var tmp = result[0]
+        var price0, price1
+        
+        if (token1Address.toLowerCase() == ETH_ADDRESS.toLowerCase()) {
+            tmp = 1 / tmp
+            price0 = (ethPrice * tmp).toFixed(20)
+            price1 = ethPrice.toFixed(20)
+        } else if (token0Address.toLowerCase() == ETH_ADDRESS.toLowerCase()) {
+            price1 = (ethPrice * tmp).toFixed(20)
+            price0 = ethPrice.toFixed(20)
+        } else {
+            price0 = (0).toFixed(20)
+            price1 = (0).toFixed(20)
+        }
+
+        return {
+            'status': 'success',
+            'data': {
+                token0Price: price0,
+                token1Price: price1,
+                token0: token0Address,
+                token1: token1Address
+            }
+        }
+    } catch (e) {
+        console.log(e)
         return {
             'status': 'fail',
             'data': {

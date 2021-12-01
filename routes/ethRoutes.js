@@ -9,4 +9,11 @@ router.get('/usd_price/:tokenAddr', function(req, res, next) {
   })
 });
 
+router.get('/pair_price/:pairAddr', function(req, res, next) {
+  etherMainnetFuncs.getLastPriceFromPair(req.params.pairAddr)
+  .then((data) => {
+    res.send(JSON.stringify(data))
+  })
+});
+
 module.exports = router;

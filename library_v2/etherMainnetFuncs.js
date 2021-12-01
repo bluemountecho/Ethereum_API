@@ -7,6 +7,7 @@ const V3_POOL_ABI = require('@uniswap/v3-core/artifacts/contracts/UniswapV3Pool.
 const V2_PAIR_ABI = require('@uniswap/v2-core/build/IUniswapV2Pair.json')
 const minABI = require('./minABI.json')
 const baseTokens = require('./etherBaseTokens.json')
+const axios = require('axios')
 
 //const web3 = new Web3(new Web3.providers.HttpProvider('https://mainnet.infura.io/v3/9ea3677d970d4dc99f3f559768b0176c'))
 const web3 = new Web3(new Web3.providers.HttpProvider('https://eth-mainnet.alchemyapi.io/v2/I8IUQHQ-q9Wb5nDDcco__u0bPhqYDUjr'))
@@ -22,85 +23,86 @@ const factorySHIBA = new web3.eth.Contract(V2_FACTORY_ABI.abi, SHIBA_FACTORY_ADD
 
 //0x8ad599c3A0ff1De082011EFDDc58f1908eb6e6D8
 
+module.exports.getLastSwapValueAlchemy = async function getLastSwapValueAlchemy(pairAddress, tokenAddress, to, isFrom = true) {
+    var from = 0, befFrom = 0
+    var options = {
+        "jsonrpc": "2.0",
+        "id": 0,
+        "method": "alchemy_getAssetTransfers",
+        "params": [
+            {
+                "fromBlock": "0x0",
+                "toBlock": "latest",
+                "contractAddresses": [
+                    tokenAddress
+                ],
+                "maxCount": "0x100",
+                "excludeZeroValue": true,
+                "category": [
+                    "token"
+                ]
+            }
+        ]
+    }
+
+    if (isFrom) {
+        options.params[0].fromAddress = pairAddress
+    } else {
+        options.params[0].toAddress = pairAddress
+    }
+
+    var res = (await axios.post('https://eth-mainnet.alchemyapi.io/v2/I8IUQHQ-q9Wb5nDDcco__u0bPhqYDUjr', options)).data.result
+
+    if (res.transfers.length == 0) {
+        return 0
+    }
+
+    if (res.pageKey != undefined) {
+        from = Math.floor((from + to) / 2) + 1
+    } else {
+        console.log(pairAddress, res.transfers[res.transfers.length - 1].value)
+        return res.transfers[res.transfers.length - 1].value
+    }
+
+    while (true) {
+        if (from > to) return 0
+
+        options.params[0].fromBlock = "0x" + from.toString(16)
+        console.log(pairAddress, options)
+
+        var res = (await axios.post('https://eth-mainnet.alchemyapi.io/v2/I8IUQHQ-q9Wb5nDDcco__u0bPhqYDUjr', options)).data.result
+    
+        if (res.pageKey == undefined) {
+            if (res.transfers.length > 0) {
+                return res.transfers[res.transfers.length - 1].value
+            } else {
+                from = Math.floor((from + befFrom) / 2) + 1
+            }
+        } else {
+            befFrom = from
+            from = Math.floor((from + to) / 2) + 1
+        }
+    }
+}
+
 module.exports.getPriceFromSwapEvent = async function getPriceFromSwapEvent(pairAddress, token0Address, token1Address, abi) {
-    var pairContract = new web3.eth.Contract(abi, pairAddress)
     var token0Contract = new web3.eth.Contract(minABI, token0Address)
     var token1Contract = new web3.eth.Contract(minABI, token1Address)
-    var topicPairAddress = "0x000000000000000000000000" + pairAddress.substring(2)
     var decimals0, decimals1
     var balance0, balance1
     var toBlockNumber
 
     [decimals0, decimals1, toBlockNumber, balance0, balance1] = await Promise.all([token0Contract.methods.decimals().call(), token1Contract.methods.decimals().call(), web3.eth.getBlockNumber(), this.getTokenBalanceOf(token0Address, pairAddress), this.getTokenBalanceOf(token1Address, pairAddress)])
     
-    let options = {
-        fromBlock: toBlockNumber - 10000,
-        toBlock: 'latest'
-    };
+    var swap0 = await this.getLastSwapValueAlchemy(pairAddress, token0Address, toBlockNumber, false), swap1 = await this.getLastSwapValueAlchemy(pairAddress, token0Address, toBlockNumber)
 
-    var results
-    var transactionHash = ''
-    
-    try {
-        results = await pairContract.getPastEvents('Swap', options)
+    console.log(pairAddress, swap0, swap1)
 
-        console.log(pairAddress, results.length)
-
-        if (results.length > 0) {
-            transactionHash = results[results.length - 1].transactionHash
-        }
-    } catch (e) {
-        
-    }
-
-    options.fromBlock = 0
-
-    if (transactionHash == '') {
-        options.toBlock = toBlockNumber - 10000
-
-        for (var from = 0; from < options.toBlock; ) {
-            try {
-                results = await pairContract.getPastEvents('Swap', options)
-        
-                console.log(pairAddress, results.length)
-        
-                if (results.length > 0) {
-                    transactionHash = results[results.length - 1].transactionHash
-                    break
-                } else {
-                    return [0, 0, 0]
-                }
-            } catch (e) {
-                console.log(pairAddress, from)
-                from = Math.floor((from + options.toBlock) / 2) + 1
-                options.fromBlock = from
-            }
-        }
-    }
-
-    if (transactionHash == '') {
+    if (swap1 == 0) {
         return [0, 0, 0]
     }
 
-    var res = await web3.eth.getTransactionReceipt(transactionHash)
-    var swap0, swap1
-    
-    for (var i = 0; i < res.logs.length; i ++) {
-        if (res.logs[i].topics[0] != "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef") continue
-        if (res.logs[i].topics[1].toLowerCase() != topicPairAddress.toLowerCase() && res.logs[i].topics[2].toLowerCase() != topicPairAddress.toLowerCase()) {
-            continue
-        }
-
-        if (res.logs[i].address.toLowerCase() == token0Address.toLowerCase()) {
-            swap0 = JSBI.BigInt(res.logs[i].data)
-        }
-
-        if (res.logs[i].address.toLowerCase() == token1Address.toLowerCase()) {
-            swap1 = JSBI.BigInt(res.logs[i].data)
-        }
-    }
-
-    return [swap0 / swap1 * 10 ** (decimals1 - decimals0), balance0, balance1]
+    return [swap0 / swap1, balance0, balance1]
 }
 
 module.exports.getTokenBalanceOf = async function getTokenBalanceOf(tokenAddress, balanceAddress) {

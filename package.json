@@ -6,6 +6,7 @@
     "start": "node ./bin/www"
   },
   "dependencies": {
+    "@alch/alchemy-web3": "^1.1.8",
     "@gnosis.pm/safe-apps-web3-react": "^0.6.5",
     "@openzeppelin/contracts": "^3.4.1",
     "@pancakeswap-libs/pancake-swap-core": "^0.1.0",

@@ -124,7 +124,7 @@ module.exports.getPriceFromSwapEvent = async function getPriceFromSwapEvent(pair
 
     var to = toBlockNumber
 
-    for (var from = toBlockNumber - 1000; from >= 0; from -= 1000) {
+    for (var from = toBlockNumber - 1000; from >= toBlockNumber - 10000; from -= 1000) {
         options.fromBlock = from
         options.toBlock = to
 
@@ -134,8 +134,6 @@ module.exports.getPriceFromSwapEvent = async function getPriceFromSwapEvent(pair
             transactionHash = results[results.length - 1].transactionHash
             break
         }
-
-        console.log(options)
 
         to = from
     }
@@ -291,7 +289,10 @@ module.exports.getLastPriceFromPair = async function getLastPriceFromPair(pairAd
 
         console.log(token0Address, token1Address)
         
-        var res = await this.getPriceFromSwapEvent(pairAddress, token0Address, token1Address)
+        var res = await Promise.all([this.getPriceFromSwapEvent(pairAddress, token0Address, token1Address), this.getPriceOfToken(token0Address), this.getPriceOfToken(token1Address)])
+
+        var token0Price = res[1].data.price
+        var token1Price = res[2].data.price
 
         result = res
 
@@ -304,11 +305,7 @@ module.exports.getLastPriceFromPair = async function getLastPriceFromPair(pairAd
             }
         }
 
-        console.log(res)
-
         res = await this.getPriceFromSwapEvent("0x58F876857a02D6762E0101bb5C46A8c1ED44Dc16", BNB_ADDRESS, BUSD_ADDRESS, result[1])
-
-        console.log(res)
 
         var bnbPrice = 1 / res[0]
         var tmp = result[0]
@@ -322,8 +319,8 @@ module.exports.getLastPriceFromPair = async function getLastPriceFromPair(pairAd
             price1 = (bnbPrice * tmp).toFixed(20)
             price0 = bnbPrice.toFixed(20)
         } else {
-            price0 = (0).toFixed(20)
-            price1 = (0).toFixed(20)
+            price0 = Number.parseFloat(token0Price).toFixed(20)
+            price1 = Number.parseFloat(token1Price).toFixed(20)
         }
 
         return {

@@ -410,7 +410,10 @@ module.exports.getLastPriceFromPair = async function getLastPriceFromPair(pairAd
 
         [token0Address, token1Address] = await Promise.all([pairContract.methods.token0().call(), pairContract.methods.token1().call()])
         
-        var res = await Promise.all([this.getPriceFromSwapEvent(pairAddress, token0Address, token1Address, true), this.getPriceFromSwapEvent(pairAddress, token0Address, token1Address, false)])
+        var res = await Promise.all([this.getPriceFromSwapEvent(pairAddress, token0Address, token1Address, true), this.getPriceFromSwapEvent(pairAddress, token0Address, token1Address, false), this.getPriceOfToken(token0Address), this.getPriceOfToken(token1Address)])
+
+        var token0Price = res[2].data.price
+        var token1Price = res[3].data.price
 
         result = res[0]
 
@@ -447,8 +450,8 @@ module.exports.getLastPriceFromPair = async function getLastPriceFromPair(pairAd
             price1 = (ethPrice * tmp).toFixed(20)
             price0 = ethPrice.toFixed(20)
         } else {
-            price0 = (0).toFixed(20)
-            price1 = (0).toFixed(20)
+            price0 = Number.parseFloat(token0Price).toFixed(20)
+            price1 = Number.parseFloat(token1Price).toFixed(20)
         }
 
         return {

@@ -67,4 +67,45 @@ async function getUniswapV2PairHistory() {
     console.log('Finished with ' + sum + ' rows!')
 }
 
-getUniswapV2PairHistory()
+async function getUniswapV3PairHistory() {
+    var fromBlock = 0, toBlock = 13835794
+    var sum = 0
+
+    for (var i = fromBlock; i < toBlock; i += 10000) {
+        var from = i
+        var to = i + 9999
+
+        if (to > toBlock) to = toBlock
+
+        try {
+            let options = {
+                fromBlock: from,
+                toBlock: to
+            };
+    
+            results = await factoryV3.getPastEvents('PoolCreated', options)
+    
+            var data = []
+    
+            for (var j = 0; j < results.length; j ++) {
+                data.push({
+                    token0Address: results[j].returnValues.token0,
+                    token1Address: results[j].returnValues.token1,
+                    pairAddress: results[j].returnValues.pool,
+                    swapName: 'UniswapV3'
+                })
+            }
+    
+            await knex('eth_pairs').insert(data)
+        } catch (err) {
+            console.log(err)
+        }
+
+        console.log(i, results.length)
+        sum += results.length
+    }
+
+    console.log('Finished with ' + sum + ' rows!')
+}
+
+getUniswapV3PairHistory()

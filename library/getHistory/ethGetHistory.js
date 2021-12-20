@@ -27,7 +27,7 @@ const knex = require('knex')({
 })
 
 async function getUniswapV2PairHistory() {
-    var fromBlock = 9500000, toBlock = 13835794
+    var fromBlock = 13830000, toBlock = 13835794
     var sum = 0
 
     for (var i = fromBlock; i < toBlock; i += 10000) {
@@ -48,10 +48,10 @@ async function getUniswapV2PairHistory() {
     
             for (var j = 0; j < results.length; j ++) {
                 data.push({
-                    token0Address: results[j].returnValues.token0,
-                    token1Address: results[j].returnValues.token1,
-                    pairAddress: results[j].returnValues.pair,
-                    swapName: 'UniswapV2'
+                    token0Address: '0x' + results[j].raw.topics[1].substr(26, 40).toLowerCase(),
+                    token1Address: '0x' + results[j].raw.topics[2].substr(26, 40).toLowerCase(),
+                    pairAddress: '0x' + results[j].raw.data.substr(26, 40).toLowerCase(),
+                    factoryAddress: results[j].address.toLowerCase()
                 })
             }
     
@@ -68,7 +68,7 @@ async function getUniswapV2PairHistory() {
 }
 
 async function getUniswapV3PairHistory() {
-    var fromBlock = 0, toBlock = 13835794
+    var fromBlock = 13830000, toBlock = 13835794
     var sum = 0
 
     for (var i = fromBlock; i < toBlock; i += 10000) {
@@ -88,15 +88,60 @@ async function getUniswapV3PairHistory() {
             var data = []
     
             for (var j = 0; j < results.length; j ++) {
+                console.log(results[j])
                 data.push({
-                    token0Address: results[j].returnValues.token0,
-                    token1Address: results[j].returnValues.token1,
-                    pairAddress: results[j].returnValues.pool,
-                    swapName: 'UniswapV3'
+                    token0Address: '0x' + results[j].raw.topics[1].substr(26, 40).toLowerCase(),
+                    token1Address: '0x' + results[j].raw.topics[2].substr(26, 40).toLowerCase(),
+                    pairAddress: '0x' + results[j].raw.data.substr(90, 40).toLowerCase(),
+                    factoryAddress: results[j].address.toLowerCase()
                 })
             }
     
             await knex('eth_pairs').insert(data)
+        } catch (err) {
+            console.log(err)
+        }
+
+        console.log(i, results.length)
+        sum += results.length
+    }
+
+    console.log('Finished with ' + sum + ' rows!')
+}
+
+async function getUniswapV2PairPriceHistory() {
+    var fromBlock = 13834794, toBlock = 13835794
+    var sum = 0
+
+    for (var i = fromBlock; i < toBlock; i += 10000) {
+        var from = i
+        var to = i + 9999
+
+        if (to > toBlock) to = toBlock
+
+        try {
+            let options = {
+                fromBlock: from,
+                toBlock: to,
+                topics: ['0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67']
+            };
+    
+            results = await web3.eth.getPastLogs(options)
+
+            console.log(results)
+    
+            /*var data = []
+    
+            for (var j = 0; j < results.length; j ++) {
+                data.push({
+                    token0Address: results[j].returnValues.token0,
+                    token1Address: results[j].returnValues.token1,
+                    pairAddress: results[j].returnValues.pair,
+                    swapName: 'UniswapV2'
+                })
+            }
+    
+            await knex('eth_pairs').insert(data)*/
         } catch (err) {
             console.log(err)
         }

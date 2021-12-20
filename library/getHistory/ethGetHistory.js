@@ -43,7 +43,6 @@ async function getUniswapV2PairHistory() {
         };
 
         results = await web3.eth.getPastLogs(options)
-        console.log(results)
 
         for (var j = 0; j < results.length; j ++) {
             try {
@@ -70,7 +69,7 @@ async function getUniswapV2PairHistory() {
 }
 
 async function getUniswapV3PairHistory() {
-    var fromBlock = 13830000, toBlock = 13835794
+    var fromBlock = 13835000, toBlock = 13840672
     var sum = 0
 
     for (var i = fromBlock; i < toBlock; i += 10000) {

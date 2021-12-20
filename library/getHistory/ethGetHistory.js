@@ -81,24 +81,29 @@ async function getUniswapV3PairHistory() {
         try {
             let options = {
                 fromBlock: from,
-                toBlock: to
+                toBlock: to,
+                topics: ['0x783cca1c0412dd0d695e784568c96da2e9c22ff989357a2e8b1d9b2b4e6b7118']
             };
     
-            results = await factoryV3.getPastEvents('PoolCreated', options)
-    
+            results = await web3.eth.getPastLogs(options)
             var data = []
     
             for (var j = 0; j < results.length; j ++) {
-                console.log(results[j])
-                data.push({
-                    token0Address: '0x' + results[j].raw.topics[1].substr(26, 40).toLowerCase(),
-                    token1Address: '0x' + results[j].raw.topics[2].substr(26, 40).toLowerCase(),
-                    pairAddress: '0x' + results[j].raw.data.substr(90, 40).toLowerCase(),
-                    factoryAddress: results[j].address.toLowerCase()
-                })
+                try {
+                    await knex('eth_pairs').insert({
+                        token0Address: '0x' + results[j].topics[1].substr(26, 40).toLowerCase(),
+                        token1Address: '0x' + results[j].topics[2].substr(26, 40).toLowerCase(),
+                        pairAddress: '0x' + results[j].data.substr(90, 40).toLowerCase(),
+                        factoryAddress: results[j].address.toLowerCase()
+                    })
+                } catch (err) {
+                    await knex('eth_pairs').update({
+                        token0Address: '0x' + results[j].topics[1].substr(26, 40).toLowerCase(),
+                        token1Address: '0x' + results[j].topics[2].substr(26, 40).toLowerCase(),
+                        factoryAddress: results[j].address.toLowerCase()
+                    }).where('pairAddress', '0x' + results[j].data.substr(90, 40).toLowerCase())
+                }
             }
-    
-            await knex('eth_pairs').insert(data)
         } catch (err) {
             console.log(err)
         }
@@ -154,4 +159,5 @@ async function getUniswapV2PairPriceHistory() {
     console.log('Finished with ' + sum + ' rows!')
 }
 
-getUniswapV2PairHistory()
+//getUniswapV2PairHistory()
+getUniswapV3PairHistory()

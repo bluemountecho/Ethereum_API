@@ -27,7 +27,7 @@ const knex = require('knex')({
 })
 
 async function getUniswapV2PairHistory() {
-    var fromBlock = 13830000, toBlock = 13835794
+    var fromBlock = 0, toBlock = 13840672
     var sum = 0
 
     for (var i = fromBlock; i < toBlock; i += 10000) {
@@ -35,29 +35,29 @@ async function getUniswapV2PairHistory() {
         var to = i + 9999
 
         if (to > toBlock) to = toBlock
+        
+        let options = {
+            fromBlock: from,
+            toBlock: to
+        };
 
-        try {
-            let options = {
-                fromBlock: from,
-                toBlock: to
-            };
-    
-            results = await factoryV2.getPastEvents('PairCreated', options)
-    
-            var data = []
-    
-            for (var j = 0; j < results.length; j ++) {
-                data.push({
+        results = await factoryV2.getPastEvents('PairCreated', options)
+
+        for (var j = 0; j < results.length; j ++) {
+            try {
+                await knex('eth_pairs').insert({
                     token0Address: '0x' + results[j].raw.topics[1].substr(26, 40).toLowerCase(),
                     token1Address: '0x' + results[j].raw.topics[2].substr(26, 40).toLowerCase(),
                     pairAddress: '0x' + results[j].raw.data.substr(26, 40).toLowerCase(),
                     factoryAddress: results[j].address.toLowerCase()
                 })
+            } catch (err) {
+                await knex('eth_pairs').update({
+                    token0Address: '0x' + results[j].raw.topics[1].substr(26, 40).toLowerCase(),
+                    token1Address: '0x' + results[j].raw.topics[2].substr(26, 40).toLowerCase(),
+                    factoryAddress: results[j].address.toLowerCase()
+                }).where('pairAddress', '0x' + results[j].raw.data.substr(26, 40).toLowerCase())
             }
-    
-            await knex('eth_pairs').insert(data)
-        } catch (err) {
-            console.log(err)
         }
 
         console.log(i, results.length)
@@ -153,4 +153,4 @@ async function getUniswapV2PairPriceHistory() {
     console.log('Finished with ' + sum + ' rows!')
 }
 
-getUniswapV3PairHistory()
+getUniswapV2PairHistory()

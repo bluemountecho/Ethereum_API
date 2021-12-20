@@ -1,20 +1,84 @@
 Web3 = require('web3')
 
-const V3_FACTORY_ABI = require('@uniswap/v3-core/artifacts/contracts/UniswapV3Factory.sol/UniswapV3Factory.json')
-const V2_FACTORY_ABI = require('@uniswap/v2-core/build/IUniswapV2Factory.json')
+const minERC20ABI = [
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "name",
+        "outputs": [
+            {
+                "name": "",
+                "type": "string"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "decimals",
+        "outputs": [
+            {
+                "name": "",
+                "type": "uint8"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "symbol",
+        "outputs": [
+            {
+                "name": "",
+                "type": "string"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    }
+]
 
-//const web3 = new Web3(new Web3.providers.HttpProvider('https://mainnet.infura.io/v3/9ea3677d970d4dc99f3f559768b0176c'))
+const minPairABI = [
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "token0",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "token1",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    }
+]
+
 const web3 = new Web3(new Web3.providers.HttpProvider('https://eth-mainnet.alchemyapi.io/v2/I8IUQHQ-q9Wb5nDDcco__u0bPhqYDUjr'))
-const V3_FACTORY_ADDRESS = "0x1F98431c8aD98523631AE4a59f267346ea31F984"
-const V2_FACTORY_ADDRESS = "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f"
-const SUSHI_FACTORY_ADDRESS = "0xC0AEe478e3658e2610c5F7A4A2E1777cE9e4f2Ac"
-const SHIBA_FACTORY_ADDRESS = "0x115934131916C8b277DD010Ee02de363c09d037c"
-const USDC_ADDRESS = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
-const ETH_ADDRESS = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
-const factoryV3 = new web3.eth.Contract(V3_FACTORY_ABI.abi, V3_FACTORY_ADDRESS)
-const factoryV2 = new web3.eth.Contract(V2_FACTORY_ABI.abi, V2_FACTORY_ADDRESS)
-const factorySUSHI = new web3.eth.Contract(V2_FACTORY_ABI.abi, SUSHI_FACTORY_ADDRESS)
-const factorySHIBA = new web3.eth.Contract(V2_FACTORY_ABI.abi, SHIBA_FACTORY_ADDRESS)
 const knex = require('knex')({
     client: 'mysql',
     connection: {
@@ -25,6 +89,56 @@ const knex = require('knex')({
       database : 'ethereum_api'
     }
 })
+
+function hexToBn(hex) {
+    if (hex.length % 2) {
+        hex = '0' + hex;
+    }
+  
+    var highbyte = parseInt(hex.slice(0, 2), 16)
+    var bn = BigInt('0x' + hex);
+  
+    if (0x80 & highbyte) {
+        // bn = ~bn; WRONG in JS (would work in other languages)
+    
+        // manually perform two's compliment (flip bits, add one)
+        // (because JS binary operators are incorrect for negatives)
+        bn = BigInt('0b' + bn.toString(2).split('').map(function (i) {
+            return '0' === i ? 1 : 0
+        }).join('')) + BigInt(1);
+        // add the sign character to output string (bytes are unaffected)
+        bn = -bn;
+    }
+  
+    return bn;
+}
+
+async function getTokenInfos(tokenAddress) {
+    const contract = new web3.eth.Contract(minERC20ABI, tokenAddress)
+    var decimals, symbol, name
+
+    [decimals, symbol, name] = await Promise.all([
+        contract.methods.decimals().call(),
+        contract.methods.symbol().call(),
+        contract.methods.name().call()
+    ])
+
+    return [decimals, symbol, name]
+}
+
+async function getPairDecimals(pairAddress) {
+    var pairContract = new web3.eth.Contract(minPairABI, pairAddress)
+    var token0Address, token1Address
+
+    [token0Address, token1Address] = await Promise.all([pairContract.methods.token0().call(), pairContract.methods.token1().call()])
+    
+    var res = await Promise.all([
+        getTokenInfos(token0Address),
+        getTokenInfos(token1Address)
+    ])
+
+    return res[1][0] - res[0][0]
+}
 
 async function getUniswapV2PairHistory() {
     var fromBlock = 0, toBlock = 13840672
@@ -116,42 +230,56 @@ async function getUniswapV3PairHistory() {
 }
 
 async function getUniswapV2PairPriceHistory() {
-    var fromBlock = 13834794, toBlock = 13835794
+    var fromBlock = 13840672, toBlock = 0
     var sum = 0
+    var isVisit = []
 
-    for (var i = fromBlock; i < toBlock; i += 10000) {
-        var from = i
-        var to = i + 9999
+    for (var i = fromBlock; i > toBlock; i -= 1000) {
+        var to = i
+        var from = i - 999
 
-        if (to > toBlock) to = toBlock
+        if (from < toBlock) from = toBlock
+        
+        let options = {
+            fromBlock: from,
+            toBlock: to,
+            topics: ['0xd78ad95fa46c994b6551d0da85fc275fe613ce37657fb8d5e3d130840159d822']
+        };
 
-        try {
-            let options = {
-                fromBlock: from,
-                toBlock: to,
-                topics: ['0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67']
-            };
-    
-            results = await web3.eth.getPastLogs(options)
+        results = await web3.eth.getPastLogs(options)
 
-            console.log(results)
-    
-            /*var data = []
-    
-            for (var j = 0; j < results.length; j ++) {
-                data.push({
-                    token0Address: results[j].returnValues.token0,
-                    token1Address: results[j].returnValues.token1,
-                    pairAddress: results[j].returnValues.pair,
-                    swapName: 'UniswapV2'
-                })
+        for (var j = results.length - 1; j >= 0; j --) {
+            try {
+                if (isVisit[results[j].address]) continue
+
+                var rows = await knex('eth_pairs').select('*').where('pairAddress', results[j].address.toLowerCase())
+                
+                if (rows.length != 0 && rows[0].lastPrice != 0) {
+                    isVisit[results[j].address] = true
+                } else {
+                    var amt0 = Number.parseInt(hexToBn(results[j].data.substr(2, 64)))
+                    var amt1 = Number.parseInt(hexToBn(results[j].data.substr(66, 64)))
+                    var amt2 = Number.parseInt(hexToBn(results[j].data.substr(130, 64)))
+                    var amt3 = Number.parseInt(hexToBn(results[j].data.substr(194, 64)))
+                    var swap0 = amt0 + amt2
+                    var swap1 = amt1 + amt3
+
+                    var decimals = await getPairDecimals(results[j].address)
+                    var res = await web3.eth.getBlock(results[j].blockNumber)
+                    
+                    await knex('eth_pairs').update({
+                        lastPrice: Math.abs(swap0 * 1.0 * 10 ** decimals / swap1),
+                        timestamp: res.timestamp
+                    }).where('pairAddress', results[j].address.toLowerCase())
+                }
+            } catch (err) {
+                console.log(err)
             }
-    
-            await knex('eth_pairs').insert(data)*/
-        } catch (err) {
-            console.log(err)
+
+            console.log(j)
         }
 
+        console.log('===================================')
         console.log(i, results.length)
         sum += results.length
     }
@@ -160,4 +288,5 @@ async function getUniswapV2PairPriceHistory() {
 }
 
 //getUniswapV2PairHistory()
-getUniswapV3PairHistory()
+//getUniswapV3PairHistory()
+getUniswapV2PairPriceHistory()

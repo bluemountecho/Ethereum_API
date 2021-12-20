@@ -27,7 +27,7 @@ const knex = require('knex')({
 })
 
 async function getUniswapV2PairHistory() {
-    var fromBlock = 0, toBlock = 13840672
+    var fromBlock = 13835000, toBlock = 13840672
     var sum = 0
 
     for (var i = fromBlock; i < toBlock; i += 10000) {
@@ -38,25 +38,27 @@ async function getUniswapV2PairHistory() {
         
         let options = {
             fromBlock: from,
-            toBlock: to
+            toBlock: to,
+            topics: ['0x0d3648bd0f6ba80134a33ba9275ac585d9d315f0ad8355cddefde31afa28d0e9']
         };
 
-        results = await factoryV2.getPastEvents('PairCreated', options)
+        results = await web3.eth.getPastLogs(options)
+        console.log(results)
 
         for (var j = 0; j < results.length; j ++) {
             try {
                 await knex('eth_pairs').insert({
-                    token0Address: '0x' + results[j].raw.topics[1].substr(26, 40).toLowerCase(),
-                    token1Address: '0x' + results[j].raw.topics[2].substr(26, 40).toLowerCase(),
-                    pairAddress: '0x' + results[j].raw.data.substr(26, 40).toLowerCase(),
+                    token0Address: '0x' + results[j].topics[1].substr(26, 40).toLowerCase(),
+                    token1Address: '0x' + results[j].topics[2].substr(26, 40).toLowerCase(),
+                    pairAddress: '0x' + results[j].data.substr(26, 40).toLowerCase(),
                     factoryAddress: results[j].address.toLowerCase()
                 })
             } catch (err) {
                 await knex('eth_pairs').update({
-                    token0Address: '0x' + results[j].raw.topics[1].substr(26, 40).toLowerCase(),
-                    token1Address: '0x' + results[j].raw.topics[2].substr(26, 40).toLowerCase(),
+                    token0Address: '0x' + results[j].topics[1].substr(26, 40).toLowerCase(),
+                    token1Address: '0x' + results[j].topics[2].substr(26, 40).toLowerCase(),
                     factoryAddress: results[j].address.toLowerCase()
-                }).where('pairAddress', '0x' + results[j].raw.data.substr(26, 40).toLowerCase())
+                }).where('pairAddress', '0x' + results[j].data.substr(26, 40).toLowerCase())
             }
         }
 

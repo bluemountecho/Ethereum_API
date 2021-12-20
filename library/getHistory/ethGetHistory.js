@@ -27,7 +27,7 @@ const knex = require('knex')({
 })
 
 async function getUniswapV2PairHistory() {
-    var fromBlock = 13835000, toBlock = 13840672
+    var fromBlock = 0, toBlock = 13840672
     var sum = 0
 
     for (var i = fromBlock; i < toBlock; i += 10000) {

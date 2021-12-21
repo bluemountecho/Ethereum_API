@@ -1,7 +1,7 @@
 Web3 = require('web3')
 
-const FROMBLOCK = 13800000
-const TOBLOCK = 13840672
+const FROMBLOCK = 0
+const TOBLOCK = 13847794
 
 const minERC20ABI = [
     {

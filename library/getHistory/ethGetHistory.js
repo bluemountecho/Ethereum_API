@@ -356,7 +356,6 @@ async function getUniswapV3PairHistory() {
             results = await web3.eth.getPastLogs(options)
     
             for (var j = 0; j < results.length; j ++) {
-                console.log(results[j])
                 await getPairDecimals('0x' + results[j].data.substr(90, 40).toLowerCase())
 
                 try {
@@ -448,6 +447,6 @@ async function getUniswapV2PairPriceHistory() {
     console.log('Finished with ' + sum + ' rows!')
 }
 
-getUniswapV2PairHistory()
-//getUniswapV3PairHistory()
+//getUniswapV2PairHistory()
+getUniswapV3PairHistory()
 //getUniswapV2PairPriceHistory()

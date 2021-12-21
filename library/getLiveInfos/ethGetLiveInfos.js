@@ -19,25 +19,11 @@ const minERC20ABI = [
     {
         "constant": true,
         "inputs": [],
-        "name": "totalSupply",
-        "outputs": [
-            {
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "payable": false,
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "constant": true,
-        "inputs": [],
         "name": "decimals",
         "outputs": [
             {
                 "name": "",
-                "type": "uint8"
+                "type": "uint256"
             }
         ],
         "payable": false,
@@ -57,6 +43,77 @@ const minERC20ABI = [
         "payable": false,
         "stateMutability": "view",
         "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "totalSupply",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+]
+
+const minDSTokenABI = [
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "name",
+        "outputs": [
+            {
+                "name": "",
+                "type": "bytes32"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "decimals",
+        "outputs": [
+            {
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "symbol",
+        "outputs": [
+            {
+                "name": "",
+                "type": "bytes32"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "totalSupply",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
     }
 ]
 
@@ -129,31 +186,108 @@ function hexToBn(hex) {
 }
 
 async function getTokenInfos(tokenAddress) {
-    const contract = new web3.eth.Contract(minERC20ABI, tokenAddress)
-    var decimals, symbol, name, totalSupply
+    try {
+        const contract = new web3.eth.Contract(minERC20ABI, tokenAddress)
+        var decimals, symbol, name, totalSupply
 
-    [decimals, symbol, name, totalSupply] = await Promise.all([
-        contract.methods.decimals().call(),
-        contract.methods.symbol().call(),
-        contract.methods.name().call(),
-        contract.methods.totalSupply().call()
-    ])
+        [decimals, symbol, name, totalSupply] = await Promise.all([
+            contract.methods.decimals().call(),
+            contract.methods.symbol().call(),
+            contract.methods.name().call(),
+            contract.methods.totalSupply().call()
+        ])
+    
+        return [decimals, symbol, name, totalSupply]
+    } catch (err) {
+        const contract = new web3.eth.Contract(minDSTokenABI, tokenAddress)
+        var decimals, symbol, name, totalSupply
 
-    return [decimals, symbol, name, totalSupply]
+        [decimals, symbol, name, totalSupply] = await Promise.all([
+            contract.methods.decimals().call(),
+            contract.methods.symbol().call(),
+            contract.methods.name().call(),
+            contract.methods.totalSupply().call()
+        ])
+
+        symbol = web3.utils.hexToUtf8(symbol)
+        name = web3.utils.hexToUtf8(name)
+    
+        return [decimals, symbol, name, totalSupply]
+    }    
 }
 
 async function getPairDecimals(pairAddress) {
+    /*
+    var rows = await knex('eth_pairs').where('pairAddress', pairAddress).select('*')
+    var token0Address, token1Address
+    var res = []
+    
+    if (rows.length) {
+        token0Address = rows[0].token0Address
+        token1Address = rows[0].token1Address
+    } else {
+        var pairContract = new web3.eth.Contract(minPairABI, pairAddress)
+        var tmpToken0Address, tmpToken1Address
+
+        [tmpToken0Address, tmpToken1Address] = await Promise.all([pairContract.methods.token0().call(), pairContract.methods.token1().call()])
+        token0Address = tmpToken0Address
+        token1Address = tmpToken1Address
+    }*/
+
     var pairContract = new web3.eth.Contract(minPairABI, pairAddress)
     var token0Address, token1Address
+    var res = []
 
-    [token0Address, token1Address] = await Promise.all([pairContract.methods.token0().call(), pairContract.methods.token1().call()])
-    
-    var res = await Promise.all([
-        getTokenInfos(token0Address),
-        getTokenInfos(token1Address)
-    ])
+    try {
+        [token0Address, token1Address] = await Promise.all([pairContract.methods.token0().call(), pairContract.methods.token1().call()])
 
-    return res[1][0] - res[0][0]
+        rows = await knex('eth_tokens').where('tokenAddress', token0Address.toLowerCase())
+
+        if (rows.length) {
+            res[0] = []
+            res[0][0] = rows[0].tokenDecimals
+            res[0][1] = rows[0].tokenSymbol
+            res[0][2] = rows[0].tokenName
+            res[0][3] = rows[0].totalSupply
+        } else {
+            res[0] = await getTokenInfos(token0Address)
+            knex('eth_tokens').insert({
+                tokenAddress: token0Address.toLowerCase(),
+                tokenDecimals: res[0][0],
+                tokenSymbol: res[0][1],
+                tokenName: res[0][2],
+                totalSupply: res[0][3]
+            }).then(res => {})
+            .catch(err => {})
+        }
+
+        rows = await knex('eth_tokens').where('tokenAddress', token1Address.toLowerCase())
+
+        if (rows.length) {
+            res[1] = []
+            res[1][0] = rows[0].tokenDecimals
+            res[1][1] = rows[0].tokenSymbol
+            res[1][2] = rows[0].tokenName
+            res[1][3] = rows[0].totalSupply
+        } else {
+            res[1] = await getTokenInfos(token1Address)
+            knex('eth_tokens').insert({
+                tokenAddress: token1Address.toLowerCase(),
+                tokenDecimals: res[1][0],
+                tokenSymbol: res[1][1],
+                tokenName: res[1][2],
+                totalSupply: res[1][3]
+            }).then(res => {})
+            .catch(err => {})
+        }
+
+        return res[1][0] - res[0][0]
+    } catch (err) {
+        console.log(pairAddress, token0Address, token1Address)
+        console.log(err)
+    }
+
+    return 1
 }
 
 async function init() {

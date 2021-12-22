@@ -534,10 +534,6 @@ async function getUniswapV3PairPriceHistory() {
                 }
 
                 var res = await web3.eth.getBlock(results[j].blockNumber)
-
-                await knex('eth_pairs').insert({
-                    pairAddress: results[j].address.toLowerCase()
-                })
                 
                 await knex('eth_pairs').update({
                     lastPrice: Math.abs(swap0 * 1.0 * 10 ** decimals / swap1),

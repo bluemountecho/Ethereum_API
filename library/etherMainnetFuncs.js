@@ -9,12 +9,15 @@ const knex = require('knex')({
     }
 })
 
+const baseTokens = require('./etherBaseTokens.json')
+const USDC_ADDRESS = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+
+/*
 var pairList = []
 var tokenList = []
 
 knex('eth_pairs').select('*').then(rows => {
     for (var i = 0; i < rows.length; i ++) {
-        /*
         if (!pairList[rows[i].token0Address]) {
             pairList[rows[i].token0Address] = []
         }
@@ -39,14 +42,15 @@ knex('eth_pairs').select('*').then(rows => {
         pairList[rows[i].token1Address][rows[i].token0Address].push({
             lastPrice: rows[i].lastPrice,
             timestamp: rows[i].timestamp
-        })*/
-        if (!pairList[rows[i].token0Address])
-            pairList[rows[i].token0Address] = 0
-        if (!pairList[rows[i].token1Address])
-            pairList[rows[i].token1Address] = 0
+        })
 
-        pairList[rows[i].token0Address] ++
-        pairList[rows[i].token1Address] ++
+        //if (!pairList[rows[i].token0Address])
+        //    pairList[rows[i].token0Address] = 0
+        //if (!pairList[rows[i].token1Address])
+        //    pairList[rows[i].token1Address] = 0
+
+        //pairList[rows[i].token0Address] ++
+        //pairList[rows[i].token1Address] ++
     }
 
     knex('eth_tokens').select('*').then(rows => {
@@ -73,65 +77,85 @@ knex('eth_pairs').select('*').then(rows => {
 
         console.log('Finished with ' + cnt + ' rows!')
     })
-})
+}) */
 
 module.exports.getPriceOfToken = async function getPriceOfToken(tokenAddress) {
     try {
-        var route = []
-        var vis = []
-        var qh = 0, qt = 1
+        var token0Address = tokenAddress > USDC_ADDRESS ? USDC_ADDRESS : tokenAddress
+        var token1Address = tokenAddress < USDC_ADDRESS ? USDC_ADDRESS : tokenAddress
 
-        route.push({
-            tokenAddress: tokenAddress,
-            res: 1.0,
-            bef: -1
-        })
+        var rows = await knex('eth_pairs')
+            .select('*')
+            .where('token0Address', token0Address)
+            .where('token1Address', token1Address)
+            .orderBy('timestamp', 'desc')
 
-        vis[tokenAddress] = true
-
-        while (qh < qt) {
-            var cur = route[qh]
-
-            if (!pairList[cur.tokenAddress]) {
-                continue
-            }
-
-            for (var key in pairList[cur.tokenAddress]) {
-                if (vis[key]) continue
-
-                vis[key] = true
-
-                for (var j = 0; j < pairList[cur.tokenAddress][key].length; j ++) {
-                    route[qt ++] = {
-                        tokenAddress: key,
-                        res: cur.res * pairList[cur.tokenAddress][key][j].lastPrice,
-                        bef: qh
-                    }
-
-                    if ((key == '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48' || key == '0xdac17f958d2ee523a2206206994597c13d831ec7') && route[qt - 1].res) break
-                }
-            }
-
-            if ((route[qt - 1] == '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48' || route[qt - 1] == '0xdac17f958d2ee523a2206206994597c13d831ec7') && route[qt - 1].res) break
-
-            qh ++
-        }
-
-        if (qh >= qt) {
-            console.log(route)
-
-            return {
-                message: 'Can\'t find swap route!',
-                data: {
-
-                }
-            }
-        } else {
-            console.log(route)
+        if (rows.length && rows[0].lastPrice > 0) {
+            var price = token0Address == USDC_ADDRESS ? rows[0].lastPrice : (1.0 / rows[0].lastPrice)
 
             return {
                 message: 'Success!',
-                data: route[qt - 1].res
+                data: {
+                    price: price
+                }
+            }
+        }
+
+        var funcs = []
+
+        for (var i = 0; i < baseTokens.length; i ++) {
+            token0Address = tokenAddress > baseTokens[i] ? baseTokens[i] : tokenAddress
+            token1Address = tokenAddress < baseTokens[i] ? baseTokens[i] : tokenAddress
+
+            funcs.push(
+                knex('eth_pairs')
+                    .select('*')
+                    .where('token0Address', token0Address)
+                    .where('token1Address', token1Address)
+                    .orderBy('timestamp', 'desc')
+            )
+        }
+
+        for (var i = 0; i < baseTokens.length; i ++) {
+            token0Address = USDC_ADDRESS > baseTokens[i] ? baseTokens[i] : USDC_ADDRESS
+            token1Address = USDC_ADDRESS < baseTokens[i] ? baseTokens[i] : USDC_ADDRESS
+
+            funcs.push(
+                knex('eth_pairs')
+                    .select('*')
+                    .where('token0Address', token0Address)
+                    .where('token1Address', token1Address)
+                    .orderBy('timestamp', 'desc')
+            )
+        }
+
+        var res = await Promise.all(funcs)
+
+        for (var i = 0; i < baseTokens.length; i ++) {
+            var res1 = 0, res2 = 0
+
+            if (res[i].length > 0 && res[i][0].lastPrice > 0) {
+                res1 = res[i][0].token1Address == tokenAddress ? res[i][0].lastPrice : (1.0 / res[i][0].lastPrice)
+            }
+
+            if (res[i + baseTokens.length].length > 0 && res[i + baseTokens.length][0].lastPrice > 0) {
+                res1 = res[i + baseTokens.length][0].token0Address == USDC_ADDRESS ? res[i + baseTokens.length][0].lastPrice : (1.0 / res[i + baseTokens.length][0].lastPrice)
+            }
+
+            if (res1 * res2 > 0) {
+                return {
+                    message: 'Success!',
+                    data: {
+                        price: res1 * res2
+                    }
+                }
+            }
+        }
+        
+        return {
+            message: "Can't find swap route!",
+            data: {
+                
             }
         }
     } catch (e) {

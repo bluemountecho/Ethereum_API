@@ -14,6 +14,7 @@ var tokenList = []
 
 knex('eth_pairs').select('*').then(rows => {
     for (var i = 0; i < rows.length; i ++) {
+        /*
         if (!pairList[rows[i].token0Address]) {
             pairList[rows[i].token0Address] = []
         }
@@ -38,23 +39,40 @@ knex('eth_pairs').select('*').then(rows => {
         pairList[rows[i].token1Address][rows[i].token0Address].push({
             lastPrice: rows[i].lastPrice,
             timestamp: rows[i].timestamp
-        })
+        })*/
+        if (!pairList[rows[i].token0Address])
+            pairList[rows[i].token0Address] = 0
+        if (!pairList[rows[i].token1Address])
+            pairList[rows[i].token1Address] = 0
+
+        pairList[rows[i].token0Address] ++
+        pairList[rows[i].token1Address] ++
     }
 
-    console.log('========= Ether Pairs are ready! =========')
-    console.log(pairList['0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2']['0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48'])
-})
-
-knex('eth_tokens').select('*').then(rows => {
-    for (var i = 0; i < rows.length; i ++) {
-        tokenList[rows[i].tokenAddress] = {
-            symbol: rows[i].tokenSymbol,
-            name: rows[i].tokenName,
-            decimal: rows[i].tokenDecimals
+    knex('eth_tokens').select('*').then(rows => {
+        for (var i = 0; i < rows.length; i ++) {
+            tokenList[rows[i].tokenAddress] = {
+                tokenAddress: rows[i].tokenAddress,
+                symbol: rows[i].tokenSymbol,
+                name: rows[i].tokenName,
+                decimal: rows[i].tokenDecimals
+            }
         }
-    }
-    
-    console.log('========= Ether Tokens are ready! =========')
+        
+        console.log('========= Ether Datas are ready! =========')
+
+        var cnt = 0
+
+        for (var key in pairList) {
+            if (pairList[key] > 100) {
+                console.log(pairList[key])
+                console.log(tokenList[key])
+                cnt ++
+            }
+        }
+
+        console.log('Finished with ' + cnt + ' rows!')
+    })
 })
 
 module.exports.getPriceOfToken = async function getPriceOfToken(tokenAddress) {

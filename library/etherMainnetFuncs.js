@@ -11,39 +11,42 @@ const knex = require('knex')({
 
 var pairList = []
 var tokenList = []
-var rows = await knex('eth_pairs').select('*')
 
-for (var i = 0; i < rows.length; i ++) {
-    if (!pairList[rows[i].token0Address]) {
-        pairList[rows[i].token0Address] = []
+knex('eth_pairs').select('*').then(rows => {
+    for (var i = 0; i < rows.length; i ++) {
+        if (!pairList[rows[i].token0Address]) {
+            pairList[rows[i].token0Address] = []
+        }
+    
+        pairList[rows[i].token0Address][rows[i].token1Address] = {
+            lastPrice: 1.0 / rows[i].lastPrice,
+            timestamp: rows[i].timestamp
+        }
+    
+        if (!pairList[rows[i].token1Address]) {
+            pairList[rows[i].token1Address] = []
+        }
+    
+        pairList[rows[i].token1Address][rows[i].token0Address] = {
+            lastPrice: rows[i].lastPrice,
+            timestamp: rows[i].timestamp
+        }
     }
 
-    pairList[rows[i].token0Address][rows[i].token1Address] = {
-        lastPrice: 1.0 / rows[i].lastPrice,
-        timestamp: rows[i].timestamp
+    console.log('========= Ether Pairs are ready! =========')
+})
+
+knex('eth_tokens').select('*').then(rows => {
+    for (var i = 0; i < rows.length; i ++) {
+        tokenList[rows[i].tokenAddress] = {
+            symbol: rows[i].tokenSymbol,
+            name: rows[i].tokenName,
+            decimal: rows[i].tokenDecimals
+        }
     }
-
-    if (!pairList[rows[i].token1Address]) {
-        pairList[rows[i].token1Address] = []
-    }
-
-    pairList[rows[i].token1Address][rows[i].token0Address] = {
-        lastPrice: rows[i].lastPrice,
-        timestamp: rows[i].timestamp
-    }
-}
-
-rows = await knex('eth_tokens').select('*')
-
-for (var i = 0; i < rows.length; i ++) {
-    tokenList[rows[i].tokenAddress] = {
-        symbol: rows[i].tokenSymbol,
-        name: rows[i].tokenName,
-        decimal: rows[i].tokenDecimals
-    }
-}
-
-console.log('========= Ether mainnet is ready! =========')
+    
+    console.log('========= Ether Tokens are ready! =========')
+})
 
 module.exports.getPriceOfToken = async function getPriceOfToken(tokenAddress) {
     try {
@@ -82,9 +85,18 @@ module.exports.getPriceOfToken = async function getPriceOfToken(tokenAddress) {
             qh ++
         }
 
-        return {
-            message: 'Success!',
-            data: route[qt].res
+        if (qh >= qt) {
+            return {
+                message: 'Can\'t find swap route!',
+                data: {
+
+                }
+            }
+        } else {
+            return {
+                message: 'Success!',
+                data: route[qt].res
+            }
         }
     } catch (e) {
         return {

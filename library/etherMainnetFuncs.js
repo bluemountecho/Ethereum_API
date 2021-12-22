@@ -65,6 +65,10 @@ module.exports.getPriceOfToken = async function getPriceOfToken(tokenAddress) {
         while (qh < qt) {
             var cur = route[qh]
 
+            if (!pairList[cur.tokenAddress]) {
+                continue
+            }
+
             for (var key in pairList[cur.tokenAddress]) {
                 if (vis[key]) continue
 

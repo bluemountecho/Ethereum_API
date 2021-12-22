@@ -388,6 +388,24 @@ async function getUniswapV2PairPriceHistory() {
     var fromBlock = TOBLOCK, toBlock = FROMBLOCK
     var sum = 0
     var isVisit = []
+    var decimalList = []
+    var pairList = []
+
+    var rows = await knex('eth_pairs').select('*').where('lastPrice', '!=', 0)
+
+    for (var i = 0; i < rows.length; i ++) {
+        isVisit[rows[i].pairAddress] = true
+        pairList[rows[i].pairAddress] = {
+            token0Address: rows[i].token0Address,
+            token1Address: rows[i].token1Address
+        }
+    }
+
+    rows = await knex('eth_tokens').select('*')
+
+    for (var i = 0; i < rows.length; i ++) {
+        decimalList[rows[i].tokenAddress] = rows[i].tokenDecimals
+    }
 
     for (var i = fromBlock; i > toBlock; i -= 1000) {
         var to = i
@@ -405,38 +423,45 @@ async function getUniswapV2PairPriceHistory() {
 
         for (var j = results.length - 1; j >= 0; j --) {
             try {
-                if (isVisit[results[j].address]) continue
+                if (isVisit[results[j].address.toLowerCase()]) continue
 
-                var rows = await knex('eth_pairs').select('*').where('pairAddress', results[j].address.toLowerCase())
-                
-                if (rows.length != 0 && rows[0].lastPrice != 0) {
-                    isVisit[results[j].address] = true
-                } else {
-                    var amt0 = Number.parseInt(hexToBn(results[j].data.substr(2, 64)))
-                    var amt1 = Number.parseInt(hexToBn(results[j].data.substr(66, 64)))
-                    var amt2 = Number.parseInt(hexToBn(results[j].data.substr(130, 64)))
-                    var amt3 = Number.parseInt(hexToBn(results[j].data.substr(194, 64)))
-                    var swap0 = amt0 + amt2
-                    var swap1 = amt1 + amt3
+                var amt0 = Number.parseInt(hexToBn(results[j].data.substr(2, 64)))
+                var amt1 = Number.parseInt(hexToBn(results[j].data.substr(66, 64)))
+                var amt2 = Number.parseInt(hexToBn(results[j].data.substr(130, 64)))
+                var amt3 = Number.parseInt(hexToBn(results[j].data.substr(194, 64)))
+                var swap0 = amt0 + amt2
+                var swap1 = amt1 + amt3
 
-                    var decimals = await getPairDecimals(results[j].address)
-                    var res = await web3.eth.getBlock(results[j].blockNumber)
+                var decimal0 = -1
+                var decimal1 = -1
+                var decimals = 0
 
-                    await knex('eth_pairs').insert({
-                        pairAddress: results[j].address.toLowerCase()
-                    })
-                    
-                    await knex('eth_pairs').update({
-                        lastPrice: Math.abs(swap0 * 1.0 * 10 ** decimals / swap1),
-                        timestamp: res.timestamp
-                    }).where('pairAddress', results[j].address.toLowerCase())
+                if (pairList[results[j].address.toLowerCase()] && decimalList[pairList[results[j].address.toLowerCase()].token0Address]) {
+                    decimal0 = decimalList[pairList[results[j].address.toLowerCase()].token0Address]
                 }
+
+                if (pairList[results[j].address.toLowerCase()] && decimalList[pairList[results[j].address.toLowerCase()].token1Address]) {
+                    decimal1 = decimalList[pairList[results[j].address.toLowerCase()].token1Address]
+                }
+                
+                if (decimal0 != -1 && decimal1 != -1) {
+                    decimals = decimal1 - decimal0
+                } else {
+                    decimals = await getPairDecimals(results[j].address)
+                }
+
+                var res = await web3.eth.getBlock(results[j].blockNumber)
+                
+                await knex('eth_pairs').update({
+                    lastPrice: Math.abs(swap0 * 1.0 * 10 ** decimals / swap1),
+                    timestamp: res.timestamp
+                }).where('pairAddress', results[j].address.toLowerCase())
+
+                isVisit[results[j].address.toLowerCase()] = true
             } catch (err) {
                 console.log(results[j])
                 console.log(err)
             }
-
-            console.log(j)
         }
 
         console.log('===================================')
@@ -448,5 +473,5 @@ async function getUniswapV2PairPriceHistory() {
 }
 
 //getUniswapV2PairHistory()
-getUniswapV3PairHistory()
-//getUniswapV2PairPriceHistory()
+//getUniswapV3PairHistory()
+getUniswapV2PairPriceHistory()

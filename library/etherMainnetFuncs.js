@@ -17,23 +17,32 @@ knex('eth_pairs').select('*').then(rows => {
         if (!pairList[rows[i].token0Address]) {
             pairList[rows[i].token0Address] = []
         }
-    
-        pairList[rows[i].token0Address][rows[i].token1Address] = {
-            lastPrice: 1.0 / rows[i].lastPrice,
-            timestamp: rows[i].timestamp
+
+        if (!pairList[rows[i].token0Address][rows[i].token1Address]) {
+            pairList[rows[i].token0Address][rows[i].token1Address] = []
         }
     
+        pairList[rows[i].token0Address][rows[i].token1Address].push({
+            lastPrice: rows[i].lastPrice ? 1.0 / rows[i].lastPrice : 0,
+            timestamp: rows[i].timestamp
+        })
+
         if (!pairList[rows[i].token1Address]) {
             pairList[rows[i].token1Address] = []
         }
+
+        if (!pairList[rows[i].token1Address][rows[i].token0Address]) {
+            pairList[rows[i].token1Address][rows[i].token0Address] = []
+        }
     
-        pairList[rows[i].token1Address][rows[i].token0Address] = {
+        pairList[rows[i].token1Address][rows[i].token0Address].push({
             lastPrice: rows[i].lastPrice,
             timestamp: rows[i].timestamp
-        }
+        })
     }
 
     console.log('========= Ether Pairs are ready! =========')
+    console.log(pairList['0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2']['0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48'])
 })
 
 knex('eth_tokens').select('*').then(rows => {
@@ -73,23 +82,26 @@ module.exports.getPriceOfToken = async function getPriceOfToken(tokenAddress) {
                 if (vis[key]) continue
 
                 vis[key] = true
-                route[qt] = {
-                    tokenAddress: key,
-                    res: cur.res * pairList[cur.tokenAddress][key].lastPrice,
-                    bef: qh
+
+                for (var j = 0; j < pairList[cur.tokenAddress][key].length; j ++) {
+                    route[qt ++] = {
+                        tokenAddress: key,
+                        res: cur.res * pairList[cur.tokenAddress][key][j].lastPrice,
+                        bef: qh
+                    }
+
+                    if ((key == '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48' || key == '0xdac17f958d2ee523a2206206994597c13d831ec7') && route[qt - 1].res) break
                 }
-
-                if (key == '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48' || key == '0xdac17f958d2ee523a2206206994597c13d831ec7') break
-
-                qt ++
             }
 
-            if (route[qt].tokenAddress == '0xdac17f958d2ee523a2206206994597c13d831ec7' || route[qt].tokenAddress == '0xdac17f958d2ee523a2206206994597c13d831ec7') break
+            if ((route[qt - 1] == '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48' || route[qt - 1] == '0xdac17f958d2ee523a2206206994597c13d831ec7') && route[qt - 1].res) break
 
             qh ++
         }
 
         if (qh >= qt) {
+            console.log(route)
+
             return {
                 message: 'Can\'t find swap route!',
                 data: {
@@ -97,9 +109,11 @@ module.exports.getPriceOfToken = async function getPriceOfToken(tokenAddress) {
                 }
             }
         } else {
+            console.log(route)
+
             return {
                 message: 'Success!',
-                data: route[qt].res
+                data: route[qt - 1].res
             }
         }
     } catch (e) {

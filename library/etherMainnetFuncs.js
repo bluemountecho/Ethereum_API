@@ -96,7 +96,7 @@ module.exports.getPriceOfToken = async function getPriceOfToken(tokenAddress) {
             return {
                 message: 'Success!',
                 data: {
-                    price: price
+                    price: price.toFixed(20)
                 }
             }
         }
@@ -134,14 +134,16 @@ module.exports.getPriceOfToken = async function getPriceOfToken(tokenAddress) {
             }
 
             if (res[1].length > 0 && res[1][0].lastPrice > 0) {
-                res2 = res[1][0].token1Address == tokenAddress ? res[1][0].lastPrice : (1.0 / res[1][0].lastPrice)
+                res2 = res[1][0].token0Address == USDC_ADDRESS ? res[1][0].lastPrice : (1.0 / res[1][0].lastPrice)
             }
+
+            console.log(baseTokens[i], res1.toFixed(20), res2.toFixed(20))
 
             if (res1 * res2 > 0) {
                 return {
                     message: 'Success!',
                     data: {
-                        price: res1 * res2
+                        price: (res1 * res2).toFixed(20)
                     }
                 }
             }

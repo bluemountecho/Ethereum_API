@@ -100,7 +100,7 @@ module.exports.getPriceOfToken = async function getPriceOfToken(tokenAddress) {
         }
     } catch (e) {
         return {
-            'status': 'fail',
+            'status': 'Error occured!',
             'data': {
 
             }

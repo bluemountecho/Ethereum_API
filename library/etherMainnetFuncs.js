@@ -101,9 +101,9 @@ module.exports.getPriceOfToken = async function getPriceOfToken(tokenAddress) {
             }
         }
 
-        var funcs = []
-
         for (var i = 0; i < baseTokens.length; i ++) {
+            var funcs = []
+
             token0Address = tokenAddress > baseTokens[i] ? baseTokens[i] : tokenAddress
             token1Address = tokenAddress < baseTokens[i] ? baseTokens[i] : tokenAddress
 
@@ -114,9 +114,7 @@ module.exports.getPriceOfToken = async function getPriceOfToken(tokenAddress) {
                     .where('token1Address', token1Address)
                     .orderBy('timestamp', 'desc')
             )
-        }
 
-        for (var i = 0; i < baseTokens.length; i ++) {
             token0Address = USDC_ADDRESS > baseTokens[i] ? baseTokens[i] : USDC_ADDRESS
             token1Address = USDC_ADDRESS < baseTokens[i] ? baseTokens[i] : USDC_ADDRESS
 
@@ -127,19 +125,16 @@ module.exports.getPriceOfToken = async function getPriceOfToken(tokenAddress) {
                     .where('token1Address', token1Address)
                     .orderBy('timestamp', 'desc')
             )
-        }
 
-        var res = await Promise.all(funcs)
-
-        for (var i = 0; i < baseTokens.length; i ++) {
+            var res = await Promise.all(funcs)
             var res1 = 0, res2 = 0
 
-            if (res[i].length > 0 && res[i][0].lastPrice > 0) {
-                res1 = res[i][0].token1Address == tokenAddress ? res[i][0].lastPrice : (1.0 / res[i][0].lastPrice)
+            if (res[0].length > 0 && res[0][0].lastPrice > 0) {
+                res1 = res[0][0].token1Address == tokenAddress ? res[0][0].lastPrice : (1.0 / res[0][0].lastPrice)
             }
 
-            if (res[i + baseTokens.length].length > 0 && res[i + baseTokens.length][0].lastPrice > 0) {
-                res1 = res[i + baseTokens.length][0].token0Address == USDC_ADDRESS ? res[i + baseTokens.length][0].lastPrice : (1.0 / res[i + baseTokens.length][0].lastPrice)
+            if (res[1].length > 0 && res[1][0].lastPrice > 0) {
+                res2 = res[1][0].token1Address == tokenAddress ? res[1][0].lastPrice : (1.0 / res[1][0].lastPrice)
             }
 
             if (res1 * res2 > 0) {
@@ -155,7 +150,7 @@ module.exports.getPriceOfToken = async function getPriceOfToken(tokenAddress) {
         return {
             message: "Can't find swap route!",
             data: {
-                
+
             }
         }
     } catch (e) {

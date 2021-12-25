@@ -642,3 +642,4 @@ async function getUniswapV3PairPriceHistory() {
 //getUniswapV3PairHistory()
 //getUniswapV2PairPriceHistory()
 //getUniswapV3PairPriceHistory()
+getUniswapV2PairPriceHistoryNotFirstTime()

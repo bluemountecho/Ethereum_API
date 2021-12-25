@@ -472,6 +472,89 @@ async function getUniswapV2PairPriceHistory() {
     console.log('Finished with ' + sum + ' rows!')
 }
 
+async function getUniswapV2PairPriceHistoryNotFirstTime() {
+    var fromBlock = TOBLOCK, toBlock = FROMBLOCK
+    var sum = 0
+    var decimalList = []
+    var pairList = []
+
+    var rows = await knex('eth_pairs').select('*')
+
+    for (var i = 0; i < rows.length; i ++) {
+        pairList[rows[i].pairAddress] = {
+            token0Address: rows[i].token0Address,
+            token1Address: rows[i].token1Address
+        }
+    }
+
+    rows = await knex('eth_tokens').select('*')
+
+    for (var i = 0; i < rows.length; i ++) {
+        decimalList[rows[i].tokenAddress] = rows[i].tokenDecimals
+    }
+
+    for (var i = fromBlock; i > toBlock; i -= 1000) {
+        var to = i
+        var from = i - 999
+
+        if (from < toBlock) from = toBlock
+        
+        let options = {
+            fromBlock: from,
+            toBlock: to,
+            topics: ['0xd78ad95fa46c994b6551d0da85fc275fe613ce37657fb8d5e3d130840159d822']
+        };
+
+        results = await web3.eth.getPastLogs(options)
+
+        for (var j = results.length - 1; j >= 0; j --) {
+            try {
+                var amt0 = Number.parseInt(hexToBn(results[j].data.substr(2, 64)))
+                var amt1 = Number.parseInt(hexToBn(results[j].data.substr(66, 64)))
+                var amt2 = Number.parseInt(hexToBn(results[j].data.substr(130, 64)))
+                var amt3 = Number.parseInt(hexToBn(results[j].data.substr(194, 64)))
+                var swap0 = amt0 + amt2
+                var swap1 = amt1 + amt3
+
+                var decimal0 = -1
+                var decimal1 = -1
+                var decimals = 0
+
+                if (pairList[results[j].address.toLowerCase()] && decimalList[pairList[results[j].address.toLowerCase()].token0Address]) {
+                    decimal0 = decimalList[pairList[results[j].address.toLowerCase()].token0Address]
+                }
+
+                if (pairList[results[j].address.toLowerCase()] && decimalList[pairList[results[j].address.toLowerCase()].token1Address]) {
+                    decimal1 = decimalList[pairList[results[j].address.toLowerCase()].token1Address]
+                }
+                
+                if (decimal0 != -1 && decimal1 != -1) {
+                    decimals = decimal1 - decimal0
+                } else {
+                    decimals = await getPairDecimals(results[j].address)
+                }
+
+                var res = await web3.eth.getBlock(results[j].blockNumber)
+                
+                await knex('eth_pairs').update({
+                    lastPrice: Math.abs(swap0 * 1.0 * 10 ** decimals / swap1),
+                    timestamp: res.timestamp
+                }).where('pairAddress', results[j].address.toLowerCase())
+                .where('timestamp', '<', res.timestamp)
+            } catch (err) {
+                console.log(results[j])
+                console.log(err)
+            }
+        }
+
+        console.log('===================================')
+        console.log(i, results.length)
+        sum += results.length
+    }
+
+    console.log('Finished with ' + sum + ' rows!')
+}
+
 async function getUniswapV3PairPriceHistory() {
     var fromBlock = TOBLOCK, toBlock = FROMBLOCK
     var sum = 0
@@ -555,7 +638,7 @@ async function getUniswapV3PairPriceHistory() {
     console.log('Finished with ' + sum + ' rows!')
 }
 
-getUniswapV2PairHistory()
-getUniswapV3PairHistory()
+//getUniswapV2PairHistory()
+//getUniswapV3PairHistory()
 //getUniswapV2PairPriceHistory()
 //getUniswapV3PairPriceHistory()

@@ -1,7 +1,7 @@
 Web3 = require('web3')
 
-const FROMBLOCK = 0
-const TOBLOCK = 13847794
+const FROMBLOCK = 13860476
+const TOBLOCK = 13871540
 
 const minERC20ABI = [
     {
@@ -555,7 +555,7 @@ async function getUniswapV3PairPriceHistory() {
     console.log('Finished with ' + sum + ' rows!')
 }
 
-//getUniswapV2PairHistory()
-//getUniswapV3PairHistory()
+getUniswapV2PairHistory()
+getUniswapV3PairHistory()
 //getUniswapV2PairPriceHistory()
-getUniswapV3PairPriceHistory()
+//getUniswapV3PairPriceHistory()

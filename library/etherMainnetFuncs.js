@@ -172,63 +172,37 @@ module.exports.getPriceOfToken = async function getPriceOfToken(tokenAddress) {
 
 module.exports.getLastPriceFromPair = async function getLastPriceFromPair(pairAddress) {
     try {
-        var pairContract = new web3.eth.Contract(minPairABI, pairAddress)
-        var token0Address, token1Address
-        var result
+        var pairInfo = (await knex('eth_pairs').where('pairAddress', pairAddress).select('*'))[0]
+        var token0Address = pairInfo.token0Address
+        var token1Address = pairInfo.token1Address
+        var price = pairInfo.lastPrice
+        var price0 = this.getPriceOfToken(token0Address)
+        var price1 = this.getPriceOfToken(token1Address)
+        var token0Info = (await knex('eth_tokens').where('tokenAddress', token0Address).select('*'))[0]
+        var token1Info = (await knex('eth_tokens').where('tokenAddress', token1Address).select('*'))[0]
 
-        [token0Address, token1Address] = await Promise.all([pairContract.methods.token0().call(), pairContract.methods.token1().call()])
-        
-        var res = await Promise.all([this.getPriceFromSwapEvent(pairAddress, token0Address, token1Address, true), this.getPriceFromSwapEvent(pairAddress, token0Address, token1Address, false), this.getPriceOfToken(token0Address), this.getPriceOfToken(token1Address)])
-
-        var token0Price = res[2].data.price
-        var token1Price = res[3].data.price
-
-        result = res[0]
-
-        if (res[0][0] == 0) {
-            result = res[1]
-        }
-
-        if (result[0] == 0) {
+        if (price == 0) {
             return {
-                'status': 'fail',
-                'data': {
-    
+                message: "Can't find swap route!",
+                data: {
+
                 }
             }
-        }
-
-        res = await Promise.all([
-            this.getPriceFromSwapEvent("0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc", USDC_ADDRESS, ETH_ADDRESS, true, result[1]),
-            //this.getPriceFromSwapEvent("0xE0554a476A092703abdB3Ef35c80e0D76d32939F", USDC_ADDRESS, ETH_ADDRESS, false, result[1]),
-            //this.getPriceFromSwapEvent("0x88e6A0c2dDD26FEEb64F039a2c41296FcB3f5640", USDC_ADDRESS, ETH_ADDRESS, false, result[1]),
-            this.getPriceFromSwapEvent("0x8ad599c3A0ff1De082011EFDDc58f1908eb6e6D8", USDC_ADDRESS, ETH_ADDRESS, false, result[1]),
-            //this.getPriceFromSwapEvent("0x7BeA39867e4169DBe237d55C8242a8f2fcDcc387", USDC_ADDRESS, ETH_ADDRESS, false, result[1])
-        ])
-
-        var ethPrice = res[0][1] > res[1][1] ? res[0][0] : res[1][0]
-        var tmp = result[0]
-        var price0, price1
-        
-        if (token1Address.toLowerCase() == ETH_ADDRESS.toLowerCase()) {
-            tmp = 1 / tmp
-            price0 = (ethPrice * tmp).toFixed(20)
-            price1 = ethPrice.toFixed(20)
-        } else if (token0Address.toLowerCase() == ETH_ADDRESS.toLowerCase()) {
-            price1 = (ethPrice * tmp).toFixed(20)
-            price0 = ethPrice.toFixed(20)
         } else {
-            price0 = Number.parseFloat(token0Price).toFixed(20)
-            price1 = Number.parseFloat(token1Price).toFixed(20)
-        }
-
-        return {
-            'status': 'success',
-            'data': {
-                token0Price: price0,
-                token1Price: price1,
-                token0: token0Address,
-                token1: token1Address
+            return {
+                message: "Success!",
+                data: {
+                    token0: {
+                        price: price1 / price,
+                        symbol: token0Info.tokenSymbol,
+                        name: token0Info.tokenName
+                    },
+                    token1: {
+                        price: price0 * price,
+                        symbol: token1Info.tokenSymbol,
+                        name: token1Info.tokenName
+                    }
+                }
             }
         }
     } catch (e) {

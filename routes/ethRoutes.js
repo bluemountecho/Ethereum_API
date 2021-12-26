@@ -16,4 +16,11 @@ router.get('/pair_price/:pairAddr', function(req, res, next) {
   })
 });
 
+router.get('/all_tokens', function (req, res, next) {
+  etherMainnetFuncs.getAllTokens()
+  .then(data => {
+    res.send(JSON.stringify(data))
+  })
+})
+
 module.exports = router;

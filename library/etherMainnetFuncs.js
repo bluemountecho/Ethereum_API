@@ -215,3 +215,22 @@ module.exports.getLastPriceFromPair = async function getLastPriceFromPair(pairAd
         }
     }
 }
+
+module.exports.getAllTokens = async function getAllTokens() {
+    try {
+        var rows = await knex('eth_tokens').select('*')
+        var datas = []
+
+        for (var i = 0; i < rows.length; i ++) {
+            datas.push({
+                address: rows[i].tokenAddress,
+                symbol: rows[i].tokenSymbol,
+                name: rows[i].tokenName
+            })
+        }
+
+        return datas
+    } catch (err) {
+        console.log(err)
+    }
+}

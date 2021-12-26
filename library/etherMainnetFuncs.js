@@ -98,8 +98,8 @@ module.exports.getPriceOfToken = async function getPriceOfToken(tokenAddress) {
                 message: 'Success!',
                 data: {
                     price: price.toFixed(20),
-                    symbol: tokenInfo.tokenSymbol,
-                    name: tokenInfo.tokenName
+                    symbol: tokenInfo[0].tokenSymbol,
+                    name: tokenInfo[0].tokenName
                 }
             }
         }
@@ -145,8 +145,8 @@ module.exports.getPriceOfToken = async function getPriceOfToken(tokenAddress) {
                     message: 'Success!',
                     data: {
                         price: (res1 * res2).toFixed(20),
-                        symbol: tokenInfo.tokenSymbol,
-                        name: tokenInfo.tokenName
+                        symbol: tokenInfo[0].tokenSymbol,
+                        name: tokenInfo[0].tokenName
                     }
                 }
             }

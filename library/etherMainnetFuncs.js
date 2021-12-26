@@ -81,6 +81,7 @@ knex('eth_pairs').select('*').then(rows => {
 
 module.exports.getPriceOfToken = async function getPriceOfToken(tokenAddress) {
     try {
+        var tokenInfo = await knex('eth_tokens').where('tokenAddress', tokenAddress).select('*')
         var token0Address = tokenAddress > USDC_ADDRESS ? USDC_ADDRESS : tokenAddress
         var token1Address = tokenAddress < USDC_ADDRESS ? USDC_ADDRESS : tokenAddress
 
@@ -96,7 +97,9 @@ module.exports.getPriceOfToken = async function getPriceOfToken(tokenAddress) {
             return {
                 message: 'Success!',
                 data: {
-                    price: price.toFixed(20)
+                    price: price.toFixed(20),
+                    symbol: tokenInfo.tokenSymbol,
+                    name: tokenInfo.tokenName
                 }
             }
         }
@@ -138,14 +141,12 @@ module.exports.getPriceOfToken = async function getPriceOfToken(tokenAddress) {
             }
 
             if (res1 * res2 > 0) {
-                var row = await knex('eth_tokens').where('tokenAddress', tokenAddress).select('*')
-
                 return {
                     message: 'Success!',
                     data: {
                         price: (res1 * res2).toFixed(20),
-                        symbol: row.tokenSymbol,
-                        name: row.tokenName
+                        symbol: tokenInfo.tokenSymbol,
+                        name: tokenInfo.tokenName
                     }
                 }
             }

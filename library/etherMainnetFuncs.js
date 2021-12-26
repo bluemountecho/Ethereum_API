@@ -176,8 +176,8 @@ module.exports.getLastPriceFromPair = async function getLastPriceFromPair(pairAd
         var token0Address = pairInfo.token0Address
         var token1Address = pairInfo.token1Address
         var price = pairInfo.lastPrice
-        var price0 = this.getPriceOfToken(token0Address)
-        var price1 = this.getPriceOfToken(token1Address)
+        var price0 = await this.getPriceOfToken(token0Address)
+        var price1 = await this.getPriceOfToken(token1Address)
         var token0Info = (await knex('eth_tokens').where('tokenAddress', token0Address).select('*'))[0]
         var token1Info = (await knex('eth_tokens').where('tokenAddress', token1Address).select('*'))[0]
 

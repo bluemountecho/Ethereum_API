@@ -137,13 +137,15 @@ module.exports.getPriceOfToken = async function getPriceOfToken(tokenAddress) {
                 res2 = res[1][0].token0Address == USDC_ADDRESS ? res[1][0].lastPrice : (1.0 / res[1][0].lastPrice)
             }
 
-            console.log(baseTokens[i], res1.toFixed(20), res2.toFixed(20))
-
             if (res1 * res2 > 0) {
+                var row = await knex('eth_tokens').where('tokenAddress', tokenAddress).select('*')
+
                 return {
                     message: 'Success!',
                     data: {
-                        price: (res1 * res2).toFixed(20)
+                        price: (res1 * res2).toFixed(20),
+                        symbol: row.tokenSymbol,
+                        name: row.tokenName
                     }
                 }
             }

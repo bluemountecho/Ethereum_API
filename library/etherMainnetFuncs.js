@@ -193,12 +193,12 @@ module.exports.getLastPriceFromPair = async function getLastPriceFromPair(pairAd
                 message: "Success!",
                 data: {
                     token0: {
-                        price: price1 / price,
+                        price: price1.data.price / price,
                         symbol: token0Info.tokenSymbol,
                         name: token0Info.tokenName
                     },
                     token1: {
-                        price: price0 * price,
+                        price: price0.data.price * price,
                         symbol: token1Info.tokenSymbol,
                         name: token1Info.tokenName
                     }

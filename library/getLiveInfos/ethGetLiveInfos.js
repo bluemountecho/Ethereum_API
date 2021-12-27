@@ -150,7 +150,16 @@ const minPairABI = [
     }
 ]
 
-const web3 = new Web3(new Web3.providers.WebsocketProvider('wss://eth-mainnet.alchemyapi.io/v2/I8IUQHQ-q9Wb5nDDcco__u0bPhqYDUjr'))
+const options = {
+    // Enable auto reconnection
+    reconnect: {
+        auto: true,
+        delay: 5000, // ms
+        maxAttempts: 5,
+        onTimeout: false
+    }
+};
+const web3 = new Web3(new Web3.providers.WebsocketProvider('wss://eth-mainnet.alchemyapi.io/v2/I8IUQHQ-q9Wb5nDDcco__u0bPhqYDUjr', options))
 const knex = require('knex')({
     client: 'mysql',
     connection: {

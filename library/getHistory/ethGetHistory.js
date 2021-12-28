@@ -1,7 +1,7 @@
 Web3 = require('web3')
 
-const FROMBLOCK = 13883069
-const TOBLOCK = 13884269
+const FROMBLOCK = 0
+const TOBLOCK = 13890537
 
 const minERC20ABI = [
     {
@@ -728,10 +728,10 @@ async function getBlockNumberFromTimeStamp() {
     console.log('Finished! Block Number is ' + i)
 }
 
-//getUniswapV2PairHistory()
+getUniswapV2PairHistory()
 //getUniswapV3PairHistory()
 //getUniswapV2PairPriceHistory()
 //getUniswapV3PairPriceHistory()
-getUniswapV2PairPriceHistoryNotFirstTime()
+//getUniswapV2PairPriceHistoryNotFirstTime()
 //getUniswapV3PairPriceHistoryNotFirstTime()
 //getBlockNumberFromTimeStamp()

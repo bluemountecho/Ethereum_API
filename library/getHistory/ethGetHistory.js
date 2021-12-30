@@ -696,10 +696,31 @@ async function getBlockNumberFromTimeStamp() {
     console.log('Finished! Block Number is ' + i)
 }
 
-getUniswapV2PairHistory()
+async function checkIfPairExist(tokenAddress) {
+    let options = {
+        fromBlock: 0,
+        topics: ['0x0d3648bd0f6ba80134a33ba9275ac585d9d315f0ad8355cddefde31afa28d0e9', tokenAddress]
+    };
+
+    results = await web3.eth.getPastLogs(options)
+
+    console.log(results)
+
+    options = {
+        fromBlock: 0,
+        topics: ['0x0d3648bd0f6ba80134a33ba9275ac585d9d315f0ad8355cddefde31afa28d0e9', null, tokenAddress]
+    };
+
+    results = await web3.eth.getPastLogs(options)
+
+    console.log(results)
+}
+
+//getUniswapV2PairHistory()
 //getUniswapV3PairHistory()
 //getUniswapV2PairPriceHistory()
 //getUniswapV3PairPriceHistory()
 //getUniswapV2PairPriceHistoryNotFirstTime()
 //getUniswapV3PairPriceHistoryNotFirstTime()
 //getBlockNumberFromTimeStamp()
+//checkIfPairExist('0x000000000000000000000000fd09cf7cfffa9932e33668311c4777cb9db3c9be')

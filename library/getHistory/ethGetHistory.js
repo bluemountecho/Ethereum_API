@@ -26,7 +26,7 @@ const minERC20ABI = [
         "outputs": [
             {
                 "name": "",
-                "type": "uint256"
+                "type": "uint8"
             }
         ],
         "payable": false,
@@ -71,7 +71,7 @@ const minDSTokenABI = [
         "outputs": [
             {
                 "name": "",
-                "type": "uint256"
+                "type": "uint8"
             }
         ],
         "payable": false,
@@ -182,7 +182,7 @@ function convertTimestampToString(timestamp, flag = false) {
 
 var tokensData = []
 var pairsData = []
-var FROMBLOCK = 0
+var FROMBLOCK = 10610000
 var TOBLOCK = 13997110
 
 async function getTokenInfos(tokenAddress) {

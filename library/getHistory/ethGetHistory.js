@@ -315,7 +315,6 @@ async function getTokenAndPairData() {
 
     console.log(pairsData['0xe232f43ef1e6fec2a2e74daf19167cf34d9c1edc'])
     console.log(tokensData['0x6710c63432a2de02954fc0f851db07146a6c0312'])
-    console.log('Getting token and pair data finished!')
 }
 
 async function getAllPairs(fromBlock) {
@@ -430,5 +429,9 @@ async function getAllPairs(fromBlock) {
     getAllPairs(toBlock + 1)
 }
 
-await getTokenAndPairData()
-//getAllPairs(FROMBLOCK)
+getTokenAndPairData()
+.then(res => {
+    console.log('Getting token and pair data finished!')
+    
+    //getAllPairs(FROMBLOCK)
+})

@@ -215,23 +215,6 @@ async function getTokenInfos(tokenAddress) {
 }
 
 async function getPairDecimals(pairAddress, createdAt) {
-    /*
-    var rows = await knex('eth_pairs').where('pairAddress', pairAddress).select('*')
-    var token0Address, token1Address
-    var res = []
-    
-    if (rows.length) {
-        token0Address = rows[0].token0Address
-        token1Address = rows[0].token1Address
-    } else {
-        var pairContract = new web3.eth.Contract(minPairABI, pairAddress)
-        var tmpToken0Address, tmpToken1Address
-
-        [tmpToken0Address, tmpToken1Address] = await Promise.all([pairContract.methods.token0().call(), pairContract.methods.token1().call()])
-        token0Address = tmpToken0Address
-        token1Address = tmpToken1Address
-    }*/
-
     if (pairsData[pairAddress]) {
         return [pairsData[pairAddress].decimals, pairsData[pairAddress].token0Address, pairsData[pairAddress].token1Address]
     }

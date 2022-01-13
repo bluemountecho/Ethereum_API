@@ -288,6 +288,36 @@ async function getPairDecimals(pairAddress, createdAt) {
     return 1
 }
 
+async function getTokenAndPairData() {
+    var res = await knex('eth_tokens').select('*')
+
+    for (var i = 0; i < res.length; i ++) {
+        tokensData[res.tokenAddress] = {
+            tokenDecimals: res.tokenDecimals,
+            tokenSymbol: res.tokenSymbol,
+            tokenName: res.tokenName,
+            createdAt: res.createdAt
+        }
+    }
+
+    res = await knex('eth_pairs').select('*')
+
+    for (var i = 0; i < res.length; i ++) {
+        pairsData[res.pairAddress] = {
+            token0Address: res.token0Address,
+            token1Address: res.token1Address,
+            decimals: res.decimals,
+            baseToken: res.baseToken,
+            blockNumber: res.blockNumber,
+            transactionID: res.transactionID
+        }
+    }
+
+    console.log(pairsData['0xe232f43ef1e6fec2a2e74daf19167cf34d9c1edc'])
+    console.log(tokensData['0x6710c63432a2de02954fc0f851db07146a6c0312'])
+    console.log('Getting token and pair data finished!')
+}
+
 async function getAllPairs(fromBlock) {
     if (fromBlock > TOBLOCK) return
 
@@ -400,4 +430,5 @@ async function getAllPairs(fromBlock) {
     getAllPairs(toBlock + 1)
 }
 
-getAllPairs(FROMBLOCK)
+await getTokenAndPairData()
+//getAllPairs(FROMBLOCK)

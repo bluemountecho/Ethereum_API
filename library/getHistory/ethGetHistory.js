@@ -292,7 +292,7 @@ async function getAllPairs(fromBlock) {
     if (fromBlock > TOBLOCK) return
 
     try {
-        var toBlock = fromBlock + 999
+        var toBlock = fromBlock + 9999
 
         if (toBlock > TOBLOCK) toBlock = TOBLOCK
 

@@ -1,8 +1,9 @@
+var fs = require('fs')
+var path = require('path')
+
 Web3 = require('web3')
 
-const FROMBLOCK = 0
-const TOBLOCK = 13903605
-
+//const web3 = new Web3(new Web3.providers.HttpProvider('https://mainnet.infura.io/v3/9ea3677d970d4dc99f3f559768b0176c'))
 const minERC20ABI = [
     {
         "constant": true,
@@ -126,7 +127,17 @@ const minPairABI = [
     }
 ]
 
-const web3 = new Web3(new Web3.providers.HttpProvider('https://eth-mainnet.alchemyapi.io/v2/I8IUQHQ-q9Wb5nDDcco__u0bPhqYDUjr'))
+const options = {
+    // Enable auto reconnection
+    reconnect: {
+        auto: true,
+        delay: 5000, // ms
+        maxAttempts: 5,
+        onTimeout: false
+    }
+};
+
+const web3 = new Web3(new Web3.providers.HttpProvider('https://eth-mainnet.alchemyapi.io/v2/_732q-Q7bDxHrmyOqA-oazz3r1LBJKx5', options))
 const knex = require('knex')({
     client: 'mysql',
     connection: {
@@ -161,6 +172,19 @@ function hexToBn(hex) {
     return bn;
 }
 
+function convertTimestampToString(timestamp, flag = false) {
+    if (flag == false) {
+        return new Date(timestamp).toISOString().replace(/T/, ' ').replace(/\..+/, '').replace(/ /g, '_').replace(/:/g, '_').replace(/-/g, '_')
+    } else {
+        return new Date(timestamp).toISOString().replace(/T/, ' ').replace(/\..+/, '')
+    }
+}
+
+var tokensData = []
+var pairsData = []
+var FROMBLOCK = 0
+var TOBLOCK = 13997110
+
 async function getTokenInfos(tokenAddress) {
     try {
         const contract = new web3.eth.Contract(minERC20ABI, tokenAddress)
@@ -190,7 +214,7 @@ async function getTokenInfos(tokenAddress) {
     }    
 }
 
-async function getPairDecimals(pairAddress) {
+async function getPairDecimals(pairAddress, createdAt) {
     /*
     var rows = await knex('eth_pairs').where('pairAddress', pairAddress).select('*')
     var token0Address, token1Address
@@ -208,6 +232,10 @@ async function getPairDecimals(pairAddress) {
         token1Address = tmpToken1Address
     }*/
 
+    if (pairsData[pairAddress]) {
+        return [pairsData[pairAddress].decimals, pairsData[pairAddress].token0Address, pairsData[pairAddress].token1Address]
+    }
+
     var pairContract = new web3.eth.Contract(minPairABI, pairAddress)
     var token0Address, token1Address
     var res = []
@@ -215,43 +243,60 @@ async function getPairDecimals(pairAddress) {
     try {
         [token0Address, token1Address] = await Promise.all([pairContract.methods.token0().call(), pairContract.methods.token1().call()])
 
-        rows = await knex('eth_tokens').where('tokenAddress', token0Address.toLowerCase())
+        token0Address = token0Address.toLowerCase()
+        token1Address = token1Address.toLowerCase()
 
-        if (rows.length) {
+        if (tokensData[token0Address]) {
             res[0] = []
-            res[0][0] = rows[0].tokenDecimals
-            res[0][1] = rows[0].tokenSymbol
-            res[0][2] = rows[0].tokenName
+            res[0][0] = tokensData[token0Address].tokenDecimals
+            res[0][1] = tokensData[token0Address].tokenSymbol
+            res[0][2] = tokensData[token0Address].tokenName
         } else {
             res[0] = await getTokenInfos(token0Address)
-            knex('eth_tokens').insert({
-                tokenAddress: token0Address.toLowerCase(),
+
+            tokensData[token0Address] = {
                 tokenDecimals: res[0][0],
                 tokenSymbol: res[0][1],
-                tokenName: res[0][2]
+                tokenName: res[0][2],
+                createdAt: createdAt
+            }
+
+            knex('eth_tokens').insert({
+                tokenAddress: token0Address,
+                tokenDecimals: res[0][0],
+                tokenSymbol: res[0][1],
+                tokenName: res[0][2],
+                createdAt: createdAt
             }).then(res => {})
             .catch(err => {})
         }
 
-        rows = await knex('eth_tokens').where('tokenAddress', token1Address.toLowerCase())
-
-        if (rows.length) {
+        if (tokensData[token1Address]) {
             res[1] = []
-            res[1][0] = rows[0].tokenDecimals
-            res[1][1] = rows[0].tokenSymbol
-            res[1][2] = rows[0].tokenName
+            res[1][0] = tokensData[token1Address].tokenDecimals
+            res[1][1] = tokensData[token1Address].tokenSymbol
+            res[1][2] = tokensData[token1Address].tokenName
         } else {
             res[1] = await getTokenInfos(token1Address)
-            knex('eth_tokens').insert({
-                tokenAddress: token1Address.toLowerCase(),
+
+            tokensData[token1Address] = {
                 tokenDecimals: res[1][0],
                 tokenSymbol: res[1][1],
-                tokenName: res[1][2]
+                tokenName: res[1][2],
+                createdAt: createdAt
+            }
+
+            knex('eth_tokens').insert({
+                tokenAddress: token1Address,
+                tokenDecimals: res[1][0],
+                tokenSymbol: res[1][1],
+                tokenName: res[1][2],
+                createdAt: createdAt
             }).then(res => {})
             .catch(err => {})
         }
 
-        return res[1][0] - res[0][0]
+        return [res[1][0] - res[0][0], token0Address, token1Address]
     } catch (err) {
         console.log(pairAddress, token0Address, token1Address)
         console.log(err)
@@ -260,467 +305,116 @@ async function getPairDecimals(pairAddress) {
     return 1
 }
 
-async function getUniswapV2PairHistory() {
-    var fromBlock = FROMBLOCK, toBlock = TOBLOCK
-    var sum = 0
+async function getAllPairs(fromBlock) {
+    if (fromBlock > TOBLOCK) return
 
-    for (var i = fromBlock; i < toBlock; i += 10000) {
-        var from = i
-        var to = i + 9999
+    try {
+        var toBlock = fromBlock + 999
 
-        if (to > toBlock) to = toBlock
-        
-        let options = {
-            fromBlock: from,
-            toBlock: to,
-            topics: ['0x0d3648bd0f6ba80134a33ba9275ac585d9d315f0ad8355cddefde31afa28d0e9']
-        };
+        if (toBlock > TOBLOCK) toBlock = TOBLOCK
 
-        results = await web3.eth.getPastLogs(options)
+        results = await Promise.all([
+            web3.eth.getPastLogs({
+                fromBlock: fromBlock,
+                toBlock: toBlock,
+                topics: ['0x0d3648bd0f6ba80134a33ba9275ac585d9d315f0ad8355cddefde31afa28d0e9']
+            }),
+            web3.eth.getPastLogs({
+                fromBlock: fromBlock,
+                toBlock: toBlock,
+                topics: ['0x783cca1c0412dd0d695e784568c96da2e9c22ff989357a2e8b1d9b2b4e6b7118']
+            })
+        ])
 
-        for (var j = 0; j < results.length; j ++) {
-            await getPairDecimals('0x' + results[j].data.substr(26, 40).toLowerCase())
+        console.log('==================================================')
+        console.log('Block Range: ' + fromBlock + ' ~ ' + toBlock)
+        console.log('UNISWAP V2 PAIR CREATED: ' + results[0].length)
+        console.log('UNISWAP V3 POOL CREATED: ' + results[1].length)
+
+        for (var i = 0; i < results[0].length; i ++) {
+            var token0Address = '0x' + results[0][i].topics[1].substr(26, 40).toLowerCase()
+            var token1Address = '0x' + results[0][i].topics[2].substr(26, 40).toLowerCase()
+            var pairAddress = '0x' + results[0][i].data.substr(26, 40).toLowerCase()
+            var factoryAddress = results[0][i].address.toLowerCase()
+            var block = results[0][i].blockNumber
+            var resBlock = await web3.eth.getBlock(block)
+            var tmpDate = convertTimestampToString(resBlock.timestamp * 1000, true)
+            var res = await getPairDecimals(pairAddress, tmpDate)
+            var baseToken = tokensData[token0Address].createdAt < tokensData[token1Address].createdAt ? 0 : 1
+
+            console.log('-------------------------------------------')
+            console.log('V2 CREATED: ' + results[0][i].transactionHash)
+
+            pairsData[pairAddress] = {
+                token0Address: token0Address,
+                token1Address: token1Address,
+                decimals: res[0],
+                baseToken: baseToken,
+                blockNumber: block,
+                transactionID: 0
+            }
 
             try {
                 await knex('eth_pairs').insert({
-                    token0Address: '0x' + results[j].topics[1].substr(26, 40).toLowerCase(),
-                    token1Address: '0x' + results[j].topics[2].substr(26, 40).toLowerCase(),
-                    pairAddress: '0x' + results[j].data.substr(26, 40).toLowerCase(),
-                    factoryAddress: results[j].address.toLowerCase()
+                    token0Address: token0Address,
+                    token1Address: token1Address,
+                    factoryAddress: factoryAddress,
+                    pairAddress: pairAddress,
+                    createdAt: tmpDate,
+                    blockNumber: block,
+                    transactionID: 0,
+                    baseToken: baseToken,
+                    decimals: res[0]
                 })
             } catch (err) {
-                await knex('eth_pairs').update({
-                    token0Address: '0x' + results[j].topics[1].substr(26, 40).toLowerCase(),
-                    token1Address: '0x' + results[j].topics[2].substr(26, 40).toLowerCase(),
-                    factoryAddress: results[j].address.toLowerCase()
-                }).where('pairAddress', '0x' + results[j].data.substr(26, 40).toLowerCase())
+                console.log(err)
             }
         }
 
-        console.log(i, results.length)
-        sum += results.length
-    }
+        for (var i = 0; i < results[1].length; i ++) {
+            var token0Address = '0x' + results[1][i].topics[1].substr(26, 40).toLowerCase()
+            var token1Address = '0x' + results[1][i].topics[2].substr(26, 40).toLowerCase()
+            var pairAddress = '0x' + results[1][i].data.substr(90, 40).toLowerCase()
+            var factoryAddress = results[1][i].address.toLowerCase()
+            var block = results[1][i].blockNumber
+            var resBlock = await web3.eth.getBlock(block)
+            var tmpDate = convertTimestampToString(resBlock.timestamp * 1000, true)
+            var res = await getPairDecimals(pairAddress, tmpDate)
+            var baseToken = tokensData[token0Address].createdAt < tokensData[token1Address].createdAt ? 0 : 1
 
-    console.log('Finished with ' + sum + ' rows!')
-}
-
-async function getUniswapV3PairHistory() {
-    var fromBlock = FROMBLOCK, toBlock = TOBLOCK
-    var sum = 0
-
-    for (var i = fromBlock; i < toBlock; i += 10000) {
-        var from = i
-        var to = i + 9999
-
-        if (to > toBlock) to = toBlock
-
-        try {
-            let options = {
-                fromBlock: from,
-                toBlock: to,
-                topics: ['0x783cca1c0412dd0d695e784568c96da2e9c22ff989357a2e8b1d9b2b4e6b7118']
-            };
+            console.log('-------------------------------------------')
+            console.log('V3 CREATED: ' + results[1][i].transactionHash)
     
-            results = await web3.eth.getPastLogs(options)
+            pairsData[pairAddress] = {
+                token0Address: token0Address,
+                token1Address: token1Address,
+                decimals: res[0],
+                baseToken: baseToken,
+                blockNumber: block,
+                transactionID: 0
+            }
     
-            for (var j = 0; j < results.length; j ++) {
-                await getPairDecimals('0x' + results[j].data.substr(90, 40).toLowerCase())
-
-                try {
-                    await knex('eth_pairs').insert({
-                        token0Address: '0x' + results[j].topics[1].substr(26, 40).toLowerCase(),
-                        token1Address: '0x' + results[j].topics[2].substr(26, 40).toLowerCase(),
-                        pairAddress: '0x' + results[j].data.substr(90, 40).toLowerCase(),
-                        factoryAddress: results[j].address.toLowerCase()
-                    })
-                } catch (err) {
-                    await knex('eth_pairs').update({
-                        token0Address: '0x' + results[j].topics[1].substr(26, 40).toLowerCase(),
-                        token1Address: '0x' + results[j].topics[2].substr(26, 40).toLowerCase(),
-                        factoryAddress: results[j].address.toLowerCase()
-                    }).where('pairAddress', '0x' + results[j].data.substr(90, 40).toLowerCase())
-                }
-            }
-        } catch (err) {
-            console.log(err)
-        }
-
-        console.log(i, results.length)
-        sum += results.length
-    }
-
-    console.log('Finished with ' + sum + ' rows!')
-}
-
-async function getUniswapV2PairPriceHistory() {
-    var fromBlock = TOBLOCK, toBlock = FROMBLOCK
-    var sum = 0
-    var isVisit = []
-    var decimalList = []
-    var pairList = []
-
-    var rows = await knex('eth_pairs').select('*').where('lastPrice', '!=', 0)
-
-    for (var i = 0; i < rows.length; i ++) {
-        isVisit[rows[i].pairAddress] = true
-        pairList[rows[i].pairAddress] = {
-            token0Address: rows[i].token0Address,
-            token1Address: rows[i].token1Address
-        }
-    }
-
-    rows = await knex('eth_tokens').select('*')
-
-    for (var i = 0; i < rows.length; i ++) {
-        decimalList[rows[i].tokenAddress] = rows[i].tokenDecimals
-    }
-
-    for (var i = fromBlock; i > toBlock; i -= 1000) {
-        var to = i
-        var from = i - 999
-
-        if (from < toBlock) from = toBlock
-        
-        let options = {
-            fromBlock: from,
-            toBlock: to,
-            topics: ['0xd78ad95fa46c994b6551d0da85fc275fe613ce37657fb8d5e3d130840159d822']
-        };
-
-        results = await web3.eth.getPastLogs(options)
-
-        for (var j = results.length - 1; j >= 0; j --) {
             try {
-                if (isVisit[results[j].address.toLowerCase()]) continue
-
-                var amt0 = Number.parseInt(hexToBn(results[j].data.substr(2, 64)))
-                var amt1 = Number.parseInt(hexToBn(results[j].data.substr(66, 64)))
-                var amt2 = Number.parseInt(hexToBn(results[j].data.substr(130, 64)))
-                var amt3 = Number.parseInt(hexToBn(results[j].data.substr(194, 64)))
-                var swap0 = amt0 + amt2
-                var swap1 = amt1 + amt3
-
-                var decimal0 = -1
-                var decimal1 = -1
-                var decimals = 0
-
-                if (pairList[results[j].address.toLowerCase()] && decimalList[pairList[results[j].address.toLowerCase()].token0Address]) {
-                    decimal0 = decimalList[pairList[results[j].address.toLowerCase()].token0Address]
-                }
-
-                if (pairList[results[j].address.toLowerCase()] && decimalList[pairList[results[j].address.toLowerCase()].token1Address]) {
-                    decimal1 = decimalList[pairList[results[j].address.toLowerCase()].token1Address]
-                }
-                
-                if (decimal0 != -1 && decimal1 != -1) {
-                    decimals = decimal1 - decimal0
-                } else {
-                    decimals = await getPairDecimals(results[j].address)
-                }
-
-                var res = await web3.eth.getBlock(results[j].blockNumber)
-                
-                await knex('eth_pairs').update({
-                    lastPrice: Math.abs(swap0 * 1.0 * 10 ** decimals / swap1),
-                    timestamp: res.timestamp
-                }).where('pairAddress', results[j].address.toLowerCase())
-
-                isVisit[results[j].address.toLowerCase()] = true
+                await knex('eth_pairs').insert({
+                    token0Address: token0Address,
+                    token1Address: token1Address,
+                    factoryAddress: factoryAddress,
+                    pairAddress: pairAddress,
+                    createdAt: tmpDate,
+                    blockNumber: block,
+                    transactionID: 0,
+                    baseToken: baseToken,
+                    decimals: res[0]
+                })
             } catch (err) {
-                console.log(results[j])
                 console.log(err)
             }
         }
-
-        console.log('===================================')
-        console.log(i, results.length)
-        sum += results.length
+    } catch (err) {
+        console.log(err)
     }
 
-    console.log('Finished with ' + sum + ' rows!')
+    getAllPairs(toBlock + 1)
 }
 
-async function getUniswapV2PairPriceHistoryNotFirstTime() {
-    var fromBlock = TOBLOCK, toBlock = FROMBLOCK
-    var sum = 0
-    var decimalList = []
-    var pairList = []
-
-    var rows = await knex('eth_pairs').select('*')
-
-    for (var i = 0; i < rows.length; i ++) {
-        pairList[rows[i].pairAddress] = {
-            token0Address: rows[i].token0Address,
-            token1Address: rows[i].token1Address
-        }
-    }
-
-    rows = await knex('eth_tokens').select('*')
-
-    for (var i = 0; i < rows.length; i ++) {
-        decimalList[rows[i].tokenAddress] = rows[i].tokenDecimals
-    }
-
-    for (var i = fromBlock; i > toBlock; i -= 1000) {
-        var to = i
-        var from = i - 999
-
-        if (from < toBlock) from = toBlock
-        
-        let options = {
-            fromBlock: from,
-            toBlock: to,
-            topics: ['0xd78ad95fa46c994b6551d0da85fc275fe613ce37657fb8d5e3d130840159d822']
-        };
-
-        results = await web3.eth.getPastLogs(options)
-
-        for (var j = results.length - 1; j >= 0; j --) {
-            try {
-                var amt0 = Number.parseInt(hexToBn(results[j].data.substr(2, 64)))
-                var amt1 = Number.parseInt(hexToBn(results[j].data.substr(66, 64)))
-                var amt2 = Number.parseInt(hexToBn(results[j].data.substr(130, 64)))
-                var amt3 = Number.parseInt(hexToBn(results[j].data.substr(194, 64)))
-                var swap0 = amt0 + amt2
-                var swap1 = amt1 + amt3
-
-                var decimal0 = -1
-                var decimal1 = -1
-                var decimals = 0
-
-                if (pairList[results[j].address.toLowerCase()] && decimalList[pairList[results[j].address.toLowerCase()].token0Address]) {
-                    decimal0 = decimalList[pairList[results[j].address.toLowerCase()].token0Address]
-                }
-
-                if (pairList[results[j].address.toLowerCase()] && decimalList[pairList[results[j].address.toLowerCase()].token1Address]) {
-                    decimal1 = decimalList[pairList[results[j].address.toLowerCase()].token1Address]
-                }
-                
-                if (decimal0 != -1 && decimal1 != -1) {
-                    decimals = decimal1 - decimal0
-                } else {
-                    decimals = await getPairDecimals(results[j].address)
-                }
-
-                var res = await web3.eth.getBlock(results[j].blockNumber)
-                
-                await knex('eth_pairs').update({
-                    lastPrice: Math.abs(swap0 * 1.0 * 10 ** decimals / swap1),
-                    timestamp: res.timestamp
-                }).where('pairAddress', results[j].address.toLowerCase())
-                .where('timestamp', '<', res.timestamp)
-            } catch (err) {
-                console.log(results[j])
-                console.log(err)
-            }
-        }
-
-        console.log('===================================')
-        console.log(i, results.length)
-        sum += results.length
-    }
-
-    console.log('Finished with ' + sum + ' rows!')
-}
-
-async function getUniswapV3PairPriceHistory() {
-    var fromBlock = TOBLOCK, toBlock = FROMBLOCK
-    var sum = 0
-    var isVisit = []
-    var decimalList = []
-    var pairList = []
-
-    var rows = await knex('eth_pairs').select('*').where('lastPrice', '!=', 0)
-
-    for (var i = 0; i < rows.length; i ++) {
-        isVisit[rows[i].pairAddress] = true
-        pairList[rows[i].pairAddress] = {
-            token0Address: rows[i].token0Address,
-            token1Address: rows[i].token1Address
-        }
-    }
-
-    rows = await knex('eth_tokens').select('*')
-
-    for (var i = 0; i < rows.length; i ++) {
-        decimalList[rows[i].tokenAddress] = rows[i].tokenDecimals
-    }
-
-    for (var i = fromBlock; i > toBlock; i -= 1000) {
-        var to = i
-        var from = i - 999
-
-        if (from < toBlock) from = toBlock
-        
-        let options = {
-            fromBlock: from,
-            toBlock: to,
-            topics: ['0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67']
-        };
-
-        results = await web3.eth.getPastLogs(options)
-
-        for (var j = results.length - 1; j >= 0; j --) {
-            try {
-                if (isVisit[results[j].address.toLowerCase()]) continue
-
-                var swap0 = Number.parseInt(hexToBn(results[j].data.substr(2, 64)))
-                var swap1 = Number.parseInt(hexToBn(results[j].data.substr(66, 64)))
-                var decimal0 = -1
-                var decimal1 = -1
-                var decimals = 0
-
-                if (pairList[results[j].address.toLowerCase()] && decimalList[pairList[results[j].address.toLowerCase()].token0Address]) {
-                    decimal0 = decimalList[pairList[results[j].address.toLowerCase()].token0Address]
-                }
-
-                if (pairList[results[j].address.toLowerCase()] && decimalList[pairList[results[j].address.toLowerCase()].token1Address]) {
-                    decimal1 = decimalList[pairList[results[j].address.toLowerCase()].token1Address]
-                }
-                
-                if (decimal0 != -1 && decimal1 != -1) {
-                    decimals = decimal1 - decimal0
-                } else {
-                    decimals = await getPairDecimals(results[j].address)
-                }
-
-                var res = await web3.eth.getBlock(results[j].blockNumber)
-                
-                await knex('eth_pairs').update({
-                    lastPrice: Math.abs(swap0 * 1.0 * 10 ** decimals / swap1),
-                    timestamp: res.timestamp
-                }).where('pairAddress', results[j].address.toLowerCase())
-
-                isVisit[results[j].address.toLowerCase()] = true
-            } catch (err) {
-                console.log(results[j])
-                console.log(err)
-            }
-        }
-
-        console.log('===================================')
-        console.log(i, results.length)
-        sum += results.length
-    }
-
-    console.log('Finished with ' + sum + ' rows!')
-}
-
-async function getUniswapV3PairPriceHistoryNotFirstTime() {
-    var fromBlock = TOBLOCK, toBlock = FROMBLOCK
-    var sum = 0
-    var decimalList = []
-    var pairList = []
-
-    var rows = await knex('eth_pairs').select('*')
-
-    for (var i = 0; i < rows.length; i ++) {
-        pairList[rows[i].pairAddress] = {
-            token0Address: rows[i].token0Address,
-            token1Address: rows[i].token1Address
-        }
-    }
-
-    rows = await knex('eth_tokens').select('*')
-
-    for (var i = 0; i < rows.length; i ++) {
-        decimalList[rows[i].tokenAddress] = rows[i].tokenDecimals
-    }
-
-    for (var i = fromBlock; i > toBlock; i -= 1000) {
-        var to = i
-        var from = i - 999
-
-        if (from < toBlock) from = toBlock
-        
-        let options = {
-            fromBlock: from,
-            toBlock: to,
-            topics: ['0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67']
-        };
-
-        results = await web3.eth.getPastLogs(options)
-
-        for (var j = results.length - 1; j >= 0; j --) {
-            try {
-                var swap0 = Number.parseInt(hexToBn(results[j].data.substr(2, 64)))
-                var swap1 = Number.parseInt(hexToBn(results[j].data.substr(66, 64)))
-                var decimal0 = -1
-                var decimal1 = -1
-                var decimals = 0
-
-                if (pairList[results[j].address.toLowerCase()] && decimalList[pairList[results[j].address.toLowerCase()].token0Address]) {
-                    decimal0 = decimalList[pairList[results[j].address.toLowerCase()].token0Address]
-                }
-
-                if (pairList[results[j].address.toLowerCase()] && decimalList[pairList[results[j].address.toLowerCase()].token1Address]) {
-                    decimal1 = decimalList[pairList[results[j].address.toLowerCase()].token1Address]
-                }
-                
-                if (decimal0 != -1 && decimal1 != -1) {
-                    decimals = decimal1 - decimal0
-                } else {
-                    decimals = await getPairDecimals(results[j].address)
-                }
-
-                var res = await web3.eth.getBlock(results[j].blockNumber)
-                
-                await knex('eth_pairs').update({
-                    lastPrice: Math.abs(swap0 * 1.0 * 10 ** decimals / swap1),
-                    timestamp: res.timestamp
-                }).where('pairAddress', results[j].address.toLowerCase())
-                .where('timestamp', '<', res.timestamp)
-            } catch (err) {
-                console.log(results[j])
-                console.log(err)
-            }
-        }
-
-        console.log('===================================')
-        console.log(i, results.length)
-        sum += results.length
-    }
-
-    console.log('Finished with ' + sum + ' rows!')
-}
-
-async function getBlockNumberFromTimeStamp() {
-    for (var i = TOBLOCK; i >= 0; i -= 100) {
-        var res = await web3.eth.getBlock(i)
-
-        console.log(i, res.timestamp)
-
-        if (res.timestamp < 1640552420) break;
-    }
-
-    console.log('Finished! Block Number is ' + i)
-}
-
-async function checkIfPairExist(tokenAddress) {
-    let options = {
-        fromBlock: 0,
-        topics: ['0x0d3648bd0f6ba80134a33ba9275ac585d9d315f0ad8355cddefde31afa28d0e9', tokenAddress]
-    };
-
-    results = await web3.eth.getPastLogs(options)
-
-    console.log(results)
-
-    options = {
-        fromBlock: 0,
-        topics: ['0x0d3648bd0f6ba80134a33ba9275ac585d9d315f0ad8355cddefde31afa28d0e9', null, tokenAddress]
-    };
-
-    results = await web3.eth.getPastLogs(options)
-
-    console.log(results)
-}
-
-//getUniswapV2PairHistory()
-//getUniswapV3PairHistory()
-//getUniswapV2PairPriceHistory()
-//getUniswapV3PairPriceHistory()
-//getUniswapV2PairPriceHistoryNotFirstTime()
-//getUniswapV3PairPriceHistoryNotFirstTime()
-//getBlockNumberFromTimeStamp()
-//checkIfPairExist('0x000000000000000000000000fd09cf7cfffa9932e33668311c4777cb9db3c9be')
+getAllPairs(FROMBLOCK)

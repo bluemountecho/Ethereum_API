@@ -136,6 +136,7 @@ const options = {
         onTimeout: false
     }
 };
+
 const web3 = new Web3(new Web3.providers.HttpProvider('https://eth-mainnet.alchemyapi.io/v2/_732q-Q7bDxHrmyOqA-oazz3r1LBJKx5', options))
 const knex = require('knex')({
     client: 'mysql',
@@ -204,7 +205,7 @@ async function getTokenInfos(tokenAddress) {
     }    
 }
 
-async function getPairDecimals(pairAddress) {
+async function getPairDecimals(pairAddress, createdAt) {
     /*
     var rows = await knex('eth_pairs').where('pairAddress', pairAddress).select('*')
     var token0Address, token1Address
@@ -247,14 +248,16 @@ async function getPairDecimals(pairAddress) {
             tokensData[token0Address] = {
                 tokenDecimals: res[0][0],
                 tokenSymbol: res[0][1],
-                tokenName: res[0][2]
+                tokenName: res[0][2],
+                createdAt: createdAt
             }
 
             knex('eth_tokens').insert({
                 tokenAddress: token0Address,
                 tokenDecimals: res[0][0],
                 tokenSymbol: res[0][1],
-                tokenName: res[0][2]
+                tokenName: res[0][2],
+                createdAt: createdAt
             }).then(res => {})
             .catch(err => {})
         }
@@ -270,14 +273,16 @@ async function getPairDecimals(pairAddress) {
             tokensData[token1Address] = {
                 tokenDecimals: res[1][0],
                 tokenSymbol: res[1][1],
-                tokenName: res[1][2]
+                tokenName: res[1][2],
+                createdAt: createdAt
             }
 
             knex('eth_tokens').insert({
                 tokenAddress: token1Address,
                 tokenDecimals: res[1][0],
                 tokenSymbol: res[1][1],
-                tokenName: res[1][2]
+                tokenName: res[1][2],
+                createdAt: createdAt
             }).then(res => {})
             .catch(err => {})
         }
@@ -295,7 +300,7 @@ function convertTimestampToString(timestamp, flag = false) {
     if (flag == false) {
         return new Date(timestamp).toISOString().replace(/T/, ' ').replace(/\..+/, '').replace(/ /g, '_').replace(/:/g, '_').replace(/-/g, '_')
     } else {
-        return new Date(timestamp).toISOString().replace(/T/, ' ').replace(/\..+/, '').replace(/-/g, '_').split(' ')[0]
+        return new Date(timestamp).toISOString().replace(/T/, ' ').replace(/\..+/, '')
     }
 }
 
@@ -341,7 +346,9 @@ async function init() {
             var pairAddress = '0x' + results[0][i].data.substr(26, 40).toLowerCase()
             var factoryAddress = results[0][i].address.toLowerCase()
             var block = results[0][i].blockNumber
-            var res = await getPairDecimals(pairAddress)
+            var resBlock = await web3.eth.getBlock(block)
+            var tmpDate = convertTimestampToString(resBlock.timestamp * 1000, true)
+            var res = await getPairDecimals(pairAddress, tmpDate)
 
             console.log('-------------------------------------------')
             console.log('V2 CREATED: ' + results[0][i].transactionHash)
@@ -359,6 +366,7 @@ async function init() {
                     token0Address: token0Address,
                     token1Address: token1Address,
                     pairAddress: pairAddress,
+                    createdAt: tmpDate,
                     factoryAddress: factoryAddress,
                     blockNumber: block,
                     transactionID: 0
@@ -373,8 +381,8 @@ async function init() {
             var amt1 = Number.parseInt(hexToBn(results[1][i].data.substr(66, 64)))
             var amt2 = Number.parseInt(hexToBn(results[1][i].data.substr(130, 64)))
             var amt3 = Number.parseInt(hexToBn(results[1][i].data.substr(194, 64)))
-            var swap0 = amt0 + amt2
-            var swap1 = amt1 + amt3
+            var swap0 = amt2 - amt0
+            var swap1 = amt3 - amt1
             var pairAddress = results[1][i].address.toLowerCase()
             var block = results[1][i].blockNumber
             var transactionID = results[1][i].logIndex

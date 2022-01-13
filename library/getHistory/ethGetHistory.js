@@ -291,6 +291,8 @@ async function getPairDecimals(pairAddress, createdAt) {
 async function getTokenAndPairData() {
     var res = await knex('eth_tokens').select('*')
 
+    console.log(res.length)
+
     for (var i = 0; i < res.length; i ++) {
         tokensData[res.tokenAddress] = {
             tokenDecimals: res.tokenDecimals,
@@ -301,6 +303,8 @@ async function getTokenAndPairData() {
     }
 
     res = await knex('eth_pairs').select('*')
+
+    console.log(res.length)
 
     for (var i = 0; i < res.length; i ++) {
         pairsData[res.pairAddress] = {
@@ -432,6 +436,6 @@ async function getAllPairs(fromBlock) {
 getTokenAndPairData()
 .then(res => {
     console.log('Getting token and pair data finished!')
-    
-    //getAllPairs(FROMBLOCK)
+
+    getAllPairs(FROMBLOCK)
 })

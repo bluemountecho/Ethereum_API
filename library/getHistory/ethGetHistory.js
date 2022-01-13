@@ -325,8 +325,8 @@ async function getAllPairs(fromBlock) {
             var res = await getPairDecimals(pairAddress, tmpDate)
             var baseToken = tokensData[token0Address].createdAt < tokensData[token1Address].createdAt ? 0 : 1
 
-            console.log('-------------------------------------------')
-            console.log('V2 CREATED: ' + results[0][i].transactionHash)
+            // console.log('-------------------------------------------')
+            // console.log('V2 CREATED: ' + results[0][i].transactionHash)
 
             pairsData[pairAddress] = {
                 token0Address: token0Address,
@@ -365,8 +365,8 @@ async function getAllPairs(fromBlock) {
             var res = await getPairDecimals(pairAddress, tmpDate)
             var baseToken = tokensData[token0Address].createdAt < tokensData[token1Address].createdAt ? 0 : 1
 
-            console.log('-------------------------------------------')
-            console.log('V3 CREATED: ' + results[1][i].transactionHash)
+            // console.log('-------------------------------------------')
+            // console.log('V3 CREATED: ' + results[1][i].transactionHash)
     
             pairsData[pairAddress] = {
                 token0Address: token0Address,

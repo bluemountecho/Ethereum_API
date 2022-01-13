@@ -294,11 +294,11 @@ async function getTokenAndPairData() {
     console.log(res.length)
 
     for (var i = 0; i < res.length; i ++) {
-        tokensData[res.tokenAddress] = {
-            tokenDecimals: res.tokenDecimals,
-            tokenSymbol: res.tokenSymbol,
-            tokenName: res.tokenName,
-            createdAt: res.createdAt
+        tokensData[res[i].tokenAddress] = {
+            tokenDecimals: res[i].tokenDecimals,
+            tokenSymbol: res[i].tokenSymbol,
+            tokenName: res[i].tokenName,
+            createdAt: convertTimestampToString(res[i].createdAt, true)
         }
     }
 
@@ -307,13 +307,13 @@ async function getTokenAndPairData() {
     console.log(res.length)
 
     for (var i = 0; i < res.length; i ++) {
-        pairsData[res.pairAddress] = {
-            token0Address: res.token0Address,
-            token1Address: res.token1Address,
-            decimals: res.decimals,
-            baseToken: res.baseToken,
-            blockNumber: res.blockNumber,
-            transactionID: res.transactionID
+        pairsData[res[i].pairAddress] = {
+            token0Address: res[i].token0Address,
+            token1Address: res[i].token1Address,
+            decimals: res[i].decimals,
+            baseToken: res[i].baseToken,
+            blockNumber: res[i].blockNumber,
+            transactionID: res[i].transactionID
         }
     }
 

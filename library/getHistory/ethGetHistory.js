@@ -189,7 +189,8 @@ function convertTimestampToString(timestamp, flag = false) {
 var tokensData = []
 var pairsData = []
 var FROMBLOCK = 10000000
-var TOBLOCK = 14003767
+// var TOBLOCK = 14003767
+var TOBLOCK = 10169999
 
 async function getTokenInfos(tokenAddress) {
     try {
@@ -805,13 +806,11 @@ async function getTransactionHistory(fromBlock) {
     getTransactionHistory(toBlock + 1)
 }
 
-getAllPairs(FROMBLOCK)
+// getAllPairs(FROMBLOCK)
 
-// getTokenAndPairData()
-// .then(res => {
-//     myLogger.log('Getting token and pair data finished!')
+getTokenAndPairData()
+.then(res => {
+    myLogger.log('Getting token and pair data finished!')
 
-//     getTransactionHistory(FROMBLOCK)
-// })
-
-//writeTransactionHistoryFile('2022-01-15')
+    getTransactionHistory(FROMBLOCK)
+})

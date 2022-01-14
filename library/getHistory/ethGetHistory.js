@@ -3,8 +3,8 @@ var path = require('path')
 
 const { Console } = require("console");
 const myLogger = new Console({
-  stdout: fs.createWriteStream("log.txt"),
-  stderr: fs.createWriteStream("log.txt"),
+  stdout: fs.createWriteStream("log_" + convertTimestampToString(new Date())  + ".txt"),
+  stderr: fs.createWriteStream("log_" + convertTimestampToString(new Date())  + ".txt"),
 });
 
 Web3 = require('web3')
@@ -188,8 +188,8 @@ function convertTimestampToString(timestamp, flag = false) {
 
 var tokensData = []
 var pairsData = []
-var FROMBLOCK = 10001000
-var TOBLOCK = 10020000
+var FROMBLOCK = 0
+var TOBLOCK = 14003767
 
 async function getTokenInfos(tokenAddress) {
     try {
@@ -328,7 +328,7 @@ async function getAllPairs(fromBlock) {
     if (fromBlock > TOBLOCK) return
 
     try {
-        var toBlock = fromBlock + 9999
+        var toBlock = fromBlock + 999
 
         if (toBlock > TOBLOCK) toBlock = TOBLOCK
 
@@ -805,11 +805,13 @@ async function getTransactionHistory(fromBlock) {
     getTransactionHistory(toBlock + 1)
 }
 
-getTokenAndPairData()
-.then(res => {
-    myLogger.log('Getting token and pair data finished!')
+getAllPairs(FROMBLOCK)
 
-    getTransactionHistory(FROMBLOCK)
-})
+// getTokenAndPairData()
+// .then(res => {
+//     myLogger.log('Getting token and pair data finished!')
+
+//     getTransactionHistory(FROMBLOCK)
+// })
 
 //writeTransactionHistoryFile('2022-01-15')

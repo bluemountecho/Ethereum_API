@@ -748,13 +748,11 @@ async function writeTransactionHistoryFile(date) {
         fs.appendFile(fileName, JSON.stringify(rows[i]) + '\n', "utf8", (err) => { })
     }
 
-    rows = await knex('eth_past')
-        .where('swapAt', '<', date + ' ' + '00:00:00')
-        .select('*')
+    rows = (await knex.raw('select CONCAT(YEAR( eth_past.swapAt ), "-", MONTH( eth_past.swapAt ), "-", DAY( eth_past.swapAt )) AS SWAPAT, swapMaker as SWAPMAKER, pairAddress from eth_past where eth_past.swapAt<"' + date + ' ' + '00:00:00' + '" order by swapAt'))[0]
 
     for (var i = 0; i < rows.length; i ++) {
         var fileName = path + '/swapers/' + rows[i].pairAddress + '.txt'
-        fs.appendFile(fileName, rows[i].swapMaker + '\n', "utf8", (err) => { })
+        fs.appendFile(fileName, JSON.stringify(rows[i]) + '\n', "utf8", (err) => { })
     }
 
     await knex('eth_past').where('swapAt', '<', date + ' ' + '00:00:00').delete()

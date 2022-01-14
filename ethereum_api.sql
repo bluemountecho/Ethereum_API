@@ -11,7 +11,7 @@
  Target Server Version : 100417
  File Encoding         : 65001
 
- Date: 13/01/2022 22:14:39
+ Date: 13/01/2022 23:51:27
 */
 
 SET NAMES utf8mb4;
@@ -48,6 +48,21 @@ CREATE TABLE `eth_pairs`  (
   `baseToken` tinyint(255) NULL DEFAULT 0,
   `decimals` int(255) NULL DEFAULT NULL,
   PRIMARY KEY (`pairAddress`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Table structure for eth_past
+-- ----------------------------
+DROP TABLE IF EXISTS `eth_past`;
+CREATE TABLE `eth_past`  (
+  `pairAddress` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `swapPrice` double NULL DEFAULT NULL,
+  `swapAmount0` double NULL DEFAULT NULL,
+  `swapAmount1` double NULL DEFAULT NULL,
+  `swapMaker` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `swapTransactionHash` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `swapAt` timestamp(0) NULL DEFAULT NULL,
+  `isBuy` tinyint(4) NULL DEFAULT 0
 ) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------

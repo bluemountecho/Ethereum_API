@@ -89,7 +89,8 @@ module.exports.getPriceOfToken = async function getPriceOfToken(tokenAddress) {
             .select('*')
             .where('token0Address', token0Address)
             .where('token1Address', token1Address)
-            .orderBy('timestamp', 'desc')
+            .orderBy('blockNumber', 'desc')
+            .orderBy('transactionID', 'desc')
 
         if (rows.length && rows[0].lastPrice > 0) {
             var price = token0Address == USDC_ADDRESS ? rows[0].lastPrice : (1.0 / rows[0].lastPrice)
@@ -115,7 +116,8 @@ module.exports.getPriceOfToken = async function getPriceOfToken(tokenAddress) {
                     .select('*')
                     .where('token0Address', token0Address)
                     .where('token1Address', token1Address)
-                    .orderBy('timestamp', 'desc')
+                    .orderBy('blockNumber', 'desc')
+                    .orderBy('transactionID', 'desc')
             )
 
             token0Address = USDC_ADDRESS > baseTokens[i] ? baseTokens[i] : USDC_ADDRESS
@@ -126,7 +128,8 @@ module.exports.getPriceOfToken = async function getPriceOfToken(tokenAddress) {
                     .select('*')
                     .where('token0Address', token0Address)
                     .where('token1Address', token1Address)
-                    .orderBy('timestamp', 'desc')
+                    .orderBy('blockNumber', 'desc')
+                    .orderBy('transactionID', 'desc')
             )
 
             var res = await Promise.all(funcs)

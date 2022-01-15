@@ -188,9 +188,8 @@ function convertTimestampToString(timestamp, flag = false) {
 
 var tokensData = []
 var pairsData = []
-var FROMBLOCK = 10000000
-// var TOBLOCK = 14003767
-var TOBLOCK = 10570999
+var FROMBLOCK = 10571000
+var TOBLOCK = 14003767
 
 async function getTokenInfos(tokenAddress) {
     try {

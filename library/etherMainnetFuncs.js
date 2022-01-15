@@ -247,8 +247,6 @@ module.exports.getPairPriceHistory = async function getPairPriceHistory(pairAddr
         var rows = content.split('\n')
         var datas = []
 
-        console.log(rows)
-
         for (var i = 0; i < rows.length - 1; i ++) {
             datas.push(JSON.parse(rows[i]))
         }

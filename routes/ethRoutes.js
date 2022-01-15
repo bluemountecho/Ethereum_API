@@ -23,4 +23,11 @@ router.get('/all_tokens', function (req, res, next) {
   })
 })
 
+router.get('/pair_price_history/:pairAddr', function(req, res, next) {
+  etherMainnetFuncs.getPairPriceHistory(req.params.pairAddr)
+  .then((data) => {
+    res.send(JSON.stringify(data))
+  })
+});
+
 module.exports = router;

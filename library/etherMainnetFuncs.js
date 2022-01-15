@@ -3,14 +3,16 @@ const knex = require('knex')({
     connection: {
       host : '127.0.0.1',
       port : 3306,
-      user : 'root',
-      password : '',
-      database : 'ethereum_api'
+      user : 'admin_root',
+      password : 'bOPTDZXP8Xvdf9I1',
+      database : 'admin_ethereum_api'
     }
 })
 
 const baseTokens = require('./etherBaseTokens.json')
 const USDC_ADDRESS = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+
+var fs = require('fs')
 
 /*
 var pairList = []
@@ -230,6 +232,23 @@ module.exports.getAllTokens = async function getAllTokens() {
                 symbol: rows[i].tokenSymbol,
                 name: rows[i].tokenName
             })
+        }
+
+        return datas
+    } catch (err) {
+        console.log(err)
+    }
+}
+
+module.exports.getPairPriceHistory = async function getPairPriceHistory(pairAddr) {
+    try {
+        var pair = pairAddr.toLowerCase()
+        var content = await fs.readFile('../database/ethereum/transactions/' + pair + '.txt', 'utf8')
+        var rows = content.split('\n')
+        var datas = []
+
+        for (var i = 0; i < rows.length; i ++) {
+            datas.push(JSON.parse(rows[i]))
         }
 
         return datas

@@ -243,7 +243,7 @@ module.exports.getAllTokens = async function getAllTokens() {
 module.exports.getPairPriceHistory = async function getPairPriceHistory(pairAddr) {
     try {
         var pair = pairAddr.toLowerCase()
-        var content = fs.readFileSync('../database/ethereum/transactions/' + pair + '.txt', {encoding:'utf8', flag:'r'})
+        var content = fs.readFileSync('/database/ethereum/transactions/' + pair + '.txt', {encoding:'utf8', flag:'r'})
         var rows = content.split('\n')
         var datas = []
 

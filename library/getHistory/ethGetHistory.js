@@ -188,6 +188,7 @@ function convertTimestampToString(timestamp, flag = false) {
 
 var tokensData = []
 var pairsData = []
+var blocksData = []
 var FROMBLOCK = 10973300
 var TOBLOCK = 14003767
 
@@ -467,7 +468,15 @@ async function getOnePartTransactionHistory(fromBlock, toBlock) {
             var swap1 = amt1 - amt3
             var pairAddress = results[0][i].address.toLowerCase()
             var block = results[0][i].blockNumber
-            var resBlock = await web3.eth.getBlock(block)
+            var resBlock
+
+            if (!blocksData[block]) {
+                resBlock = await web3.eth.getBlock(block)
+                blocksData[block] = {timestamp: resBlock.timestamp}
+            } else {
+                resBlock = blocksData[block]
+            }
+            
             var tmpDate = convertTimestampToString(resBlock.timestamp * 1000, true)
             var transactionID = results[0][i].logIndex
             var transactionHash = results[0][i].transactionHash
@@ -591,7 +600,15 @@ async function getOnePartTransactionHistory(fromBlock, toBlock) {
             var swap1 = Number.parseInt(hexToBn(results[1][i].data.substr(66, 64)))
             var pairAddress = results[1][i].address.toLowerCase()
             var block = results[1][i].blockNumber
-            var resBlock = await web3.eth.getBlock(block)
+            var resBlock
+
+            if (!blocksData[block]) {
+                resBlock = await web3.eth.getBlock(block)
+                blocksData[block] = {timestamp: resBlock.timestamp}
+            } else {
+                resBlock = blocksData[block]
+            }
+            
             var tmpDate = convertTimestampToString(resBlock.timestamp * 1000, true)
             var transactionID = results[1][i].logIndex
             var transactionHash = results[1][i].transactionHash
@@ -767,7 +784,7 @@ async function getTransactionHistory(fromBlock) {
 
     try {
         var v1 = 1000
-        var v2 = 10
+        var v2 = 20
         var toBlock = fromBlock + v1 - 1
         var funcs = []
 
@@ -787,10 +804,25 @@ async function getTransactionHistory(fromBlock) {
 
         await Promise.all(funcs)
 
-        var resBlock = await web3.eth.getBlock(fromBlock)
+        
+        var resBlock
+
+        if (!blocksData[fromBlock]) {
+            resBlock = await web3.eth.getBlock(fromBlock)
+            blocksData[fromBlock] = {timestamp: resBlock.timestamp}
+        } else {
+            resBlock = blocksData[fromBlock]
+        }
+
         var tmpDate1 = convertTimestampToString(resBlock.timestamp * 1000, true)
 
-        resBlock = await web3.eth.getBlock(toBlock)
+        if (!blocksData[toBlock]) {
+            resBlock = await web3.eth.getBlock(toBlock)
+            blocksData[toBlock] = {timestamp: resBlock.timestamp}
+        } else {
+            resBlock = blocksData[toBlock]
+        }
+
         var tmpDate2 = convertTimestampToString(resBlock.timestamp * 1000, true)
 
         if (tmpDate1.split(' ')[0] != tmpDate2.split(' ')[0]) {

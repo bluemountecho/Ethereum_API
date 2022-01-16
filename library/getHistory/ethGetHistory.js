@@ -145,7 +145,8 @@ const options = {
 // const web3 = new Web3(new Web3.providers.HttpProvider('https://eth-mainnet.alchemyapi.io/v2/SszaZPuxxxVhD6TKaCScBk7SQN4EEO8t', options))
 // const web3 = new Web3(new Web3.providers.HttpProvider('https://eth-mainnet.alchemyapi.io/v2/UhrdEQkkqcqwwlm9wOXnYx71ut5BNDTd', options))
 // const web3 = new Web3(new Web3.providers.HttpProvider('https://eth-mainnet.alchemyapi.io/v2/GwVYJ0rBAGMeeC7nkaVdBimTapbyssKC', options))
-const web3 = new Web3(new Web3.providers.HttpProvider('https://eth-mainnet.alchemyapi.io/v2/KDRotLOmW8M21flLsKNaLN4IO5lB_6PN', options))
+// const web3 = new Web3(new Web3.providers.HttpProvider('https://eth-mainnet.alchemyapi.io/v2/KDRotLOmW8M21flLsKNaLN4IO5lB_6PN', options))
+const web3 = new Web3(new Web3.providers.HttpProvider('https://eth-mainnet.alchemyapi.io/v2/fwJegFhgVtUiflVVpMRv0wV00g1CWW0p', options))
 
 const knex = require('knex')({
     client: 'mysql',
@@ -201,8 +202,10 @@ var blocksData = []
 // var TOBLOCK = 11994473
 // var FROMBLOCK = 11994474
 // var TOBLOCK = 12299578
-var FROMBLOCK = 12299579
-var TOBLOCK = 12603434
+// var FROMBLOCK = 12299579
+// var TOBLOCK = 12603434
+var FROMBLOCK = 12603435
+var TOBLOCK = 13104131
 
 async function getTokenInfos(tokenAddress) {
     try {
@@ -569,7 +572,7 @@ async function getOnePartTransactionHistory(fromBlock, toBlock) {
 
                 try {
                     insertDatas.push(data)
-                    // await knex('eth_past3').insert(data)
+                    // await knex('eth_past4').insert(data)
                 } catch (err) {
                     myLogger.log(err)
                 }
@@ -600,7 +603,7 @@ async function getOnePartTransactionHistory(fromBlock, toBlock) {
 
                 try {
                     insertDatas.push(data)
-                    // await knex('eth_past3').insert(data)
+                    // await knex('eth_past4').insert(data)
                 } catch (err) {
                     myLogger.log(err)
                 }
@@ -700,7 +703,7 @@ async function getOnePartTransactionHistory(fromBlock, toBlock) {
 
                 try {
                     insertDatas.push(data)
-                    // await knex('eth_past3').insert(data)
+                    // await knex('eth_past4').insert(data)
                 } catch (err) {
                     myLogger.log(err)
                 }
@@ -731,7 +734,7 @@ async function getOnePartTransactionHistory(fromBlock, toBlock) {
 
                 try {
                     insertDatas.push(data)
-                    // await knex('eth_past3').insert(data)
+                    // await knex('eth_past4').insert(data)
                 } catch (err) {
                     myLogger.log(err)
                 }
@@ -739,7 +742,7 @@ async function getOnePartTransactionHistory(fromBlock, toBlock) {
         }
 
         if (insertDatas.length) {
-            await knex('eth_past3').insert(insertDatas)
+            await knex('eth_past4').insert(insertDatas)
         }
     } catch (err) {
         myLogger.log(err)
@@ -751,39 +754,39 @@ async function writeTransactionHistoryFile(date) {
 
     var rows = (await knex.raw('\
         SELECT\
-            eth_past3.pairAddress AS PAIRADDRESS,\
-            CONCAT(YEAR( eth_past3.swapAt ), "-", MONTH( eth_past3.swapAt ), "-", DAY( eth_past3.swapAt )) AS SWAPAT,\
-            avg( eth_past3.swapPrice ) AS AVGPRICE,\
-            max( eth_past3.swapPrice ) AS MAXPRICE,\
-            min( eth_past3.swapPrice ) AS MINPRICE,\
-            sum( eth_past3.swapAmount0 * ( eth_pairs.baseToken * 2 - 1 ) * ( eth_past3.isBuy * - 2 + 1 ) ) AS VOLUME0,\
-            sum( eth_past3.swapAmount1 * ( eth_pairs.baseToken * - 2 + 1 ) * ( eth_past3.isBuy * - 2 + 1 ) ) AS VOLUME1,\
-            sum( eth_past3.swapAmount0 ) AS TOTALVOLUME0,\
-            sum( eth_past3.swapAmount1 ) AS TOTALVOLUME1 \
+            eth_past4.pairAddress AS PAIRADDRESS,\
+            CONCAT(YEAR( eth_past4.swapAt ), "-", MONTH( eth_past4.swapAt ), "-", DAY( eth_past4.swapAt )) AS SWAPAT,\
+            avg( eth_past4.swapPrice ) AS AVGPRICE,\
+            max( eth_past4.swapPrice ) AS MAXPRICE,\
+            min( eth_past4.swapPrice ) AS MINPRICE,\
+            sum( eth_past4.swapAmount0 * ( eth_pairs.baseToken * 2 - 1 ) * ( eth_past4.isBuy * - 2 + 1 ) ) AS VOLUME0,\
+            sum( eth_past4.swapAmount1 * ( eth_pairs.baseToken * - 2 + 1 ) * ( eth_past4.isBuy * - 2 + 1 ) ) AS VOLUME1,\
+            sum( eth_past4.swapAmount0 ) AS TOTALVOLUME0,\
+            sum( eth_past4.swapAmount1 ) AS TOTALVOLUME1 \
         FROM\
-            eth_past3\
-            LEFT JOIN eth_pairs ON eth_pairs.pairAddress = eth_past3.pairAddress \
+            eth_past4\
+            LEFT JOIN eth_pairs ON eth_pairs.pairAddress = eth_past4.pairAddress \
         WHERE\
-            eth_past3.swapAt<"' + date + ' ' + '00:00:00' + '"\
+            eth_past4.swapAt<"' + date + ' ' + '00:00:00' + '"\
         GROUP BY\
-            eth_past3.pairAddress,\
-            DATE( eth_past3.swapAt ) \
+            eth_past4.pairAddress,\
+            DATE( eth_past4.swapAt ) \
         ORDER BY\
-            DATE( eth_past3.swapAt)'))[0]
+            DATE( eth_past4.swapAt)'))[0]
 
     for (var i = 0; i < rows.length; i ++) {
         var fileName = path + '/transactions/' + rows[i].PAIRADDRESS + '.txt'
         fs.appendFile(fileName, JSON.stringify(rows[i]) + '\n', "utf8", (err) => { })
     }
 
-    rows = (await knex.raw('select CONCAT(YEAR( eth_past3.swapAt ), "-", MONTH( eth_past3.swapAt ), "-", DAY( eth_past3.swapAt )) AS SWAPAT, swapMaker as SWAPMAKER, pairAddress from eth_past3 where eth_past3.swapAt<"' + date + ' ' + '00:00:00' + '" order by swapAt'))[0]
+    rows = (await knex.raw('select CONCAT(YEAR( eth_past4.swapAt ), "-", MONTH( eth_past4.swapAt ), "-", DAY( eth_past4.swapAt )) AS SWAPAT, swapMaker as SWAPMAKER, pairAddress from eth_past4 where eth_past4.swapAt<"' + date + ' ' + '00:00:00' + '" order by swapAt'))[0]
 
     for (var i = 0; i < rows.length; i ++) {
         var fileName = path + '/swapers/' + rows[i].pairAddress + '.txt'
         fs.appendFile(fileName, JSON.stringify(rows[i]) + '\n', "utf8", (err) => { })
     }
 
-    await knex('eth_past3').where('swapAt', '<', date + ' ' + '00:00:00').delete()
+    await knex('eth_past4').where('swapAt', '<', date + ' ' + '00:00:00').delete()
 
     myLogger.log("WRITE TRANSACTION HISTORY FILE FINISHED!!!")
 }

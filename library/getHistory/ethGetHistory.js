@@ -200,15 +200,15 @@ var blocksData = []
 var FROMBLOCK = 10000000
 var TOBLOCK = 10973299
 // var FROMBLOCK = 10973299
-// var TOBLOCK = 11499870
+// var TOBLOCK = 11499871
 // var FROMBLOCK = 11499871
-// var TOBLOCK = 11994473
+// var TOBLOCK = 11994474
 // var FROMBLOCK = 11994474
-// var TOBLOCK = 12299578
+// var TOBLOCK = 12299579
 // var FROMBLOCK = 12299579
-// var TOBLOCK = 12603434
+// var TOBLOCK = 12603435
 // var FROMBLOCK = 12603435
-// var TOBLOCK = 13104131
+// var TOBLOCK = 13104132
 
 async function getTokenInfos(tokenAddress) {
     try {

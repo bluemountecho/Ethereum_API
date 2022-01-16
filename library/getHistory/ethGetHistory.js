@@ -143,7 +143,8 @@ const options = {
 };
 
 // const web3 = new Web3(new Web3.providers.HttpProvider('https://eth-mainnet.alchemyapi.io/v2/SszaZPuxxxVhD6TKaCScBk7SQN4EEO8t', options))
-const web3 = new Web3(new Web3.providers.HttpProvider('https://eth-mainnet.alchemyapi.io/v2/UhrdEQkkqcqwwlm9wOXnYx71ut5BNDTd', options))
+// const web3 = new Web3(new Web3.providers.HttpProvider('https://eth-mainnet.alchemyapi.io/v2/UhrdEQkkqcqwwlm9wOXnYx71ut5BNDTd', options))
+const web3 = new Web3(new Web3.providers.HttpProvider('https://eth-mainnet.alchemyapi.io/v2/GwVYJ0rBAGMeeC7nkaVdBimTapbyssKC', options))
 
 const knex = require('knex')({
     client: 'mysql',
@@ -195,8 +196,10 @@ var blocksData = []
 
 // var FROMBLOCK = 10973300
 // var TOBLOCK = 11499870
-var FROMBLOCK = 11499871
-var TOBLOCK = 11994473
+// var FROMBLOCK = 11499871
+// var TOBLOCK = 11994473
+var FROMBLOCK = 11994474
+var TOBLOCK = 12299578
 
 async function getTokenInfos(tokenAddress) {
     try {
@@ -563,7 +566,7 @@ async function getOnePartTransactionHistory(fromBlock, toBlock) {
 
                 try {
                     insertDatas.push(data)
-                    // await knex('eth_past1').insert(data)
+                    // await knex('eth_past2').insert(data)
                 } catch (err) {
                     myLogger.log(err)
                 }
@@ -594,7 +597,7 @@ async function getOnePartTransactionHistory(fromBlock, toBlock) {
 
                 try {
                     insertDatas.push(data)
-                    // await knex('eth_past1').insert(data)
+                    // await knex('eth_past2').insert(data)
                 } catch (err) {
                     myLogger.log(err)
                 }
@@ -694,7 +697,7 @@ async function getOnePartTransactionHistory(fromBlock, toBlock) {
 
                 try {
                     insertDatas.push(data)
-                    // await knex('eth_past1').insert(data)
+                    // await knex('eth_past2').insert(data)
                 } catch (err) {
                     myLogger.log(err)
                 }
@@ -725,7 +728,7 @@ async function getOnePartTransactionHistory(fromBlock, toBlock) {
 
                 try {
                     insertDatas.push(data)
-                    // await knex('eth_past1').insert(data)
+                    // await knex('eth_past2').insert(data)
                 } catch (err) {
                     myLogger.log(err)
                 }
@@ -733,7 +736,7 @@ async function getOnePartTransactionHistory(fromBlock, toBlock) {
         }
 
         if (insertDatas.length) {
-            await knex('eth_past1').insert(insertDatas)
+            await knex('eth_past2').insert(insertDatas)
         }
     } catch (err) {
         myLogger.log(err)
@@ -745,39 +748,39 @@ async function writeTransactionHistoryFile(date) {
 
     var rows = (await knex.raw('\
         SELECT\
-            eth_past1.pairAddress AS PAIRADDRESS,\
-            CONCAT(YEAR( eth_past1.swapAt ), "-", MONTH( eth_past1.swapAt ), "-", DAY( eth_past1.swapAt )) AS SWAPAT,\
-            avg( eth_past1.swapPrice ) AS AVGPRICE,\
-            max( eth_past1.swapPrice ) AS MAXPRICE,\
-            min( eth_past1.swapPrice ) AS MINPRICE,\
-            sum( eth_past1.swapAmount0 * ( eth_pairs.baseToken * 2 - 1 ) * ( eth_past1.isBuy * - 2 + 1 ) ) AS VOLUME0,\
-            sum( eth_past1.swapAmount1 * ( eth_pairs.baseToken * - 2 + 1 ) * ( eth_past1.isBuy * - 2 + 1 ) ) AS VOLUME1,\
-            sum( eth_past1.swapAmount0 ) AS TOTALVOLUME0,\
-            sum( eth_past1.swapAmount1 ) AS TOTALVOLUME1 \
+            eth_past2.pairAddress AS PAIRADDRESS,\
+            CONCAT(YEAR( eth_past2.swapAt ), "-", MONTH( eth_past2.swapAt ), "-", DAY( eth_past2.swapAt )) AS SWAPAT,\
+            avg( eth_past2.swapPrice ) AS AVGPRICE,\
+            max( eth_past2.swapPrice ) AS MAXPRICE,\
+            min( eth_past2.swapPrice ) AS MINPRICE,\
+            sum( eth_past2.swapAmount0 * ( eth_pairs.baseToken * 2 - 1 ) * ( eth_past2.isBuy * - 2 + 1 ) ) AS VOLUME0,\
+            sum( eth_past2.swapAmount1 * ( eth_pairs.baseToken * - 2 + 1 ) * ( eth_past2.isBuy * - 2 + 1 ) ) AS VOLUME1,\
+            sum( eth_past2.swapAmount0 ) AS TOTALVOLUME0,\
+            sum( eth_past2.swapAmount1 ) AS TOTALVOLUME1 \
         FROM\
-            eth_past1\
-            LEFT JOIN eth_pairs ON eth_pairs.pairAddress = eth_past1.pairAddress \
+            eth_past2\
+            LEFT JOIN eth_pairs ON eth_pairs.pairAddress = eth_past2.pairAddress \
         WHERE\
-            eth_past1.swapAt<"' + date + ' ' + '00:00:00' + '"\
+            eth_past2.swapAt<"' + date + ' ' + '00:00:00' + '"\
         GROUP BY\
-            eth_past1.pairAddress,\
-            DATE( eth_past1.swapAt ) \
+            eth_past2.pairAddress,\
+            DATE( eth_past2.swapAt ) \
         ORDER BY\
-            DATE( eth_past1.swapAt)'))[0]
+            DATE( eth_past2.swapAt)'))[0]
 
     for (var i = 0; i < rows.length; i ++) {
         var fileName = path + '/transactions/' + rows[i].PAIRADDRESS + '.txt'
         fs.appendFile(fileName, JSON.stringify(rows[i]) + '\n', "utf8", (err) => { })
     }
 
-    rows = (await knex.raw('select CONCAT(YEAR( eth_past1.swapAt ), "-", MONTH( eth_past1.swapAt ), "-", DAY( eth_past1.swapAt )) AS SWAPAT, swapMaker as SWAPMAKER, pairAddress from eth_past1 where eth_past1.swapAt<"' + date + ' ' + '00:00:00' + '" order by swapAt'))[0]
+    rows = (await knex.raw('select CONCAT(YEAR( eth_past2.swapAt ), "-", MONTH( eth_past2.swapAt ), "-", DAY( eth_past2.swapAt )) AS SWAPAT, swapMaker as SWAPMAKER, pairAddress from eth_past2 where eth_past2.swapAt<"' + date + ' ' + '00:00:00' + '" order by swapAt'))[0]
 
     for (var i = 0; i < rows.length; i ++) {
         var fileName = path + '/swapers/' + rows[i].pairAddress + '.txt'
         fs.appendFile(fileName, JSON.stringify(rows[i]) + '\n', "utf8", (err) => { })
     }
 
-    await knex('eth_past1').where('swapAt', '<', date + ' ' + '00:00:00').delete()
+    await knex('eth_past2').where('swapAt', '<', date + ' ' + '00:00:00').delete()
 
     myLogger.log("WRITE TRANSACTION HISTORY FILE FINISHED!!!")
 }

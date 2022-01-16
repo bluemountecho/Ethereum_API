@@ -251,6 +251,10 @@ module.exports.getPairPriceHistory = async function getPairPriceHistory(pairAddr
             datas.push(JSON.parse(rows[i]))
         }
 
+        datas.sort(function (a, b) {
+            return a.SWAPAT < b.SWAPAT
+        })
+
         return datas
     } catch (err) {
         console.log(err)

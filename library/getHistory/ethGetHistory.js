@@ -9,7 +9,6 @@ const myLogger = new Console({
 
 Web3 = require('web3')
 
-//const web3 = new Web3(new Web3.providers.HttpProvider('https://mainnet.infura.io/v3/9ea3677d970d4dc99f3f559768b0176c'))
 const minERC20ABI = [
     {
         "constant": true,
@@ -144,6 +143,8 @@ const options = {
 };
 
 const web3 = new Web3(new Web3.providers.HttpProvider('https://eth-mainnet.alchemyapi.io/v2/SszaZPuxxxVhD6TKaCScBk7SQN4EEO8t', options))
+// const web3 = new Web3(new Web3.providers.HttpProvider('https://eth-mainnet.alchemyapi.io/v2/UhrdEQkkqcqwwlm9wOXnYx71ut5BNDTd', options))
+
 const knex = require('knex')({
     client: 'mysql',
     connection: {
@@ -189,9 +190,12 @@ function convertTimestampToString(timestamp, flag = false) {
 var tokensData = []
 var pairsData = []
 var blocksData = []
-var FROMBLOCK = 10973300
+// var FROMBLOCK = 10973300
 // var TOBLOCK = 14003767
+var FROMBLOCK = 10973300
 var TOBLOCK = 11499870
+// var FROMBLOCK = 11499871
+// var TOBLOCK = 11499870
 
 async function getTokenInfos(tokenAddress) {
     try {
@@ -785,7 +789,7 @@ async function getTransactionHistory(fromBlock) {
 
     try {
         var v1 = 100
-        var v2 = 20
+        var v2 = 50
         var toBlock = fromBlock + v1 - 1
         var funcs = []
 

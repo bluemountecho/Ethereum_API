@@ -369,7 +369,7 @@ async function getAllPairs(fromBlock) {
     if (fromBlock > TOBLOCK) return
 
     try {
-        var toBlock = fromBlock + 99
+        var toBlock = fromBlock + 4999
 
         if (toBlock > TOBLOCK) toBlock = TOBLOCK
 
@@ -482,7 +482,7 @@ async function getAllPairs(fromBlock) {
         myLogger.log(err)
     }
 
-    getAllPairs(toBlock + 1)
+    setTimeout(() => getAllPairs(toBlock + 1), 100)
 }
 
 async function getOnePartTransactionHistory(fromBlock, toBlock) {

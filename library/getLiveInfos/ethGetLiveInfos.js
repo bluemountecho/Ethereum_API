@@ -137,7 +137,7 @@ const options = {
     }
 };
 
-const web3 = new Web3(new Web3.providers.HttpProvider('https://eth-mainnet.alchemyapi.io/v2/_732q-Q7bDxHrmyOqA-oazz3r1LBJKx5', options))
+const web3 = new Web3(new Web3.providers.HttpProvider('https://eth-mainnet.alchemyapi.io/v2/SszaZPuxxxVhD6TKaCScBk7SQN4EEO8t', options))
 const knex = require('knex')({
     client: 'mysql',
     connection: {

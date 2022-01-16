@@ -143,7 +143,7 @@ const options = {
 };
 
 // const web3 = new Web3(new Web3.providers.HttpProvider('https://eth-mainnet.alchemyapi.io/v2/SszaZPuxxxVhD6TKaCScBk7SQN4EEO8t', options))
-const web3 = new Web3(new Web3.providers.HttpProvider('https://eth-mainnet.alchemyapi.io/v2/UhrdEQkkqcqwwlm9wOXnYx71ut5BNDTd', options))
+// const web3 = new Web3(new Web3.providers.HttpProvider('https://eth-mainnet.alchemyapi.io/v2/UhrdEQkkqcqwwlm9wOXnYx71ut5BNDTd', options))
 // const web3 = new Web3(new Web3.providers.HttpProvider('https://eth-mainnet.alchemyapi.io/v2/GwVYJ0rBAGMeeC7nkaVdBimTapbyssKC', options))
 // const web3 = new Web3(new Web3.providers.HttpProvider('https://eth-mainnet.alchemyapi.io/v2/KDRotLOmW8M21flLsKNaLN4IO5lB_6PN', options))
 // const web3 = new Web3(new Web3.providers.HttpProvider('https://eth-mainnet.alchemyapi.io/v2/fwJegFhgVtUiflVVpMRv0wV00g1CWW0p', options))
@@ -197,10 +197,10 @@ var blocksData = []
 // var FROMBLOCK = 10000000
 // var TOBLOCK = 14003767
 
-// var FROMBLOCK = 10000000
-// var TOBLOCK = 10973299
-var FROMBLOCK = 10973299
-var TOBLOCK = 11499871
+var FROMBLOCK = 10000000
+var TOBLOCK = 10973299
+// var FROMBLOCK = 10973299
+// var TOBLOCK = 11499871
 // var FROMBLOCK = 11499871
 // var TOBLOCK = 11994474
 // var FROMBLOCK = 11994474
@@ -817,7 +817,7 @@ async function getTransactionHistory(fromBlock) {
     }
 
     try {
-        var v1 = 150
+        var v1 = 100
         var v2 = 50
         var toBlock = fromBlock + v1 - 1
         var funcs = []

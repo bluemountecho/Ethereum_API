@@ -783,8 +783,8 @@ async function getTransactionHistory(fromBlock) {
     }
 
     try {
-        var v1 = 100
-        var v2 = 10
+        var v1 = 1000
+        var v2 = 200
         var toBlock = fromBlock + v1 - 1
         var funcs = []
 

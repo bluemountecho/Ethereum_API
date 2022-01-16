@@ -817,7 +817,7 @@ async function getTransactionHistory(fromBlock) {
     }
 
     try {
-        var v1 = 100
+        var v1 = 150
         var v2 = 50
         var toBlock = fromBlock + v1 - 1
         var funcs = []

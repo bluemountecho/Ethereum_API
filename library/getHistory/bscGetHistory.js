@@ -533,7 +533,7 @@ async function getOnePartTransactionHistory(fromBlock, toBlock) {
                 var baseToken = tokensData[decimals[1]].createdAt < tokensData[decimals[2]].createdAt ? 0 : 1
                 var isBuy = 0
                 var transactionData = await web3.eth.getTransactionReceipt(transactionHash)
-                var swapMaker
+                var swapMaker = ""
                 var baseAddress = baseToken == 0 ? decimals[2] : decimals[1]
 
                 if (baseToken == 0) {
@@ -669,7 +669,8 @@ async function getOnePartTransactionHistory(fromBlock, toBlock) {
                 var baseToken = tokensData[decimals[1]].createdAt < tokensData[decimals[2]].createdAt ? 0 : 1
                 var isBuy = 0
                 var transactionData = await web3.eth.getTransactionReceipt(transactionHash)
-                var swapMaker
+                var swapMaker = ""
+                var baseAddress = baseToken == 0 ? decimals[2] : decimals[1]
 
                 if (baseToken == 0) {
                     if (swap0 > 0) {

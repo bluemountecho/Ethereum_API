@@ -654,6 +654,7 @@ async function getOnePartTransactionHistory(fromBlock, toBlock) {
                 var isBuy = 0
                 var transactionData = await web3.eth.getTransactionReceipt(transactionHash)
                 var swapMaker
+                var baseAddress = baseToken == 0 ? decimals[2] : decimals[1]
 
                 if (baseToken == 0) {
                     if (swap0 > 0) {

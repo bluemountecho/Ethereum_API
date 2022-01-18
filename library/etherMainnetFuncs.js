@@ -13,6 +13,19 @@ const baseTokens = require('./etherBaseTokens.json')
 const USDC_ADDRESS = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
 
 var fs = require('fs')
+const { Console } = require("console");
+const myLogger = new Console({
+  stdout: fs.createWriteStream("app_" + convertTimestampToString(new Date())  + ".txt"),
+  stderr: fs.createWriteStream("app_" + convertTimestampToString(new Date())  + ".txt"),
+});
+
+function convertTimestampToString(timestamp, flag = false) {
+    if (flag == false) {
+        return new Date(timestamp).toISOString().replace(/T/, ' ').replace(/\..+/, '').replace(/ /g, '_').replace(/:/g, '_').replace(/-/g, '_')
+    } else {
+        return new Date(timestamp).toISOString().replace(/T/, ' ').replace(/\..+/, '')
+    }
+}
 
 /*
 var pairList = []
@@ -65,19 +78,19 @@ knex('eth_pairs').select('*').then(rows => {
             }
         }
         
-        console.log('========= Ether Datas are ready! =========')
+        myLogger.log('========= Ether Datas are ready! =========')
 
         var cnt = 0
 
         for (var key in pairList) {
             if (pairList[key] > 100) {
-                console.log(pairList[key])
-                console.log(tokenList[key])
+                myLogger.log(pairList[key])
+                myLogger.log(tokenList[key])
                 cnt ++
             }
         }
 
-        console.log('Finished with ' + cnt + ' rows!')
+        myLogger.log('Finished with ' + cnt + ' rows!')
     })
 }) */
 
@@ -164,7 +177,7 @@ module.exports.getPriceOfToken = async function getPriceOfToken(tokenAddress) {
             }
         }
     } catch (e) {
-        console.log(e)
+        myLogger.log(e)
         
         return {
             message: 'Error occured!',
@@ -211,7 +224,7 @@ module.exports.getLastPriceFromPair = async function getLastPriceFromPair(pairAd
             }
         }
     } catch (e) {
-        console.log(e)
+        myLogger.log(e)
         return {
             'status': 'fail',
             'data': {
@@ -236,7 +249,7 @@ module.exports.getAllTokens = async function getAllTokens() {
 
         return datas
     } catch (err) {
-        console.log(err)
+        myLogger.log(err)
     }
 }
 
@@ -244,7 +257,7 @@ module.exports.getPairPriceHistory = async function getPairPriceHistory(pairAddr
     try {
         var pair = pairAddr.toLowerCase()
         var content = fs.readFileSync('./database/ethereum/transactions/' + pair + '.txt', {encoding:'utf8', flag:'r'})
-        var rows = content.split('\n')
+        var rows = content.split('\r\n')
         var datas = []
 
         for (var i = 0; i < rows.length - 1; i ++) {
@@ -252,11 +265,16 @@ module.exports.getPairPriceHistory = async function getPairPriceHistory(pairAddr
         }
 
         datas.sort(function (a, b) {
-            return a.SWAPAT < b.SWAPAT
+            var ad = (new Date(a.SWAPAT)).getTime()
+            var bd = (new Date(b.SWAPAT)).getTime()
+
+            if (ad < bd) return -1
+            if (ad > bd) return 1
+            return 0
         })
 
         return datas
     } catch (err) {
-        console.log(err)
+        myLogger.log(err)
     }
 }

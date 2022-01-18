@@ -13,12 +13,6 @@ const baseTokens = require('./etherBaseTokens.json')
 const USDC_ADDRESS = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
 
 var fs = require('fs')
-const { Console } = require("console");
-const myLogger = new Console({
-  stdout: fs.createWriteStream("app_" + convertTimestampToString(new Date())  + ".txt"),
-  stderr: fs.createWriteStream("app_" + convertTimestampToString(new Date())  + ".txt"),
-});
-
 function convertTimestampToString(timestamp, flag = false) {
     if (flag == false) {
         return new Date(timestamp).toISOString().replace(/T/, ' ').replace(/\..+/, '').replace(/ /g, '_').replace(/:/g, '_').replace(/-/g, '_')
@@ -78,19 +72,19 @@ knex('eth_pairs').select('*').then(rows => {
             }
         }
         
-        myLogger.log('========= Ether Datas are ready! =========')
+        console.log('========= Ether Datas are ready! =========')
 
         var cnt = 0
 
         for (var key in pairList) {
             if (pairList[key] > 100) {
-                myLogger.log(pairList[key])
-                myLogger.log(tokenList[key])
+                console.log(pairList[key])
+                console.log(tokenList[key])
                 cnt ++
             }
         }
 
-        myLogger.log('Finished with ' + cnt + ' rows!')
+        console.log('Finished with ' + cnt + ' rows!')
     })
 }) */
 
@@ -177,7 +171,7 @@ module.exports.getPriceOfToken = async function getPriceOfToken(tokenAddress) {
             }
         }
     } catch (e) {
-        myLogger.log(e)
+        console.log(e)
         
         return {
             message: 'Error occured!',
@@ -224,7 +218,7 @@ module.exports.getLastPriceFromPair = async function getLastPriceFromPair(pairAd
             }
         }
     } catch (e) {
-        myLogger.log(e)
+        console.log(e)
         return {
             'status': 'fail',
             'data': {
@@ -249,7 +243,7 @@ module.exports.getAllTokens = async function getAllTokens() {
 
         return datas
     } catch (err) {
-        myLogger.log(err)
+        console.log(err)
     }
 }
 
@@ -275,6 +269,6 @@ module.exports.getPairPriceHistory = async function getPairPriceHistory(pairAddr
 
         return datas
     } catch (err) {
-        myLogger.log(err)
+        console.log(err)
     }
 }

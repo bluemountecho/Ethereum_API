@@ -251,7 +251,7 @@ module.exports.getPairPriceHistory = async function getPairPriceHistory(pairAddr
     try {
         var pair = pairAddr.toLowerCase()
         var content = fs.readFileSync('./database/ethereum/transactions/' + pair + '.txt', {encoding:'utf8', flag:'r'})
-        var rows = content.split('\r\n')
+        var rows = content.split('\n')
         var datas = []
 
         for (var i = 0; i < rows.length - 1; i ++) {

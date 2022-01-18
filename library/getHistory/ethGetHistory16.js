@@ -165,14 +165,14 @@ const web3 = new Web3(new Web3.providers.HttpProvider('https://eth-mainnet.alche
 const knex = require('knex')({
     client: 'mysql',
     connection: {
-      host : '127.0.0.1',
-      port : 3306,
-    //   user : 'admin_root',
-    //   password : 'bOPTDZXP8Xvdf9I1',
-    //   database : 'admin_ethereum_api'
-      user : 'root',
-      password : '',
-      database : 'ethereum_api'
+        host : '127.0.0.1',
+        port : 3306,
+        user : 'admin_root',
+        password : 'bOPTDZXP8Xvdf9I1',
+        database : 'admin_ethereum_api'
+        // user : 'root',
+        // password : '',
+        // database : 'ethereum_api'
     }
 })
 

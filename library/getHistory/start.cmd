@@ -1,1 +1,18 @@
-cmd
+copy ethGetHistory.js ethGetHistory1.js
+copy ethGetHistory.js ethGetHistory2.js
+copy ethGetHistory.js ethGetHistory3.js
+copy ethGetHistory.js ethGetHistory4.js
+copy ethGetHistory.js ethGetHistory5.js
+copy ethGetHistory.js ethGetHistory6.js
+copy ethGetHistory.js ethGetHistory7.js
+copy ethGetHistory.js ethGetHistory8.js
+copy ethGetHistory.js ethGetHistory9.js
+copy ethGetHistory.js ethGetHistory10.js
+copy ethGetHistory.js ethGetHistory11.js
+copy ethGetHistory.js ethGetHistory12.js
+copy ethGetHistory.js ethGetHistory13.js
+copy ethGetHistory.js ethGetHistory14.js
+copy ethGetHistory.js ethGetHistory15.js
+copy ethGetHistory.js ethGetHistory16.js
+copy ethGetHistory.js ethGetHistory17.js
+copy ethGetHistory.js ethGetHistory18.js

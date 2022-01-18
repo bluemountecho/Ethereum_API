@@ -150,15 +150,29 @@ const options = {
 // const web3 = new Web3(new Web3.providers.HttpProvider('https://eth-mainnet.alchemyapi.io/v2/L9M1slw79QVfDhr9v66G3UoN69gkHLew', options))
 const web3 = new Web3(new Web3.providers.HttpProvider('https://eth-mainnet.alchemyapi.io/v2/GyQ7M-bgZiAfRJQ0cNduGGyTWaSOPKFg', options))
 // const web3 = new Web3(new Web3.providers.HttpProvider('https://eth-mainnet.alchemyapi.io/v2/yDKkjtKduNj3MOm6VS0NOq4K1oQGu3BY', options))
+// const web3 = new Web3(new Web3.providers.HttpProvider('https://eth-mainnet.alchemyapi.io/v2/ydhzzCYhpBSw5j9laeJ1MUavoXH7Yx0x', options))
+// const web3 = new Web3(new Web3.providers.HttpProvider('https://eth-mainnet.alchemyapi.io/v2/I6Ex4PhEd7lnlGDpOK4eZQ66ZtAi3t8H', options))
+// const web3 = new Web3(new Web3.providers.HttpProvider('https://eth-mainnet.alchemyapi.io/v2/pHiog1JCoRJEbpi3uPJT2-dV5zxcoXUJ', options))
+// const web3 = new Web3(new Web3.providers.HttpProvider('https://eth-mainnet.alchemyapi.io/v2/gvEWEHmC6hIgX8E6eEe0Hm4uMeEZpQpX', options))
+// const web3 = new Web3(new Web3.providers.HttpProvider('https://eth-mainnet.alchemyapi.io/v2/Blyrrajz70B-xcvQMJE__h_k6XrLqPPo', options))
+// const web3 = new Web3(new Web3.providers.HttpProvider('https://eth-mainnet.alchemyapi.io/v2/rYh9vEbLLMy84dQmnEERywb0LLHaB-ed', options))
+// const web3 = new Web3(new Web3.providers.HttpProvider('https://eth-mainnet.alchemyapi.io/v2/TrnxMJ2lhHLjpN7BBM0CaCENbBVKoIRT', options))
+// const web3 = new Web3(new Web3.providers.HttpProvider('https://eth-mainnet.alchemyapi.io/v2/0-eOaucZ3wiI_2qkj6W4ExfohXDmaRjw', options))
+// const web3 = new Web3(new Web3.providers.HttpProvider('https://eth-mainnet.alchemyapi.io/v2/gwQXpDW7dSs1cCCWM2elWLX7g1pe9tfu', options))
+// const web3 = new Web3(new Web3.providers.HttpProvider('https://eth-mainnet.alchemyapi.io/v2/0_DTvXZh-Y7iIZppUg_yPfpDcdOG6M3t', options))
+// const web3 = new Web3(new Web3.providers.HttpProvider('https://eth-mainnet.alchemyapi.io/v2/gSyeUk2nIKtZMC_7xU1DnrB3DWeaXiRm', options))
 
 const knex = require('knex')({
     client: 'mysql',
     connection: {
       host : '127.0.0.1',
       port : 3306,
-      user : 'admin_root',
-      password : 'bOPTDZXP8Xvdf9I1',
-      database : 'admin_ethereum_api'
+    //   user : 'admin_root',
+    //   password : 'bOPTDZXP8Xvdf9I1',
+    //   database : 'admin_ethereum_api'
+      user : 'root',
+      password : '',
+      database : 'ethereum_api'
     }
 })
 
@@ -196,25 +210,47 @@ function convertTimestampToString(timestamp, flag = false) {
 var tokensData = []
 var pairsData = []
 var blocksData = []
-// var FROMBLOCK = 10000000
-// var TOBLOCK = 14003767
+// var FROMBLOCK = 14003767
+// var TOBLOCK = 14026168
 
-// var FROMBLOCK = 10000000
-// var TOBLOCK = 10973299
-// var FROMBLOCK = 10973299
-// var TOBLOCK = 11499871
-// var FROMBLOCK = 11499871
-// var TOBLOCK = 11994474
-// var FROMBLOCK = 11994474
-// var TOBLOCK = 12299579
-// var FROMBLOCK = 12299579
-// var TOBLOCK = 12603435
-// var FROMBLOCK = 12603435
+// var FROMBLOCK = 10100000
+// var TOBLOCK = 10505861
+// var FROMBLOCK = 10505861
+// var TOBLOCK = 10700231
+// var FROMBLOCK = 10700231
+// var TOBLOCK = 10902387
+// var FROMBLOCK = 10902387
+// var TOBLOCK = 11102639
+// var FROMBLOCK = 11102639
+// var TOBLOCK = 11304643
+// var FROMBLOCK = 11304643
+// var TOBLOCK = 11506373
+var FROMBLOCK = 11506373
+var TOBLOCK = 11701952
+// var FROMBLOCK = 11701952
+// var TOBLOCK = 11903480
+// var FROMBLOCK = 11903480
+// var TOBLOCK = 12104733
+// var FROMBLOCK = 12104733
+// var TOBLOCK = 12306079
+// var FROMBLOCK = 12306079
+// var TOBLOCK = 12500189
+// var FROMBLOCK = 12500189
+// var TOBLOCK = 12699965
+// var FROMBLOCK = 12699965
+// var TOBLOCK = 12898513
+// var FROMBLOCK = 12898513
 // var TOBLOCK = 13104132
-var FROMBLOCK = 13104132
-var TOBLOCK = 13502421
+// var FROMBLOCK = 13104132
+// var TOBLOCK = 13304528
+// var FROMBLOCK = 13304528
+// var TOBLOCK = 13502421
 // var FROMBLOCK = 13502421
-// var TOBLOCK = 14000271
+// var TOBLOCK = 13699125
+// var FROMBLOCK = 13699125
+// var TOBLOCK = 13903355
+// var FROMBLOCK = 13903355
+// var TOBLOCK = 14026168
 
 async function getTokenInfos(tokenAddress) {
     try {
@@ -788,7 +824,8 @@ async function writeTransactionHistoryFile(date) {
             sum( eth_past6.swapAmount0 * ( eth_pairs.baseToken * 2 - 1 ) * ( eth_past6.isBuy * - 2 + 1 ) ) AS VOLUME0,\
             sum( eth_past6.swapAmount1 * ( eth_pairs.baseToken * - 2 + 1 ) * ( eth_past6.isBuy * - 2 + 1 ) ) AS VOLUME1,\
             sum( eth_past6.swapAmount0 ) AS TOTALVOLUME0,\
-            sum( eth_past6.swapAmount1 ) AS TOTALVOLUME1 \
+            sum( eth_past6.swapAmount1 ) AS TOTALVOLUME1,\
+            count( eth_past6.swapMaker ) AS SWAPCOUNT \
         FROM\
             eth_past6\
             LEFT JOIN eth_pairs ON eth_pairs.pairAddress = eth_past6.pairAddress \

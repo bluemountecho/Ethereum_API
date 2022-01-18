@@ -369,7 +369,7 @@ async function getAllPairs(fromBlock) {
     if (fromBlock > TOBLOCK) return
 
     try {
-        var toBlock = fromBlock + 4999
+        var toBlock = fromBlock + 999
 
         if (toBlock > TOBLOCK) toBlock = TOBLOCK
 
@@ -482,7 +482,7 @@ async function getAllPairs(fromBlock) {
         myLogger.log(err)
     }
 
-    setTimeout(() => getAllPairs(toBlock + 1), 100)
+    setTimeout(() => getAllPairs(toBlock + 1), 200)
 }
 
 async function getOnePartTransactionHistory(fromBlock, toBlock) {
@@ -792,7 +792,7 @@ async function getOnePartTransactionHistory(fromBlock, toBlock) {
 }
 
 async function writeTransactionHistoryFile(date) {
-    var path = "../../database/ethereum"
+    var path = "../../database/binance"
 
     var rows = (await knex.raw('\
         SELECT\
@@ -804,7 +804,8 @@ async function writeTransactionHistoryFile(date) {
             sum( bsc_past.swapAmount0 * ( bsc_pairs.baseToken * 2 - 1 ) * ( bsc_past.isBuy * - 2 + 1 ) ) AS VOLUME0,\
             sum( bsc_past.swapAmount1 * ( bsc_pairs.baseToken * - 2 + 1 ) * ( bsc_past.isBuy * - 2 + 1 ) ) AS VOLUME1,\
             sum( bsc_past.swapAmount0 ) AS TOTALVOLUME0,\
-            sum( bsc_past.swapAmount1 ) AS TOTALVOLUME1 \
+            sum( bsc_past.swapAmount1 ) AS TOTALVOLUME1,\
+            count( bsc_past.swapMaker ) AS SWAPCOUNT\
         FROM\
             bsc_past\
             LEFT JOIN bsc_pairs ON bsc_pairs.pairAddress = bsc_past.pairAddress \

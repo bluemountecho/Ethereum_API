@@ -21,73 +21,6 @@ function convertTimestampToString(timestamp, flag = false) {
     }
 }
 
-/*
-var pairList = []
-var tokenList = []
-
-knex('eth_pairs').select('*').then(rows => {
-    for (var i = 0; i < rows.length; i ++) {
-        if (!pairList[rows[i].token0Address]) {
-            pairList[rows[i].token0Address] = []
-        }
-
-        if (!pairList[rows[i].token0Address][rows[i].token1Address]) {
-            pairList[rows[i].token0Address][rows[i].token1Address] = []
-        }
-    
-        pairList[rows[i].token0Address][rows[i].token1Address].push({
-            lastPrice: rows[i].lastPrice ? 1.0 / rows[i].lastPrice : 0,
-            timestamp: rows[i].timestamp
-        })
-
-        if (!pairList[rows[i].token1Address]) {
-            pairList[rows[i].token1Address] = []
-        }
-
-        if (!pairList[rows[i].token1Address][rows[i].token0Address]) {
-            pairList[rows[i].token1Address][rows[i].token0Address] = []
-        }
-    
-        pairList[rows[i].token1Address][rows[i].token0Address].push({
-            lastPrice: rows[i].lastPrice,
-            timestamp: rows[i].timestamp
-        })
-
-        //if (!pairList[rows[i].token0Address])
-        //    pairList[rows[i].token0Address] = 0
-        //if (!pairList[rows[i].token1Address])
-        //    pairList[rows[i].token1Address] = 0
-
-        //pairList[rows[i].token0Address] ++
-        //pairList[rows[i].token1Address] ++
-    }
-
-    knex('eth_tokens').select('*').then(rows => {
-        for (var i = 0; i < rows.length; i ++) {
-            tokenList[rows[i].tokenAddress] = {
-                tokenAddress: rows[i].tokenAddress,
-                symbol: rows[i].tokenSymbol,
-                name: rows[i].tokenName,
-                decimal: rows[i].tokenDecimals
-            }
-        }
-        
-        console.log('========= Ether Datas are ready! =========')
-
-        var cnt = 0
-
-        for (var key in pairList) {
-            if (pairList[key] > 100) {
-                console.log(pairList[key])
-                console.log(tokenList[key])
-                cnt ++
-            }
-        }
-
-        console.log('Finished with ' + cnt + ' rows!')
-    })
-}) */
-
 module.exports.getPriceOfToken = async function getPriceOfToken(tokenAddress) {
     try {
         var tokenInfo = await knex('eth_tokens').where('tokenAddress', tokenAddress).select('*')
@@ -247,7 +180,7 @@ module.exports.getAllTokens = async function getAllTokens() {
     }
 }
 
-module.exports.getPairPriceHistory = async function getPairPriceHistory(pairAddr) {
+module.exports.getDailyPairPrice = async function getDailyPairPrice(pairAddr) {
     try {
         var pair = pairAddr.toLowerCase()
         var content = fs.readFileSync('./database/ethereum/transactions/' + pair + '.txt', {encoding:'utf8', flag:'r'})
@@ -256,6 +189,10 @@ module.exports.getPairPriceHistory = async function getPairPriceHistory(pairAddr
 
         for (var i = 0; i < rows.length - 1; i ++) {
             datas.push(JSON.parse(rows[i]))
+        }
+
+        for (var i = 0; i < datas.length; i ++) {
+            datas[i].AVGPRICE = datas[i].TOTALVOLUME0 / datas[i].TOTALVOLUME1
         }
 
         datas.sort(function (a, b) {

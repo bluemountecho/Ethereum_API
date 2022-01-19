@@ -1,9 +1,14 @@
 var fs = require('fs')
 var path = require('path')
 
+const { Console } = require("console");
+const myLogger = new Console({
+  stdout: fs.createWriteStream("eth_live_" + convertTimestampToString(new Date())  + ".txt"),
+  stderr: fs.createWriteStream("eth_live_" + convertTimestampToString(new Date())  + ".txt"),
+});
+
 Web3 = require('web3')
 
-//const web3 = new Web3(new Web3.providers.HttpProvider('https://mainnet.infura.io/v3/9ea3677d970d4dc99f3f559768b0176c'))
 const minERC20ABI = [
     {
         "constant": true,
@@ -137,15 +142,18 @@ const options = {
     }
 };
 
-const web3 = new Web3(new Web3.providers.HttpProvider('https://eth-mainnet.alchemyapi.io/v2/SszaZPuxxxVhD6TKaCScBk7SQN4EEO8t', options))
+const web3 = new Web3(new Web3.providers.HttpProvider('https://eth-mainnet.alchemyapi.io/v2/aHb_aSqhmtQHA9ekTkyfjhjRnwzyqNeM', options))
 const knex = require('knex')({
     client: 'mysql',
     connection: {
-      host : '127.0.0.1',
-      port : 3306,
-      user : 'root',
-      password : '',
-      database : 'ethereum_api'
+        host : '127.0.0.1',
+        port : 3306,
+        user : 'admin_root',
+        password : 'bOPTDZXP8Xvdf9I1',
+        database : 'admin_ethereum_api'
+        // user : 'root',
+        // password : '',
+        // database : 'ethereum_api'
     }
 })
 
@@ -172,9 +180,18 @@ function hexToBn(hex) {
     return bn;
 }
 
+function convertTimestampToString(timestamp, flag = false) {
+    if (flag == false) {
+        return new Date(timestamp).toISOString().replace(/T/, ' ').replace(/\..+/, '').replace(/ /g, '_').replace(/:/g, '_').replace(/-/g, '_')
+    } else {
+        return new Date(timestamp).toISOString().replace(/T/, ' ').replace(/\..+/, '')
+    }
+}
+
 var tokensData = []
 var pairsData = []
-var lastBlockNumber = 13976468
+var blocksData = []
+var lastBlockNumber = 14034324
 
 async function getTokenInfos(tokenAddress) {
     try {
@@ -206,23 +223,6 @@ async function getTokenInfos(tokenAddress) {
 }
 
 async function getPairDecimals(pairAddress, createdAt) {
-    /*
-    var rows = await knex('eth_pairs').where('pairAddress', pairAddress).select('*')
-    var token0Address, token1Address
-    var res = []
-    
-    if (rows.length) {
-        token0Address = rows[0].token0Address
-        token1Address = rows[0].token1Address
-    } else {
-        var pairContract = new web3.eth.Contract(minPairABI, pairAddress)
-        var tmpToken0Address, tmpToken1Address
-
-        [tmpToken0Address, tmpToken1Address] = await Promise.all([pairContract.methods.token0().call(), pairContract.methods.token1().call()])
-        token0Address = tmpToken0Address
-        token1Address = tmpToken1Address
-    }*/
-
     if (pairsData[pairAddress]) {
         return [pairsData[pairAddress].decimals, pairsData[pairAddress].token0Address, pairsData[pairAddress].token1Address]
     }
@@ -289,19 +289,11 @@ async function getPairDecimals(pairAddress, createdAt) {
 
         return [res[1][0] - res[0][0], token0Address, token1Address]
     } catch (err) {
-        console.log(pairAddress, token0Address, token1Address)
-        console.log(err)
+        myLogger.log(pairAddress, token0Address, token1Address)
+        myLogger.log(err)
     }
 
     return 1
-}
-
-function convertTimestampToString(timestamp, flag = false) {
-    if (flag == false) {
-        return new Date(timestamp).toISOString().replace(/T/, ' ').replace(/\..+/, '').replace(/ /g, '_').replace(/:/g, '_').replace(/-/g, '_')
-    } else {
-        return new Date(timestamp).toISOString().replace(/T/, ' ').replace(/\..+/, '')
-    }
 }
 
 async function init() {
@@ -331,397 +323,384 @@ async function init() {
             })
         ])
 
-        console.log('==================================================')
-        console.log('lastBlockNumber: ' + lastBlockNumber)
-        console.log('UNISWAP V2 PAIR CREATED: ' + results[0].length)
-        console.log('UNISWAP V2 SWAP        : ' + results[1].length)
-        console.log('UNISWAP V3 POOL CREATED: ' + results[2].length)
-        console.log('UNISWAP V3 SWAP        : ' + results[3].length)
+        myLogger.log('==================================================')
+        myLogger.log('lastBlockNumber: ' + lastBlockNumber)
+        myLogger.log('UNISWAP V2 PAIR CREATED: ' + results[0].length)
+        myLogger.log('UNISWAP V2 SWAP        : ' + results[1].length)
+        myLogger.log('UNISWAP V3 POOL CREATED: ' + results[2].length)
+        myLogger.log('UNISWAP V3 SWAP        : ' + results[3].length)
 
         lastBlockNumber = blockNumber
 
         for (var i = 0; i < results[0].length; i ++) {
-            var token0Address = '0x' + results[0][i].topics[1].substr(26, 40).toLowerCase()
-            var token1Address = '0x' + results[0][i].topics[2].substr(26, 40).toLowerCase()
-            var pairAddress = '0x' + results[0][i].data.substr(26, 40).toLowerCase()
-            var factoryAddress = results[0][i].address.toLowerCase()
-            var block = results[0][i].blockNumber
-            var resBlock = await web3.eth.getBlock(block)
-            var tmpDate = convertTimestampToString(resBlock.timestamp * 1000, true)
-            var res = await getPairDecimals(pairAddress, tmpDate)
-
-            console.log('-------------------------------------------')
-            console.log('V2 CREATED: ' + results[0][i].transactionHash)
-
-            pairsData[pairAddress] = {
-                token0Address: token0Address,
-                token1Address: token1Address,
-                decimals: res[0],
-                blockNumber: block,
-                transactionID: 0
-            }
-
             try {
-                await knex('eth_pairs').insert({
+                var token0Address = '0x' + results[0][i].topics[1].substr(26, 40).toLowerCase()
+                var token1Address = '0x' + results[0][i].topics[2].substr(26, 40).toLowerCase()
+                var pairAddress = '0x' + results[0][i].data.substr(26, 40).toLowerCase()
+                var factoryAddress = results[0][i].address.toLowerCase()
+                var block = results[0][i].blockNumber
+                var resBlock = await web3.eth.getBlock(block)
+                var tmpDate = convertTimestampToString(resBlock.timestamp * 1000, true)
+                var res = await getPairDecimals(pairAddress, tmpDate)
+                var baseToken = tokensData[token0Address].createdAt < tokensData[token1Address].createdAt ? 0 : 1
+
+                myLogger.log('-------------------------------------------')
+                myLogger.log('V2 CREATED: ' + results[0][i].transactionHash)
+
+                pairsData[pairAddress] = {
                     token0Address: token0Address,
                     token1Address: token1Address,
-                    pairAddress: pairAddress,
-                    createdAt: tmpDate,
-                    factoryAddress: factoryAddress,
+                    decimals: res[0],
+                    baseToken: baseToken,
                     blockNumber: block,
                     transactionID: 0
-                })
-            } catch (err) {
-                console.log(err)
-            }
-        }
-
-        for (var i = 0; i < results[1].length; i ++) {
-            var amt0 = Number.parseInt(hexToBn(results[1][i].data.substr(2, 64)))
-            var amt1 = Number.parseInt(hexToBn(results[1][i].data.substr(66, 64)))
-            var amt2 = Number.parseInt(hexToBn(results[1][i].data.substr(130, 64)))
-            var amt3 = Number.parseInt(hexToBn(results[1][i].data.substr(194, 64)))
-            var swap0 = amt2 - amt0
-            var swap1 = amt3 - amt1
-            var pairAddress = results[1][i].address.toLowerCase()
-            var block = results[1][i].blockNumber
-            var transactionID = results[1][i].logIndex
-
-            //var curDate = new Date(new Date().toUTCString())
-            //var curTimeString = convertTimestampToString(curDate.getTime(), true)
-            //var fileName = '../../database/liveInfo/' + pairAddress + '_' + curTimeString + '.txt'
-            //fs.appendFile(fileName, JSON.stringify(data) + '\n', "utf8", (err) => { })
-
-            console.log('-------------------------------------------')
-            console.log('V2 SWAP: ' + results[1][i].transactionHash)
-
-            var decimals = await getPairDecimals(pairAddress)
-
-            if (!pairsData[pairAddress]) {
-                pairsData[pairAddress] = {
-                    token0Address: decimals[1],
-                    token1Address: decimals[2],
-                    decimals: decimals[0],
-                    blockNumber: block,
-                    transactionID: transactionID
                 }
 
                 try {
                     await knex('eth_pairs').insert({
-                        token0Address: decimals[1],
-                        token1Address: decimals[2],
+                        token0Address: token0Address,
+                        token1Address: token1Address,
+                        factoryAddress: factoryAddress,
                         pairAddress: pairAddress,
+                        createdAt: tmpDate,
                         blockNumber: block,
-                        transactionID: transactionID
+                        transactionID: 0,
+                        baseToken: baseToken,
+                        decimals: res[0]
                     })
                 } catch (err) {
-                    await knex('eth_pairs').update({
+                    myLogger.log(err)
+                }
+            } catch (err) {
+
+            }            
+        }
+
+        for (var i = 0; i < results[1].length; i ++) {
+            try {
+                var amt0 = Number.parseInt(hexToBn(results[1][i].data.substr(2, 64)))
+                var amt1 = Number.parseInt(hexToBn(results[1][i].data.substr(66, 64)))
+                var amt2 = Number.parseInt(hexToBn(results[1][i].data.substr(130, 64)))
+                var amt3 = Number.parseInt(hexToBn(results[1][i].data.substr(194, 64)))
+                var swap0 = amt0 - amt2
+                var swap1 = amt1 - amt3
+                var pairAddress = results[1][i].address.toLowerCase()
+                var block = results[1][i].blockNumber
+                var resBlock
+
+                if (!blocksData[block]) {
+                    resBlock = await web3.eth.getBlock(block)
+                    blocksData[block] = {timestamp: resBlock.timestamp}
+                } else {
+                    resBlock = blocksData[block]
+                }
+
+                var tmpDate = convertTimestampToString(resBlock.timestamp * 1000, true)
+                var transactionID = results[1][i].logIndex
+                var transactionHash = results[1][i].transactionHash
+                var decimals = await getPairDecimals(pairAddress, tmpDate)
+                var baseToken = tokensData[decimals[1]].createdAt < tokensData[decimals[2]].createdAt ? 0 : 1
+                var isBuy = 0
+                var transactionData = await web3.eth.getTransactionReceipt(transactionHash)
+                var swapMaker = ""
+                var baseAddress = baseToken == 0 ? decimals[2] : decimals[1]
+
+                if (baseToken == 0) {
+                    if (swap0 > 0) {
+                        isBuy = 1
+                    } else {
+                        isBuy = 0
+                    }
+                } else {
+                    if (swap1 > 0) {
+                        isBuy = 1
+                    } else {
+                        isBuy = 0
+                    }
+                }
+
+                for (var j = 0; j < transactionData.logs.length; j ++) {
+                    if (transactionData.logs[j].logIndex == transactionID) break;
+                    if (transactionData.logs[j].topics[0] == '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef' && transactionData.logs[j].address.toLowerCase() == baseAddress) {
+                        if (isBuy) {
+                            swapMaker = transactionData.logs[j].topics[2].substr(26, 40)
+                        } else {
+                            swapMaker = transactionData.logs[j].topics[1].substr(26, 40)
+                        }
+                    }
+                }
+
+                swapMaker = '0x' + swapMaker
+
+                myLogger.log('-------------------------------------------')
+                myLogger.log('V2 SWAP: ' + results[1][i].transactionHash)
+
+                if (!pairsData[pairAddress]) {
+                    pairsData[pairAddress] = {
+                        token0Address: decimals[1],
+                        token1Address: decimals[2],
+                        decimals: decimals[0],
                         blockNumber: block,
                         transactionID: transactionID
-                    }).whereRaw('pairAddress="' + pairAddress + '" and (blockNumber<' + block + ' or (blockNumber=' + block + ' and transactionID<' + transactionID + '))')
-                }
+                    }
 
-                var res = await web3.eth.getBlock(block)
-                var tmp = convertTimestampToString(res.timestamp * 1000).split('_')
-                var data = {
-                    pairAddress: pairAddress,
-                    swapPrice: Math.abs(swap0 * 1.0 * 10 ** decimals[0] / swap1),
-                    swapAmount0: Math.abs(swap0 / 10 ** tokensData[decimals[1]].tokenDecimals),
-                    swapAmount1: Math.abs(swap1 / 10 ** tokensData[decimals[2]].tokenDecimals),
-                    swapDate: tmp[0] + '-' + tmp[1] + '-' + tmp[2],
-                    swapTime: tmp[3] + ':' + tmp[4] + ':' + tmp[5]
-                }
+                    try {
+                        await knex('eth_pairs').insert({
+                            token0Address: decimals[1],
+                            token1Address: decimals[2],
+                            pairAddress: pairAddress,
+                            blockNumber: block,
+                            transactionID: transactionID,
+                            decimals: decimals[0],
+                            baseToken: baseToken,
+                            lastPrice: Math.abs(swap0 * 1.0 * 10 ** decimals[0] / swap1),
+                            createdAt: tmpDate
+                        })
+                    } catch (err) {
+                        await knex('eth_pairs').update({
+                            blockNumber: block,
+                            transactionID: transactionID,
+                            lastPrice: Math.abs(swap0 * 1.0 * 10 ** decimals[0] / swap1)
+                        }).whereRaw('pairAddress="' + pairAddress + '" and (blockNumber<' + block + ' or (blockNumber=' + block + ' and transactionID<' + transactionID + '))')
+                    }
 
-                try {
-                    await knex('eth_live').insert(data)
-                } catch (err) {
-                    console.log(err)
-                }
-            } else if (pairsData[pairAddress].blockNumber < block || (pairsData[pairAddress].blockNumber == block && pairsData[pairAddress].transactionID < transactionID)) {
-                pairsData[pairAddress].blockNumber = block
-                pairsData[pairAddress].transactionID = transactionID
+                    var data = {
+                        pairAddress: pairAddress,
+                        swapPrice: Math.abs(swap0 * 1.0 * 10 ** decimals[0] / swap1),
+                        swapAmount0: Math.abs(swap0 / 10 ** tokensData[decimals[1]].tokenDecimals),
+                        swapAmount1: Math.abs(swap1 / 10 ** tokensData[decimals[2]].tokenDecimals),
+                        swapAt: tmpDate,
+                        swapTransactionHash: transactionHash,
+                        isBuy: isBuy,
+                        swapMaker: swapMaker
+                    }
 
-                try {
-                    await knex('eth_pairs').update({
-                        blockNumber: block,
-                        transactionID: transactionID
-                    }).where('pairAddress', pairAddress)
-                } catch (err) {
-                    console.log(err)
-                }
+                    try {
+                        await knex('eth_live').insert(data)
+                    } catch (err) {
+                        myLogger.log(err)
+                    }
+                } else if (pairsData[pairAddress].blockNumber < block || (pairsData[pairAddress].blockNumber == block && pairsData[pairAddress].transactionID < transactionID)) {
+                    pairsData[pairAddress].blockNumber = block
+                    pairsData[pairAddress].transactionID = transactionID
 
-                var res = await web3.eth.getBlock(block)
-                var tmp = convertTimestampToString(res.timestamp * 1000).split('_')
-                var data = {
-                    pairAddress: pairAddress,
-                    swapPrice: Math.abs(swap0 * 1.0 * 10 ** decimals[0] / swap1),
-                    swapAmount0: Math.abs(swap0 / 10 ** tokensData[decimals[1]].tokenDecimals),
-                    swapAmount1: Math.abs(swap1 / 10 ** tokensData[decimals[2]].tokenDecimals),
-                    swapDate: tmp[0] + '-' + tmp[1] + '-' + tmp[2],
-                    swapTime: tmp[3] + ':' + tmp[4] + ':' + tmp[5]
-                }
+                    try {
+                        await knex('eth_pairs').update({
+                            blockNumber: block,
+                            transactionID: transactionID,
+                            lastPrice: Math.abs(swap0 * 1.0 * 10 ** decimals[0] / swap1)
+                        }).where('pairAddress', pairAddress)
+                    } catch (err) {
+                        myLogger.log(err)
+                    }
 
-                try {
-                    await knex('eth_live').insert(data)
-                } catch (err) {
-                    console.log(err)
+                    var data = {
+                        pairAddress: pairAddress,
+                        swapPrice: Math.abs(swap0 * 1.0 * 10 ** decimals[0] / swap1),
+                        swapAmount0: Math.abs(swap0 / 10 ** tokensData[decimals[1]].tokenDecimals),
+                        swapAmount1: Math.abs(swap1 / 10 ** tokensData[decimals[2]].tokenDecimals),
+                        swapAt: tmpDate,
+                        swapTransactionHash: transactionHash,
+                        isBuy: isBuy,
+                        swapMaker: swapMaker
+                    }
+
+                    try {
+                        await knex('eth_live').insert(data)
+                    } catch (err) {
+                        myLogger.log(err)
+                    }
                 }
+            } catch (err) {
+                
             }
         }
 
         for (var i = 0; i < results[2].length; i ++) {
-            var token0Address = '0x' + results[2][i].topics[1].substr(26, 40).toLowerCase()
-            var token1Address = '0x' + results[2][i].topics[2].substr(26, 40).toLowerCase()
-            var pairAddress = '0x' + results[2][i].data.substr(90, 40).toLowerCase()
-            var factoryAddress = results[2][i].address.toLowerCase()
-            var block = results[2][i].blockNumber
-            var res = await getPairDecimals(pairAddress)
-
-            console.log('-------------------------------------------')
-            console.log('V3 CREATED: ' + results[2][i].transactionHash)
-    
-            pairsData[pairAddress] = {
-                token0Address: token0Address,
-                token1Address: token1Address,
-                decimals: res[0],
-                blockNumber: block,
-                transactionID: 0
-            }
-    
             try {
-                await knex('eth_pairs').insert({
+                var token0Address = '0x' + results[2][i].topics[1].substr(26, 40).toLowerCase()
+                var token1Address = '0x' + results[2][i].topics[2].substr(26, 40).toLowerCase()
+                var pairAddress = '0x' + results[2][i].data.substr(90, 40).toLowerCase()
+                var factoryAddress = results[2][i].address.toLowerCase()
+                var block = results[2][i].blockNumber
+                var resBlock = await web3.eth.getBlock(block)
+                var tmpDate = convertTimestampToString(resBlock.timestamp * 1000, true)
+                var res = await getPairDecimals(pairAddress, tmpDate)
+                var baseToken = tokensData[token0Address].createdAt < tokensData[token1Address].createdAt ? 0 : 1
+
+                myLogger.log('-------------------------------------------')
+                myLogger.log('V3 CREATED: ' + results[2][i].transactionHash)
+        
+                pairsData[pairAddress] = {
                     token0Address: token0Address,
                     token1Address: token1Address,
-                    pairAddress: pairAddress,
-                    factoryAddress: factoryAddress,
+                    decimals: res[0],
+                    baseToken: baseToken,
                     blockNumber: block,
                     transactionID: 0
-                })
+                }
+        
+                try {
+                    await knex('eth_pairs').insert({
+                        token0Address: token0Address,
+                        token1Address: token1Address,
+                        factoryAddress: factoryAddress,
+                        pairAddress: pairAddress,
+                        createdAt: tmpDate,
+                        blockNumber: block,
+                        transactionID: 0,
+                        baseToken: baseToken,
+                        decimals: res[0]
+                    })
+                } catch (err) {
+                    myLogger.log(err)
+                }
             } catch (err) {
-                console.log(err)
+                
             }
         }
 
         for (var i = 0; i < results[3].length; i ++) {
-            // console.log("===================== UNISWAP V3 SWAP ====================")
-            // console.log(data.transactionHash)
-            // var swap0 = Number.parseInt(hexToBn(data.data.substr(2, 64)))
-            // var swap1 = Number.parseInt(hexToBn(data.data.substr(66, 64)))
+            try {
+                var swap0 = Number.parseInt(hexToBn(results[3][i].data.substr(2, 64)))
+                var swap1 = Number.parseInt(hexToBn(results[3][i].data.substr(66, 64)))
+                var pairAddress = results[3][i].address.toLowerCase()
+                var block = results[3][i].blockNumber
+                var resBlock
 
-            // getPairDecimals(data.address)
-            // .then(decimals => {
-            //     web3.eth.getBlock(data.blockNumber).then(res => {
-            //         knex('eth_pairs').insert({
-            //             pairAddress: data.address.toLowerCase(),
-            //             lastPrice: Math.abs(swap0 * 1.0 * 10 ** decimals / swap1),
-            //             timestamp: res.timestamp
-            //         }).then(res => { })
-            //         .catch(err => {
-            //             knex('eth_pairs').update({
-            //                 lastPrice: Math.abs(swap0 * 1.0 * 10 ** decimals / swap1),
-            //                 timestamp: res.timestamp
-            //             }).where('pairAddress', data.address.toLowerCase())
-            //             .then(res => { }) 
-            //         })      
-            //     })
-            // })
-            var swap0 = Number.parseInt(hexToBn(results[3][i].data.substr(2, 64)))
-            var swap1 = Number.parseInt(hexToBn(results[3][i].data.substr(66, 64)))
-            var pairAddress = results[3][i].address.toLowerCase()
-            var block = results[3][i].blockNumber
-            var transactionID = results[3][i].logIndex
+                if (!blocksData[block]) {
+                    resBlock = await web3.eth.getBlock(block)
+                    blocksData[block] = {timestamp: resBlock.timestamp}
+                } else {
+                    resBlock = blocksData[block]
+                }
+                
+                var tmpDate = convertTimestampToString(resBlock.timestamp * 1000, true)
+                var transactionID = results[3][i].logIndex
+                var transactionHash = results[3][i].transactionHash
+                var decimals = await getPairDecimals(pairAddress, tmpDate)
+                var baseToken = tokensData[decimals[1]].createdAt < tokensData[decimals[2]].createdAt ? 0 : 1
+                var isBuy = 0
+                var transactionData = await web3.eth.getTransactionReceipt(transactionHash)
+                var swapMaker = ""
+                var baseAddress = baseToken == 0 ? decimals[2] : decimals[1]
 
-            console.log('-------------------------------------------')
-            console.log('V3 SWAP: ' + results[3][i].transactionHash)
-
-            if (!pairsData[pairAddress]) {
-                var decimals = await getPairDecimals(pairAddress)
-
-                pairsData[pairAddress] = {
-                    token0Address: decimals[1],
-                    token1Address: decimals[2],
-                    decimals: decimals[0],
-                    blockNumber: block,
-                    transactionID: transactionID
+                if (baseToken == 0) {
+                    if (swap0 > 0) {
+                        isBuy = 1
+                    } else {
+                        isBuy = 0
+                    }
+                } else {
+                    if (swap1 > 0) {
+                        isBuy = 1
+                    } else {
+                        isBuy = 0
+                    }
                 }
 
-                try {
-                    await knex('eth_pairs').insert({
+                for (var j = 0; j < transactionData.logs.length; j ++) {
+                    if (transactionData.logs[j].logIndex == transactionID) break;
+                    if (transactionData.logs[j].topics[0] == '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef' && transactionData.logs[j].address.toLowerCase() == baseAddress) {
+                        if (isBuy) {
+                            swapMaker = transactionData.logs[j].topics[2].substr(26, 40)
+                        } else {
+                            swapMaker = transactionData.logs[j].topics[1].substr(26, 40)
+                        }
+                    }
+                }
+
+                swapMaker = '0x' + swapMaker
+
+                myLogger.log('-------------------------------------------')
+                myLogger.log('V3 SWAP: ' + results[3][i].transactionHash)
+
+                if (!pairsData[pairAddress]) {
+                    pairsData[pairAddress] = {
                         token0Address: decimals[1],
                         token1Address: decimals[2],
+                        decimals: decimals[0],
+                        baseToken: baseToken,
+                        blockNumber: block,
+                        transactionID: transactionID
+                    }
+
+                    try {
+                        await knex('eth_pairs').insert({
+                            token0Address: decimals[1],
+                            token1Address: decimals[2],
+                            pairAddress: pairAddress,
+                            blockNumber: block,
+                            transactionID: transactionID,
+                            decimals: decimals[0],
+                            baseToken: baseToken,
+                            lastPrice: Math.abs(swap0 * 1.0 * 10 ** decimals[0] / swap1),
+                            createdAt: tmpDate
+                        })
+                    } catch (err) {
+                        await knex('eth_pairs').update({
+                            blockNumber: block,
+                            transactionID: transactionID,
+                            lastPrice: Math.abs(swap0 * 1.0 * 10 ** decimals[0] / swap1)
+                        }).whereRaw('pairAddress="' + pairAddress + '" and (blockNumber<' + block + ' or (blockNumber=' + block + ' and transactionID<' + transactionID + '))')
+                    }
+
+                    var data = {
                         pairAddress: pairAddress,
-                        blockNumber: block,
-                        transactionID: transactionID
-                    })
-                } catch (err) {
-                    await knex('eth_pairs').update({
-                        blockNumber: block,
-                        transactionID: transactionID
-                    }).whereRaw('pairAddress="' + pairAddress + '" and (blockNumber<' + block + ' or (blockNumber=' + block + ' and transactionID<' + transactionID + '))')
-                }
+                        swapPrice: Math.abs(swap0 * 1.0 * 10 ** decimals[0] / swap1),
+                        swapAmount0: Math.abs(swap0 / 10 ** tokensData[decimals[1]].tokenDecimals),
+                        swapAmount1: Math.abs(swap1 / 10 ** tokensData[decimals[2]].tokenDecimals),
+                        swapAt: tmpDate,
+                        swapTransactionHash: transactionHash,
+                        isBuy: isBuy,
+                        swapMaker: swapMaker
+                    }
 
-                var res = await web3.eth.getBlock(block)
-                var tmp = convertTimestampToString(res.timestamp * 1000).split('_')
-                var data = {
-                    pairAddress: pairAddress,
-                    swapPrice: Math.abs(swap0 * 1.0 * 10 ** decimals[0] / swap1),
-                    swapAmount0: Math.abs(swap0 / 10 ** tokensData[decimals[1]].tokenDecimals),
-                    swapAmount1: Math.abs(swap1 / 10 ** tokensData[decimals[2]].tokenDecimals),
-                    swapDate: tmp[0] + '-' + tmp[1] + '-' + tmp[2],
-                    swapTime: tmp[3] + ':' + tmp[4] + ':' + tmp[5]
-                }
+                    try {
+                        await knex('eth_live').insert(data)
+                    } catch (err) {
+                        myLogger.log(err)
+                    }
+                } else if (pairsData[pairAddress].blockNumber < block || (pairsData[pairAddress].blockNumber == block && pairsData[pairAddress].transactionID < transactionID)) {
+                    pairsData[pairAddress].blockNumber = block
+                    pairsData[pairAddress].transactionID = transactionID
 
-                try {
-                    await knex('eth_live').insert(data)
-                } catch (err) {
-                    console.log(err)
-                }
-            } else if (pairsData[pairAddress].blockNumber < block || (pairsData[pairAddress].blockNumber == block && pairsData[pairAddress].transactionID < transactionID)) {
-                pairsData[pairAddress].blockNumber = block
-                pairsData[pairAddress].transactionID = transactionID
+                    try {
+                        await knex('eth_pairs').update({
+                            blockNumber: block,
+                            transactionID: transactionID,
+                            lastPrice: Math.abs(swap0 * 1.0 * 10 ** decimals[0] / swap1)
+                        }).where('pairAddress', pairAddress)
+                    } catch (err) {
+                        myLogger.log(err)
+                    }
 
-                try {
-                    await knex('eth_pairs').update({
-                        blockNumber: block,
-                        transactionID: transactionID
-                    }).where('pairAddress', pairAddress)
-                } catch (err) {
-                    console.log(err)
-                }
+                    var data = {
+                        pairAddress: pairAddress,
+                        swapPrice: Math.abs(swap0 * 1.0 * 10 ** decimals[0] / swap1),
+                        swapAmount0: Math.abs(swap0 / 10 ** tokensData[decimals[1]].tokenDecimals),
+                        swapAmount1: Math.abs(swap1 / 10 ** tokensData[decimals[2]].tokenDecimals),
+                        swapAt: tmpDate,
+                        swapTransactionHash: transactionHash,
+                        isBuy: isBuy,
+                        swapMaker: swapMaker
+                    }
 
-                var res = await web3.eth.getBlock(block)
-                var tmp = convertTimestampToString(res.timestamp * 1000).split('_')
-                var data = {
-                    pairAddress: pairAddress,
-                    swapPrice: Math.abs(swap0 * 1.0 * 10 ** pairsData[pairAddress].decimals / swap1),
-                    swapAmount0: Math.abs(swap0 / 10 ** tokensData[pairsData[pairAddress].token0Address].tokenDecimals),
-                    swapAmount1: Math.abs(swap1 / 10 ** tokensData[pairsData[pairAddress].token1Address].tokenDecimals),
-                    swapDate: tmp[0] + '-' + tmp[1] + '-' + tmp[2],
-                    swapTime: tmp[3] + ':' + tmp[4] + ':' + tmp[5]
+                    try {
+                        await knex('eth_live').insert(data)
+                    } catch (err) {
+                        myLogger.log(err)
+                    }
                 }
-
-                try {
-                    await knex('eth_live').insert(data)
-                } catch (err) {
-                    console.log(err)
-                }
+            } catch (err) {
+                
             }
         }
     } catch (err) {
-        console.log(err)
+        myLogger.log(err)
     }
 
-    setTimeout(init, 10000)
-    /*
-    web3.eth.subscribe('logs', {
-        topics: ['0x0d3648bd0f6ba80134a33ba9275ac585d9d315f0ad8355cddefde31afa28d0e9']
-    }, function(error, result){
-        if (error)
-            console.log(error)
-    })
-    .on("data", function(data){
-        console.log("===================== UNISWAP V2 PAIR CREATED ====================")
-        console.log(data.transactionHash);
-        var token0Address = '0x' + data.topics[1].substr(26, 40).toLowerCase()
-        var token1Address = '0x' + data.topics[2].substr(26, 40).toLowerCase()
-        knex('eth_pairs').insert({
-            token0Address: token0Address,
-            token1Address: token1Address,
-            pairAddress: '0x' + data.data.substr(26, 40).toLowerCase(),
-            factoryAddress: data.address.toLowerCase()
-        }).then(res => {
-        })
-        .catch(err => {
-            console.log(err)
-        })
-    })
-
-    web3.eth.subscribe('logs', {
-        topics: ['0xd78ad95fa46c994b6551d0da85fc275fe613ce37657fb8d5e3d130840159d822']
-    }, function(error, result){
-        if (error)
-            console.log(error)
-    })
-    .on("data", function(data){
-        console.log("===================== UNISWAP V2 SWAP ====================")
-        console.log(data.transactionHash);
-        var amt0 = Number.parseInt(hexToBn(data.data.substr(2, 64)))
-        var amt1 = Number.parseInt(hexToBn(data.data.substr(66, 64)))
-        var amt2 = Number.parseInt(hexToBn(data.data.substr(130, 64)))
-        var amt3 = Number.parseInt(hexToBn(data.data.substr(194, 64)))
-        var swap0 = amt0 + amt2
-        var swap1 = amt1 + amt3
-
-        getPairDecimals(data.address)
-        .then(decimals => {
-            web3.eth.getBlock(data.blockNumber).then(res => {
-                knex('eth_pairs').insert({
-                    pairAddress: data.address.toLowerCase(),
-                    lastPrice: Math.abs(swap0 * 1.0 * 10 ** decimals / swap1),
-                    timestamp: res.timestamp
-                }).then(res => { })
-                .catch(err => {
-                    knex('eth_pairs').update({
-                        lastPrice: Math.abs(swap0 * 1.0 * 10 ** decimals / swap1),
-                        timestamp: res.timestamp
-                    }).where('pairAddress', data.address.toLowerCase())
-                    .then(res => { }) 
-                })      
-            })
-        })
-    })
-
-    web3.eth.subscribe('logs', {
-        topics: ['0x783cca1c0412dd0d695e784568c96da2e9c22ff989357a2e8b1d9b2b4e6b7118']
-    }, function(error, result){
-        if (error)
-            console.log(error)
-    })
-    .on("data", function(data){
-        console.log("===================== UNISWAP V3 POOL CREATED ====================")
-        console.log(data.transactionHash);
-        knex('eth_pairs').insert({
-            token0Address: '0x' + data.topics[1].substr(26, 40).toLowerCase(),
-            token1Address: '0x' + data.topics[2].substr(26, 40).toLowerCase(),
-            pairAddress: '0x' + data.data.substr(90, 40).toLowerCase(),
-            factoryAddress: data.address.toLowerCase()
-        }).then(res => { })
-        .catch(err => {
-            console.log(err)
-        })
-    })
-
-    web3.eth.subscribe('logs', {
-        topics: ['0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67']
-    }, function(error, result){
-        if (error)
-            console.log(error);
-    })
-    .on("data", function(data){
-        console.log("===================== UNISWAP V3 SWAP ====================")
-        console.log(data.transactionHash)
-        var swap0 = Number.parseInt(hexToBn(data.data.substr(2, 64)))
-        var swap1 = Number.parseInt(hexToBn(data.data.substr(66, 64)))
-
-        getPairDecimals(data.address)
-        .then(decimals => {
-            web3.eth.getBlock(data.blockNumber).then(res => {
-                knex('eth_pairs').insert({
-                    pairAddress: data.address.toLowerCase(),
-                    lastPrice: Math.abs(swap0 * 1.0 * 10 ** decimals / swap1),
-                    timestamp: res.timestamp
-                }).then(res => { })
-                .catch(err => {
-                    knex('eth_pairs').update({
-                        lastPrice: Math.abs(swap0 * 1.0 * 10 ** decimals / swap1),
-                        timestamp: res.timestamp
-                    }).where('pairAddress', data.address.toLowerCase())
-                    .then(res => { }) 
-                })      
-            })
-        })
-    })
-    */
+    setTimeout(init, 100)
 }
 
 init()

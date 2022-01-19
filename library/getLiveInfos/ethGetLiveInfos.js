@@ -193,6 +193,36 @@ var pairsData = []
 var blocksData = []
 var lastBlockNumber = 14026168
 
+async function getTokenAndPairData() {
+    var res = await knex('eth_tokens').select('*')
+
+    myLogger.log(res.length)
+
+    for (var i = 0; i < res.length; i ++) {
+        tokensData[res[i].tokenAddress] = {
+            tokenDecimals: res[i].tokenDecimals,
+            tokenSymbol: res[i].tokenSymbol,
+            tokenName: res[i].tokenName,
+            createdAt: convertTimestampToString(res[i].createdAt, true)
+        }
+    }
+
+    res = await knex('eth_pairs').select('*')
+
+    myLogger.log(res.length)
+
+    for (var i = 0; i < res.length; i ++) {
+        pairsData[res[i].pairAddress] = {
+            token0Address: res[i].token0Address,
+            token1Address: res[i].token1Address,
+            decimals: res[i].decimals,
+            baseToken: res[i].baseToken,
+            blockNumber: res[i].blockNumber,
+            transactionID: res[i].transactionID
+        }
+    }
+}
+
 async function getTokenInfos(tokenAddress) {
     try {
         const contract = new web3.eth.Contract(minERC20ABI, tokenAddress)
@@ -779,4 +809,7 @@ async function init() {
     setTimeout(init, 100)
 }
 
-init()
+getTokenAndPairData()
+.then(res => {
+    init()
+})

@@ -281,7 +281,110 @@ module.exports.getDailyTokenPrice = async function getDailyTokenPrice(tokenAddre
         .select('*')
 
     if (rows.length) {
-        return mergeDailyPairData(rows)
+        var res = mergeDailyPairData(rows)
+
+        if (token0Address != USDC_ADDRESS) {
+            for (var i = 0; i < res.length; i ++) {
+                var tmp = 1.0 / res[i].LOWPRICE
+
+                res[i].LOWPRICE = 1.0 / res[i].HIGHPRICE
+                res[i].HIGHPRICE = tmp
+                res[i].AVGPRICE = 1.0 / res[i].AVGPRICE
+            }
+        }
+
+        return {
+            message: 'Success!',
+            symbol: tokenInfo[0].tokenSymbol,
+            name: tokenInfo[0].tokenName,
+            data: res
+        }
+    }
+
+    for (var i = 0; i < baseTokens.length; i ++) {
+        var funcs = []
+
+        token0Address = tokenAddress > baseTokens[i] ? baseTokens[i] : tokenAddress
+        token1Address = tokenAddress < baseTokens[i] ? baseTokens[i] : tokenAddress
+
+        funcs.push(
+            knex('eth_pairs')
+                .where('token0Address', token0Address)
+                .where('token1Address', token1Address)
+                .select('*')
+        )
+
+        token0Address = USDC_ADDRESS > baseTokens[i] ? baseTokens[i] : USDC_ADDRESS
+        token1Address = USDC_ADDRESS < baseTokens[i] ? baseTokens[i] : USDC_ADDRESS
+
+        funcs.push(
+            knex('eth_pairs')
+                .where('token0Address', token0Address)
+                .where('token1Address', token1Address)
+                .select('*')
+        )
+
+        var rows = await Promise.all(funcs)
+        var res1 = mergeDailyPairData(rows[0])
+        var res2 = mergeDailyPairData(rows[1])
+
+        if (rows[0].length) {
+            if (rows[0][0].token1Address != tokenAddress) {
+                for (var j = 0; j < res1.length; j ++) {
+                    var tmp = 1.0 / res1[j].LOWPRICE
+    
+                    res1[j].LOWPRICE = 1.0 / res1[j].HIGHPRICE
+                    res1[j].HIGHPRICE = tmp
+                    res1[j].AVGPRICE = 1.0 / res1[j].AVGPRICE
+                }
+            }
+        }
+
+        if (rows[1].length) {
+            if (rows[1][0].token0Address != USDC_ADDRESS) {
+                for (var j = 0; j < res2.length; j ++) {
+                    var tmp = 1.0 / res2[j].LOWPRICE
+    
+                    res2[j].LOWPRICE = 1.0 / res2[j].HIGHPRICE
+                    res2[j].HIGHPRICE = tmp
+                    res2[j].AVGPRICE = 1.0 / res2[j].AVGPRICE
+                }
+            }
+        }
+
+        if (rows[0].length > 0 && rows[1].length > 0) {
+            for (var j = 0; j < res1.length; j ++) {
+                var jd = (new Date(res1[j].SWAPAT)).getTime()
+
+                for (var k = res2.length - 1; k >= 0; k --) {
+                    var kd = (new Date(res1[j].SWAPAT)).getTime()
+
+                    if (kd <= jd) break
+                }
+
+                if (k < 0) break
+
+                res1[j].AVGPRICE = res1[j].AVGPRICE * res2[k].AVGPRICE
+                res1[j].HIGHPRICE = res1[j].HIGHPRICE * res2[k].HIGHPRICE
+                res1[j].LOWPRICE = res1[j].LOWPRICE * res2[k].LOWPRICE
+            }
+
+            if (j == res1.length) {
+                return {
+                    message: 'Success!',
+                    symbol: tokenInfo[0].tokenSymbol,
+                    name: tokenInfo[0].tokenName,
+                    data: res1
+                }
+            }
+        }
+    }
+    
+    return {
+        message: "Can't find swap route!",
+        data: {
+
+        }
     }
 }
 

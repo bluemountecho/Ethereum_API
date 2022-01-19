@@ -30,12 +30,12 @@ router.get('/daily_pair_price_history/:pairAddr', function(req, res, next) {
   })
 });
 
-router.get('/live_pair_price/:pairAddr', function(req, res, next) {
-  etherMainnetFuncs.getLivePairPrice(req.params.pairAddr)
-  .then((data) => {
-    res.send(JSON.stringify(data))
-  })
-});
+// router.get('/live_pair_price/:pairAddr', function(req, res, next) {
+//   etherMainnetFuncs.getLivePairPrice(req.params.pairAddr)
+//   .then((data) => {
+//     res.send(JSON.stringify(data))
+//   })
+// });
 
 router.get('/daily_token_price_history/:tokenAddr', function(req, res, next) {
   etherMainnetFuncs.getDailyTokenPrice(req.params.tokenAddr)
@@ -44,11 +44,11 @@ router.get('/daily_token_price_history/:tokenAddr', function(req, res, next) {
   })
 });
 
-router.get('/live_token_price/:tokenAddr', function(req, res, next) {
-  etherMainnetFuncs.getLiveTokenPrice(req.params.tokenAddr)
-  .then((data) => {
-    res.send(JSON.stringify(data))
-  })
-});
+// router.get('/live_token_price/:tokenAddr', function(req, res, next) {
+//   etherMainnetFuncs.getLiveTokenPrice(req.params.tokenAddr)
+//   .then((data) => {
+//     res.send(JSON.stringify(data))
+//   })
+// });
 
 module.exports = router;

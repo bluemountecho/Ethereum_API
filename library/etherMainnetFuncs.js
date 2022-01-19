@@ -180,6 +180,100 @@ module.exports.getAllTokens = async function getAllTokens() {
     }
 }
 
+function getDailyPairData(pairAddr) {
+    try {
+        var pair = pairAddr.toLowerCase()
+        var content = fs.readFileSync('./database/ethereum/transactions/' + pair + '.txt', {encoding:'utf8', flag:'r'})
+        var rows = content.split('\n')
+        var datas = []
+
+        for (var i = 0; i < rows.length - 1; i ++) {
+            datas.push(JSON.parse(rows[i]))
+        }
+
+        for (var i = 0; i < datas.length; i ++) {
+            datas[i].AVGPRICE = datas[i].TOTALVOLUME0 / datas[i].TOTALVOLUME1
+        }
+
+        datas.sort(function (a, b) {
+            var ad = (new Date(a.SWAPAT)).getTime()
+            var bd = (new Date(b.SWAPAT)).getTime()
+
+            if (ad < bd) return -1
+            if (ad > bd) return 1
+            return 0
+        })
+
+        return datas
+    } catch (err) {
+        console.log(err)
+    }
+}
+
+function mergeDailyPairData(rows) {
+    var datas = []
+    var res = []
+
+    for (var i = 0; i < rows.length; i ++) {
+        var oneData = getDailyPairData(rows[i].pairAddress)
+
+        for (var j = 0; j < oneData.length; j ++) {
+            if (!datas[oneData[j].SWAPAT]) {
+                datas[oneData[j].SWAPAT] = []
+            }
+
+            datas[oneData[j].SWAPAT].push(oneData[j])
+        }
+    }
+
+    for (var key in datas) {
+        var swapAt = key
+        var totalVolume0 = 0
+        var totalVolume1 = 0
+        var volume0 = 0
+        var volume1 = 0
+        var minPrice = datas[key][0].minPrice
+        var maxPrice = datas[key][0].maxPrice
+
+        for (var i = 0; i < datas[key].length; i ++) {
+            totalVolume0 += datas[key][i].TOTALVOLUME0
+            totalVolume1 += datas[key][i].TOTALVOLUME1
+            volume0 += datas[key][i].VOLUME0
+            volume1 += datas[key][i].VOLUME1
+
+            if (minPrice > datas[key][i].MINPRICE) minPrice = datas[key][i].MINPRICE
+            if (maxPrice < datas[key][i].MAXPRICE) maxPrice = datas[key][i].MAXPRICE
+        }
+
+        res.push({
+            SWAPAT: swapAt,
+            TOTALVOLUME0: totalVolume0,
+            TOTALVOLUME1: totalVolume1,
+            VOLUME0: volume0,
+            VOLUME1: volume1,
+            MINPRICE: minPrice,
+            MAXPRICE: maxPrice
+        })
+    }
+
+    return res
+}
+
+module.exports.getDailyTokenPrice = async function getDailyTokenPrice(tokenAddress) {
+    var tokenInfo = await knex('eth_tokens').where('tokenAddress', tokenAddress).select('*')
+    var token0Address = tokenAddress > USDC_ADDRESS ? USDC_ADDRESS : tokenAddress
+    var token1Address = tokenAddress < USDC_ADDRESS ? USDC_ADDRESS : tokenAddress
+
+    var rows = await knex('eth_pairs')
+        .where('token0Address', token0Address)
+        .where('token1Address', token1Address)
+        .select('*')
+
+    if (rows.length) {
+        return mergeDailyPairData(rows)
+    }
+}
+
 module.exports.getDailyPairPrice = async function getDailyPairPrice(pairAddr) {
     try {
         var pair = pairAddr.toLowerCase()

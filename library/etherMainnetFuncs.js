@@ -242,8 +242,8 @@ function mergeDailyPairData(rows) {
             volume0 += datas[key][i].VOLUME0
             volume1 += datas[key][i].VOLUME1
 
-            if (minPrice > datas[key][i].MINPRICE) minPrice = datas[key][i].MINPRICE
-            if (maxPrice < datas[key][i].MAXPRICE) maxPrice = datas[key][i].MAXPRICE
+            if (minPrice > datas[key][i].MINPRICE && datas[key][i].MINPRICE) minPrice = datas[key][i].MINPRICE
+            if (maxPrice < datas[key][i].MAXPRICE && datas[key][i].MAXPRICE) maxPrice = datas[key][i].MAXPRICE
         }
 
         res.push({

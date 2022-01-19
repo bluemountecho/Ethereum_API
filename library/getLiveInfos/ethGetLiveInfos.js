@@ -148,12 +148,12 @@ const knex = require('knex')({
     connection: {
         host : '127.0.0.1',
         port : 3306,
-        user : 'admin_root',
-        password : 'bOPTDZXP8Xvdf9I1',
-        database : 'admin_ethereum_api'
-        // user : 'root',
-        // password : '',
-        // database : 'ethereum_api'
+        // user : 'admin_root',
+        // password : 'bOPTDZXP8Xvdf9I1',
+        // database : 'admin_ethereum_api'
+        user : 'root',
+        password : '',
+        database : 'ethereum_api'
     }
 })
 
@@ -191,7 +191,7 @@ function convertTimestampToString(timestamp, flag = false) {
 var tokensData = []
 var pairsData = []
 var blocksData = []
-var lastBlockNumber = 14034324
+var lastBlockNumber = 14026168
 
 async function getTokenInfos(tokenAddress) {
     try {
@@ -296,9 +296,57 @@ async function getPairDecimals(pairAddress, createdAt) {
     return 1
 }
 
+async function writeTransactionHistoryFile(date) {
+    var path = "../../database/ethereum"
+
+    var rows = (await knex.raw('\
+        SELECT\
+            eth_live.pairAddress AS PAIRADDRESS,\
+            CONCAT(YEAR( eth_live.swapAt ), "-", MONTH( eth_live.swapAt ), "-", DAY( eth_live.swapAt )) AS SWAPAT,\
+            avg( eth_live.swapPrice ) AS AVGPRICE,\
+            max( eth_live.swapPrice ) AS MAXPRICE,\
+            min( eth_live.swapPrice ) AS MINPRICE,\
+            sum( eth_live.swapAmount0 * ( eth_pairs.baseToken * 2 - 1 ) * ( eth_live.isBuy * - 2 + 1 ) ) AS VOLUME0,\
+            sum( eth_live.swapAmount1 * ( eth_pairs.baseToken * - 2 + 1 ) * ( eth_live.isBuy * - 2 + 1 ) ) AS VOLUME1,\
+            sum( eth_live.swapAmount0 ) AS TOTALVOLUME0,\
+            sum( eth_live.swapAmount1 ) AS TOTALVOLUME1,\
+            count( eth_live.swapMaker ) AS SWAPCOUNT \
+        FROM\
+            eth_live\
+            LEFT JOIN eth_pairs ON eth_pairs.pairAddress = eth_live.pairAddress \
+        WHERE\
+            eth_live.swapAt<"' + date + ' ' + '00:00:00' + '"\
+        GROUP BY\
+            eth_live.pairAddress,\
+            DATE( eth_live.swapAt ) \
+        ORDER BY\
+            DATE( eth_live.swapAt)'))[0]
+
+    for (var i = 0; i < rows.length; i ++) {
+        var fileName = path + '/transactions/' + rows[i].PAIRADDRESS + '.txt'
+        fs.appendFile(fileName, JSON.stringify(rows[i]) + '\n', "utf8", (err) => { })
+    }
+
+    rows = (await knex.raw('select CONCAT(YEAR( eth_live.swapAt ), "-", MONTH( eth_live.swapAt ), "-", DAY( eth_live.swapAt )) AS SWAPAT, swapMaker as SWAPMAKER, pairAddress from eth_live where eth_live.swapAt<"' + date + ' ' + '00:00:00' + '" order by swapAt'))[0]
+
+    for (var i = 0; i < rows.length; i ++) {
+        var fileName = path + '/swapers/' + rows[i].pairAddress + '.txt'
+        fs.appendFile(fileName, JSON.stringify(rows[i]) + '\n', "utf8", (err) => { })
+    }
+
+    await knex('eth_live').where('swapAt', '<', date + ' ' + '00:00:00').delete()
+
+    myLogger.log("WRITE TRANSACTION HISTORY FILE FINISHED!!!")
+}
+
 async function init() {
     try {
         var blockNumber = await web3.eth.getBlockNumber()
+        var curBlock = blockNumber
+
+        if (curBlock > lastBlockNumber + 99) {
+            blockNumber = lastBlockNumber + 99
+        }
 
         results = await Promise.all([
             web3.eth.getPastLogs({
@@ -329,8 +377,6 @@ async function init() {
         myLogger.log('UNISWAP V2 SWAP        : ' + results[1].length)
         myLogger.log('UNISWAP V3 POOL CREATED: ' + results[2].length)
         myLogger.log('UNISWAP V3 SWAP        : ' + results[3].length)
-
-        lastBlockNumber = blockNumber
 
         for (var i = 0; i < results[0].length; i ++) {
             try {
@@ -695,6 +741,36 @@ async function init() {
             } catch (err) {
                 
             }
+        }
+
+        var resBlock
+
+        if (!blocksData[lastBlockNumber]) {
+            resBlock = await web3.eth.getBlock(lastBlockNumber)
+            blocksData[lastBlockNumber] = {timestamp: resBlock.timestamp}
+        } else {
+            resBlock = blocksData[lastBlockNumber]
+        }
+
+        var tmpDate1 = convertTimestampToString(resBlock.timestamp * 1000 - 7 * 86400 * 1000, true)
+
+        if (!blocksData[blockNumber]) {
+            resBlock = await web3.eth.getBlock(blockNumber)
+            blocksData[blockNumber] = {timestamp: resBlock.timestamp}
+        } else {
+            resBlock = blocksData[blockNumber]
+        }
+
+        var tmpDate2 = convertTimestampToString(resBlock.timestamp * 1000 - 7 * 86400 * 1000, true)
+
+        if (tmpDate1.split(' ')[0] != tmpDate2.split(' ')[0]) {
+            writeTransactionHistoryFile(tmpDate2.split(' ')[0])
+        }
+        
+        if (curBlock > blockNumber) {
+            lastBlockNumber = blockNumber + 1
+        } else {
+            lastBlockNumber = blockNumber
         }
     } catch (err) {
         myLogger.log(err)

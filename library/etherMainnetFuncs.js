@@ -233,8 +233,8 @@ function mergeDailyPairData(rows) {
         var totalVolume1 = 0
         var volume0 = 0
         var volume1 = 0
-        var minPrice = datas[key][0].minPrice
-        var maxPrice = datas[key][0].maxPrice
+        var minPrice = 1000000000000000
+        var maxPrice = 0
 
         for (var i = 0; i < datas[key].length; i ++) {
             totalVolume0 += datas[key][i].TOTALVOLUME0

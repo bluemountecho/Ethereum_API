@@ -207,6 +207,7 @@ function getDailyPairData(pairAddr) {
         return datas
     } catch (err) {
         console.log(err)
+        return []
     }
 }
 

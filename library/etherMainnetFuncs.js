@@ -252,8 +252,8 @@ function mergeDailyPairData(rows) {
             TOTALVOLUME1: totalVolume1,
             VOLUME0: volume0,
             VOLUME1: volume1,
-            MINPRICE: minPrice,
-            MAXPRICE: maxPrice,
+            LOWPRICE: minPrice,
+            HIGHPRICE: maxPrice,
             AVGPRICE: totalVolume0 / totalVolume1
         })
     }

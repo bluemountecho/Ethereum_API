@@ -253,9 +253,19 @@ function mergeDailyPairData(rows) {
             VOLUME0: volume0,
             VOLUME1: volume1,
             MINPRICE: minPrice,
-            MAXPRICE: maxPrice
+            MAXPRICE: maxPrice,
+            AVGPRICE: totalVolume0 / totalVolume1
         })
     }
+
+    res.sort(function (a, b) {
+        var ad = (new Date(a.SWAPAT)).getTime()
+        var bd = (new Date(b.SWAPAT)).getTime()
+
+        if (ad < bd) return -1
+        if (ad > bd) return 1
+        return 0
+    })
 
     return res
 }

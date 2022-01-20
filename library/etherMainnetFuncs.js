@@ -421,7 +421,7 @@ module.exports.getDailyPairPrice = async function getDailyPairPrice(pairAddr) {
 module.exports.getLivePairPrice = async function getLivePairPrice(pairAddr) {
     try {
         var pair = pairAddr.toLowerCase()
-        var rows = knex('eth_live').where('pairAddress', pair).orderBy('swapAt', 'desc').select('*')
+        var rows = await knex('eth_live').where('pairAddress', pair).orderBy('swapAt', 'desc').select('*')
         var datas = []
 
         for (var i = 0; i < rows.length; i ++) {

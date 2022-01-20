@@ -272,34 +272,34 @@ function mergeDailyPairData(rows) {
 
 module.exports.getDailyTokenPrice = async function getDailyTokenPrice(tokenAddress) {
     var tokenInfo = await knex('eth_tokens').where('tokenAddress', tokenAddress).select('*')
-    var token0Address = tokenAddress > USDC_ADDRESS ? USDC_ADDRESS : tokenAddress
-    var token1Address = tokenAddress < USDC_ADDRESS ? USDC_ADDRESS : tokenAddress
+    // var token0Address = tokenAddress > USDC_ADDRESS ? USDC_ADDRESS : tokenAddress
+    // var token1Address = tokenAddress < USDC_ADDRESS ? USDC_ADDRESS : tokenAddress
 
-    var rows = await knex('eth_pairs')
-        .where('token0Address', token0Address)
-        .where('token1Address', token1Address)
-        .select('*')
+    // var rows = await knex('eth_pairs')
+    //     .where('token0Address', token0Address)
+    //     .where('token1Address', token1Address)
+    //     .select('*')
 
-    if (rows.length) {
-        var res = mergeDailyPairData(rows)
+    // if (rows.length) {
+    //     var res = mergeDailyPairData(rows)
 
-        if (token0Address != USDC_ADDRESS) {
-            for (var i = 0; i < res.length; i ++) {
-                var tmp = 1.0 / res[i].LOWPRICE
+    //     if (token0Address != USDC_ADDRESS) {
+    //         for (var i = 0; i < res.length; i ++) {
+    //             var tmp = 1.0 / res[i].LOWPRICE
 
-                res[i].LOWPRICE = 1.0 / res[i].HIGHPRICE
-                res[i].HIGHPRICE = tmp
-                res[i].AVGPRICE = 1.0 / res[i].AVGPRICE
-            }
-        }
+    //             res[i].LOWPRICE = 1.0 / res[i].HIGHPRICE
+    //             res[i].HIGHPRICE = tmp
+    //             res[i].AVGPRICE = 1.0 / res[i].AVGPRICE
+    //         }
+    //     }
 
-        return {
-            message: 'Success!',
-            symbol: tokenInfo[0].tokenSymbol,
-            name: tokenInfo[0].tokenName,
-            data: res
-        }
-    }
+    //     return {
+    //         message: 'Success!',
+    //         symbol: tokenInfo[0].tokenSymbol,
+    //         name: tokenInfo[0].tokenName,
+    //         data: res
+    //     }
+    // }
 
     for (var i = 0; i < baseTokens.length; i ++) {
         var funcs = []
@@ -411,6 +411,30 @@ module.exports.getDailyPairPrice = async function getDailyPairPrice(pairAddr) {
             if (ad > bd) return 1
             return 0
         })
+
+        return datas
+    } catch (err) {
+        console.log(err)
+    }
+}
+
+module.exports.getLivePairPrice = async function getLivePairPrice(pairAddr) {
+    try {
+        var pair = pairAddr.toLowerCase()
+        var rows = knex('eth_live').where('pairAddress', pair).orderBy('swapAt', 'desc').select('*')
+        var datas = []
+
+        for (var i = 0; i < rows.length; i ++) {
+            datas.push({
+                SWAPAT: rows[i].swapAt,
+                PRICE: rows[i].swapPrice,
+                SWAPAMOUNT0: rows[i].swapAmount0,
+                SWAPAMOUNT1: rows[i].swapAmount1,
+                SWAPMAKER: rows[i].swapMaker,
+                SWAPTRANSACTION: rows[i].swapTransactionHash,
+                BUYORSELL: rows[i].isBuy ? 'BUY' : 'SELL'
+            })
+        }
 
         return datas
     } catch (err) {

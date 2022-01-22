@@ -1,10 +1,12 @@
 var fs = require('fs')
 var path = require('path')
+const process = require('process')
+const config = require('./config.js')
 
 const { Console } = require("console");
 const myLogger = new Console({
-  stdout: fs.createWriteStream("log_" + convertTimestampToString(new Date())  + ".txt"),
-  stderr: fs.createWriteStream("log_" + convertTimestampToString(new Date())  + ".txt"),
+  stdout: fs.createWriteStream("bsc" + process.argv[2] + ".txt"),
+  stderr: fs.createWriteStream("bsc" + process.argv[2] + ".txt"),
 });
 
 Web3 = require('web3')
@@ -142,19 +144,7 @@ const options = {
     }
 };
 
-const web3 = new Web3(new Web3.providers.HttpProvider('https://bsc-dataseed.binance.org/', options))
-// const web3 = new Web3(new Web3.providers.HttpProvider('https://bsc-dataseed1.defibit.io/', options))
-// const web3 = new Web3(new Web3.providers.HttpProvider('https://bsc-dataseed1.ninicoin.io/', options))
-// const web3 = new Web3(new Web3.providers.HttpProvider('https://bsc-dataseed2.defibit.io/', options))
-// const web3 = new Web3(new Web3.providers.HttpProvider('https://bsc-dataseed3.defibit.io/', options))
-// const web3 = new Web3(new Web3.providers.HttpProvider('https://bsc-dataseed4.defibit.io/', options))
-// const web3 = new Web3(new Web3.providers.HttpProvider('https://bsc-dataseed2.ninicoin.io/', options))
-// const web3 = new Web3(new Web3.providers.HttpProvider('https://bsc-dataseed3.ninicoin.io//', options))
-// const web3 = new Web3(new Web3.providers.HttpProvider('https://bsc-dataseed4.ninicoin.io/', options))
-// const web3 = new Web3(new Web3.providers.HttpProvider('https://bsc-dataseed1.binance.org/', options))
-// const web3 = new Web3(new Web3.providers.HttpProvider('https://bsc-dataseed2.binance.org/', options))
-// const web3 = new Web3(new Web3.providers.HttpProvider('https://bsc-dataseed3.binance.org/', options))
-// const web3 = new Web3(new Web3.providers.HttpProvider('https://bsc-dataseed4.binance.org/', options))
+const web3 = new Web3(new Web3.providers.HttpProvider(config.BSC.web3Providers[process.argv[2]], options))
 
 const knex = require('knex')({
     client: 'mysql',
@@ -204,29 +194,9 @@ function convertTimestampToString(timestamp, flag = false) {
 var tokensData = []
 var pairsData = []
 var blocksData = []
-// var FROMBLOCK = 13969661
-// var TOBLOCK = 14543782
 
-var FROMBLOCK = 13969661
-var TOBLOCK = 14027134
-// var FROMBLOCK = 14027134
-// var TOBLOCK = 14084638
-// var FROMBLOCK = 14084638
-// var TOBLOCK = 14142120
-// var FROMBLOCK = 14142120
-// var TOBLOCK = 14199588
-// var FROMBLOCK = 14199588
-// var TOBLOCK = 14257136
-// var FROMBLOCK = 14257136
-// var TOBLOCK = 14314567
-// var FROMBLOCK = 14314567
-// var TOBLOCK = 14372060
-// var FROMBLOCK = 14372060
-// var TOBLOCK = 14429477
-// var FROMBLOCK = 14429477
-// var TOBLOCK = 14486354
-// var FROMBLOCK = 14486354
-// var TOBLOCK = 14543782
+var FROMBLOCK = config.BSC.fromAndTo[process.argv[2]].FROMBLOCK
+var TOBLOCK = config.BSC.fromAndTo[process.argv[2]].TOBLOCK
 
 async function getTokenInfos(tokenAddress) {
     try {

@@ -1,12 +1,12 @@
 module.exports.BSC = {
     'web3Providers': [
         'https://bsc-dataseed.binance.org/',
-        'https://speedy-nodes-nyc.moralis.io/f82f9ab69dad383c4bca0db3/bsc/mainnet',
-        'https://speedy-nodes-nyc.moralis.io/0efb186cdf6e083e194a1e62/bsc/mainnet',
-        'https://speedy-nodes-nyc.moralis.io/3a2176bd8a01644ed14003c0/bsc/mainnet',
-        'https://speedy-nodes-nyc.moralis.io/2d3d943614ff38d9b0c13da8/bsc/mainnet',
-        'https://speedy-nodes-nyc.moralis.io/e2ca261abdfff1a3313eea3a/bsc/mainnet',
-        'https://speedy-nodes-nyc.moralis.io/3d1e6d7f5b4258d0754a0a15/bsc/mainnet',
+        'https://apis-sj.ankr.com/c065266fd780473eb92db7065dd6e9ed/58f7ca5eb34ae1527c6e567d3c694801/binance/full/main',
+        'https://apis-sj.ankr.com/8e1d2c17839440308940a2be0c1d0d39/e9c10db03e0d97780a62c26e86499f1c/binance/full/main',
+        'https://apis-sj.ankr.com/9a82f3a94a70417593392c759cd6213d/9dfe2d57101d958c6652b5d7f74a1998/binance/full/main',
+        'https://apis-sj.ankr.com/953c79a27a824bb8a4574c402d31d474/9d95c00b6fd86e010cb38d29479507ef/binance/full/main',
+        'https://apis-sj.ankr.com/a3876da39d26447790d8143728ba53a6/a43977f104f2b8aee6e94d3a2e172d90/binance/full/main',
+        'https://apis-sj.ankr.com/b27b95f2dbe3481d89fbb185fae1ec84/d662a1f76f240399a6c921a36c25e514/binance/full/main',
         'https://bsc-dataseed1.defibit.io/',
         'https://bsc-dataseed1.ninicoin.io/',
         'https://bsc-dataseed2.defibit.io/',

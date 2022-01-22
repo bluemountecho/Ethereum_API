@@ -451,7 +451,7 @@ async function getAllPairs(fromBlock) {
         myLogger.log(err)
     }
 
-    setTimeout(() => getAllPairs(toBlock + 1), 200)
+    setTimeout(() => getAllPairs(toBlock + 1), 1000)
 }
 
 async function getOnePartTransactionHistory(fromBlock, toBlock) {

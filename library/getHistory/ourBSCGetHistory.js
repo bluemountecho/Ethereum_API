@@ -332,7 +332,10 @@ async function getTokenAndPairData() {
 }
 
 async function getAllPairs(fromBlock) {
-    if (fromBlock > TOBLOCK) return
+    if (fromBlock > TOBLOCK) {
+        myLogger.log("Getting Pairs Finished!!!")
+        return
+    }
 
     try {
         var toBlock = fromBlock + 999

@@ -969,17 +969,17 @@ async function getUniswapV3PairPriceHistory() {
 
                 isVisit[results[j].address.toLowerCase()] = true
             } catch (err) {
-                console.log(results[j])
-                console.log(err)
+                myLogger.log(results[j])
+                myLogger.log(err)
             }
         }
 
-        console.log('===================================')
-        console.log(i, results.length)
+        myLogger.log('===================================')
+        myLogger.log(i, results.length)
         sum += results.length
     }
 
-    console.log('Finished with ' + sum + ' rows!')
+    myLogger.log('Finished with ' + sum + ' rows!')
 }
 
 // getAllPairs(FROMBLOCK)

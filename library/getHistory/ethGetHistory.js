@@ -203,7 +203,7 @@ var blocksData = []
 // var FROMBLOCK = config.fromAndTo[process.argv[2]].FROMBLOCK
 // var TOBLOCK = config.fromAndTo[process.argv[2]].TOBLOCK
 var FROMBLOCK = 10000000
-var TOBLOCK = 12654786
+var TOBLOCK = 10681787
 
 async function getTokenInfos(tokenAddress) {
     try {
@@ -995,5 +995,5 @@ async function getUniswapV3PairPriceHistory() {
 getTokenAndPairData()
 .then(res => {
     myLogger.log('Getting token and pair data finished!')
-    getUniswapV3PairPriceHistory()
+    getUniswapV2PairPriceHistory()
 })

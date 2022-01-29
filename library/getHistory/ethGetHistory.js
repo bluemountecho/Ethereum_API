@@ -203,7 +203,7 @@ var blocksData = []
 // var FROMBLOCK = config.fromAndTo[process.argv[2]].FROMBLOCK
 // var TOBLOCK = config.fromAndTo[process.argv[2]].TOBLOCK
 var FROMBLOCK = 10000000
-var TOBLOCK = 14094786
+var TOBLOCK = 12654786
 
 async function getTokenInfos(tokenAddress) {
     try {

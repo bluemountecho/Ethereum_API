@@ -1,8 +1,7 @@
 var fs = require('fs')
-var path = require('path')
 const config = require('../../config')
 const process = require('process')
-const https = require('https')
+const HttpsProxyAgent = require('https-proxy-agent');
 
 const { Console } = require("console");
 const myLogger = new Console({
@@ -153,7 +152,7 @@ const options = {
     timeout: 20000,
     headers: [{name: 'Access-Control-Allow-Origin', value: '*'}],
     withCredentials: false,
-    agent: {https: https.Agent(config.PROXY[process.argv[2]]), baseUrl: ''}
+    // agent: new HttpsProxyAgent('https://' + config.PROXY[process.argv[2]])
 };
 
 const web3 = new Web3(new Web3.providers.HttpProvider(config.ETH.web3Providers[process.argv[2]], options))

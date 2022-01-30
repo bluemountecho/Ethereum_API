@@ -31,6 +31,7 @@
     "express": "~4.16.1",
     "fs": "^0.0.1-security",
     "http-errors": "~1.6.3",
+    "https-proxy-agent": "^5.0.0",
     "knex": "^0.95.14",
     "morgan": "~1.9.1",
     "ms.macro": "^2.0.0",

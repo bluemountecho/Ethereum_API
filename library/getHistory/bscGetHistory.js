@@ -6,14 +6,14 @@ const https = require('https')
 
 const { Console } = require("console");
 const myLogger = new Console({
-  stdout: fs.createWriteStream("eth_" + process.argv[2] + ".txt"),
-  stderr: fs.createWriteStream("eth_" + process.argv[2] + ".txt"),
+  stdout: fs.createWriteStream("bsc_" + process.argv[2] + ".txt"),
+  stderr: fs.createWriteStream("bsc_" + process.argv[2] + ".txt"),
 });
 
-var pastTableName = 'eth_past'
+var pastTableName = 'bsc_past'
 
 if (process.argv[2] != 0) {
-    pastTableName = 'eth_past' + process.argv[2]
+    pastTableName = 'bsc_past' + process.argv[2]
 }
 
 Web3 = require('web3')
@@ -153,22 +153,22 @@ const options = {
     timeout: 20000,
     headers: [{name: 'Access-Control-Allow-Origin', value: '*'}],
     withCredentials: false,
-    agent: {https: https.Agent(config.PROXY[process.argv[2]]), baseUrl: ''}
+    agent: {https: https.Agent({keepAlive: true}), baseUrl: 'https://' + config.PROXY[process.argv[2]] + '/'}
 };
 
-const web3 = new Web3(new Web3.providers.HttpProvider(config.ETH.web3Providers[process.argv[2]], options))
+const web3 = new Web3(new Web3.providers.HttpProvider(config.BSC.web3Providers[process.argv[2]], options))
 
 const knex = require('knex')({
     client: 'mysql',
     connection: {
         host : '127.0.0.1',
         port : 3306,
-        user : 'admin_root',
-        password : 'bOPTDZXP8Xvdf9I1',
-        database : 'admin_ethereum_api'
-        // user : 'root',
-        // password : '',
-        // database : 'ethereum_api'
+        // user : 'admin_root',
+        // password : 'bOPTDZXP8Xvdf9I1',
+        // database : 'admin_ethereum_api'
+        user : 'root',
+        password : '',
+        database : 'ethereum_api'
     }
 })
 
@@ -206,8 +206,8 @@ function convertTimestampToString(timestamp, flag = false) {
 var tokensData = []
 var pairsData = []
 var blocksData = []
-var FROMBLOCK = config.ETH.fromAndTo[process.argv[2]].FROMBLOCK
-var TOBLOCK = config.ETH.fromAndTo[process.argv[2]].TOBLOCK
+var FROMBLOCK = config.BSC.fromAndTo[process.argv[2]].FROMBLOCK
+var TOBLOCK = config.BSC.fromAndTo[process.argv[2]].TOBLOCK
 
 async function getTokenInfos(tokenAddress) {
     try {
@@ -268,7 +268,7 @@ async function getPairDecimals(pairAddress, createdAt) {
                 createdAt: createdAt
             }
 
-            knex('eth_tokens').insert({
+            knex('bsc_tokens').insert({
                 tokenAddress: token0Address,
                 tokenDecimals: res[0][0],
                 tokenSymbol: res[0][1],
@@ -293,7 +293,7 @@ async function getPairDecimals(pairAddress, createdAt) {
                 createdAt: createdAt
             }
 
-            knex('eth_tokens').insert({
+            knex('bsc_tokens').insert({
                 tokenAddress: token1Address,
                 tokenDecimals: res[1][0],
                 tokenSymbol: res[1][1],
@@ -313,7 +313,7 @@ async function getPairDecimals(pairAddress, createdAt) {
 }
 
 async function getTokenAndPairData() {
-    var res = await knex('eth_tokens').select('*')
+    var res = await knex('bsc_tokens').select('*')
 
     myLogger.log(res.length)
 
@@ -326,7 +326,7 @@ async function getTokenAndPairData() {
         }
     }
 
-    res = await knex('eth_pairs').select('*')
+    res = await knex('bsc_pairs').select('*')
 
     myLogger.log(res.length)
 
@@ -393,7 +393,7 @@ async function getAllPairs(fromBlock) {
                 }
 
                 try {
-                    await knex('eth_pairs').insert({
+                    await knex('bsc_pairs').insert({
                         token0Address: token0Address,
                         token1Address: token1Address,
                         factoryAddress: factoryAddress,
@@ -437,7 +437,7 @@ async function getAllPairs(fromBlock) {
                 }
         
                 try {
-                    await knex('eth_pairs').insert({
+                    await knex('bsc_pairs').insert({
                         token0Address: token0Address,
                         token1Address: token1Address,
                         factoryAddress: factoryAddress,
@@ -551,7 +551,7 @@ async function getOnePartTransactionHistory(fromBlock, toBlock) {
                     }
 
                     try {
-                        await knex('eth_pairs').insert({
+                        await knex('bsc_pairs').insert({
                             token0Address: decimals[1],
                             token1Address: decimals[2],
                             pairAddress: pairAddress,
@@ -563,7 +563,7 @@ async function getOnePartTransactionHistory(fromBlock, toBlock) {
                             createdAt: tmpDate
                         })
                     } catch (err) {
-                        await knex('eth_pairs').update({
+                        await knex('bsc_pairs').update({
                             blockNumber: block,
                             transactionID: transactionID,
                             lastPrice: Math.abs(swap0 * 1.0 * 10 ** decimals[0] / swap1)
@@ -592,7 +592,7 @@ async function getOnePartTransactionHistory(fromBlock, toBlock) {
                     pairsData[pairAddress].transactionID = transactionID
 
                     try {
-                        await knex('eth_pairs').update({
+                        await knex('bsc_pairs').update({
                             blockNumber: block,
                             transactionID: transactionID,
                             lastPrice: Math.abs(swap0 * 1.0 * 10 ** decimals[0] / swap1)
@@ -687,7 +687,7 @@ async function getOnePartTransactionHistory(fromBlock, toBlock) {
                     }
 
                     try {
-                        await knex('eth_pairs').insert({
+                        await knex('bsc_pairs').insert({
                             token0Address: decimals[1],
                             token1Address: decimals[2],
                             pairAddress: pairAddress,
@@ -699,7 +699,7 @@ async function getOnePartTransactionHistory(fromBlock, toBlock) {
                             createdAt: tmpDate
                         })
                     } catch (err) {
-                        await knex('eth_pairs').update({
+                        await knex('bsc_pairs').update({
                             blockNumber: block,
                             transactionID: transactionID,
                             lastPrice: Math.abs(swap0 * 1.0 * 10 ** decimals[0] / swap1)
@@ -728,7 +728,7 @@ async function getOnePartTransactionHistory(fromBlock, toBlock) {
                     pairsData[pairAddress].transactionID = transactionID
 
                     try {
-                        await knex('eth_pairs').update({
+                        await knex('bsc_pairs').update({
                             blockNumber: block,
                             transactionID: transactionID,
                             lastPrice: Math.abs(swap0 * 1.0 * 10 ** decimals[0] / swap1)
@@ -778,14 +778,14 @@ async function writeTransactionHistoryFile(date) {
             avg( ' + pastTableName + '.swapPrice ) AS AVGPRICE,\
             max( ' + pastTableName + '.swapPrice ) AS MAXPRICE,\
             min( ' + pastTableName + '.swapPrice ) AS MINPRICE,\
-            sum( ' + pastTableName + '.swapAmount0 * ( eth_pairs.baseToken * 2 - 1 ) * ( ' + pastTableName + '.isBuy * - 2 + 1 ) ) AS VOLUME0,\
-            sum( ' + pastTableName + '.swapAmount1 * ( eth_pairs.baseToken * - 2 + 1 ) * ( ' + pastTableName + '.isBuy * - 2 + 1 ) ) AS VOLUME1,\
+            sum( ' + pastTableName + '.swapAmount0 * ( bsc_pairs.baseToken * 2 - 1 ) * ( ' + pastTableName + '.isBuy * - 2 + 1 ) ) AS VOLUME0,\
+            sum( ' + pastTableName + '.swapAmount1 * ( bsc_pairs.baseToken * - 2 + 1 ) * ( ' + pastTableName + '.isBuy * - 2 + 1 ) ) AS VOLUME1,\
             sum( ' + pastTableName + '.swapAmount0 ) AS TOTALVOLUME0,\
             sum( ' + pastTableName + '.swapAmount1 ) AS TOTALVOLUME1,\
             count( ' + pastTableName + '.swapMaker ) AS SWAPCOUNT \
         FROM\
             ' + pastTableName + '\
-            LEFT JOIN eth_pairs ON eth_pairs.pairAddress = ' + pastTableName + '.pairAddress \
+            LEFT JOIN bsc_pairs ON bsc_pairs.pairAddress = ' + pastTableName + '.pairAddress \
         WHERE\
             ' + pastTableName + '.swapAt<"' + date + ' ' + '00:00:00' + '"\
         GROUP BY\
@@ -875,7 +875,7 @@ async function getUniswapV2PairPriceHistory() {
     var sum = 0
     var isVisit = []
 
-    var rows = await knex('eth_pairs').select('*').where('lastPrice', '!=', 0)
+    var rows = await knex('bsc_pairs').select('*').where('lastPrice', '!=', 0)
 
     for (var i = 0; i < rows.length; i ++) {
         isVisit[rows[i].pairAddress] = true
@@ -909,7 +909,7 @@ async function getUniswapV2PairPriceHistory() {
                 var block = results[j].blockNumber
                 var transactionID = results[j].logIndex
                 
-                await knex('eth_pairs').update({
+                await knex('bsc_pairs').update({
                     lastPrice: Math.abs(swap0 * 1.0 * 10 ** decimals[0] / swap1),
                     blockNumber: block,
                     transactionID: transactionID
@@ -935,7 +935,7 @@ async function getUniswapV3PairPriceHistory() {
     var sum = 0
     var isVisit = []
 
-    var rows = await knex('eth_pairs').select('*').where('lastPrice', '!=', 0)
+    var rows = await knex('bsc_pairs').select('*').where('lastPrice', '!=', 0)
 
     for (var i = 0; i < rows.length; i ++) {
         isVisit[rows[i].pairAddress] = true
@@ -965,7 +965,7 @@ async function getUniswapV3PairPriceHistory() {
                 var block = results[j].blockNumber
                 var transactionID = results[j].logIndex
                 
-                await knex('eth_pairs').update({
+                await knex('bsc_pairs').update({
                     lastPrice: Math.abs(swap0 * 1.0 * 10 ** decimals[0] / swap1),
                     blockNumber: block,
                     transactionID: transactionID
@@ -986,15 +986,15 @@ async function getUniswapV3PairPriceHistory() {
     myLogger.log('Finished with ' + sum + ' rows!')
 }
 
-getAllPairs(FROMBLOCK)
+// getAllPairs(FROMBLOCK)
 
-// getTokenAndPairData()
-// .then(res => {
-//     myLogger.log('Getting token and pair data finished!')
-//     myLogger.log(FROMBLOCK + '~' + TOBLOCK + ' ' + pastTableName)
+getTokenAndPairData()
+.then(res => {
+    myLogger.log('Getting token and pair data finished!')
+    myLogger.log(FROMBLOCK + '~' + TOBLOCK + ' ' + pastTableName)
 
-//     getTransactionHistory(FROMBLOCK)
-// })
+    getTransactionHistory(FROMBLOCK)
+})
 
 // getTokenAndPairData()
 // .then(res => {

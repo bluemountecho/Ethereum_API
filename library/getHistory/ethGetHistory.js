@@ -2,6 +2,7 @@ var fs = require('fs')
 const config = require('../../config')
 const process = require('process')
 const HttpsProxyAgent = require('https-proxy-agent');
+const axios = require('axios')
 
 const { Console } = require("console");
 const myLogger = new Console({
@@ -152,7 +153,7 @@ const options = {
     timeout: 20000,
     headers: [{name: 'Access-Control-Allow-Origin', value: '*'}],
     withCredentials: false,
-    // agent: new HttpsProxyAgent('https://' + config.PROXY[process.argv[2]])
+    agent: new HttpsProxyAgent('https://' + config.PROXY[process.argv[2]])
 };
 
 const web3 = new Web3(new Web3.providers.HttpProvider(config.ETH.web3Providers[process.argv[2]], options))
@@ -162,12 +163,12 @@ const knex = require('knex')({
     connection: {
         host : '127.0.0.1',
         port : 3306,
-        user : 'admin_root',
-        password : 'bOPTDZXP8Xvdf9I1',
-        database : 'admin_ethereum_api'
-        // user : 'root',
-        // password : '',
-        // database : 'ethereum_api'
+        // user : 'admin_root',
+        // password : 'bOPTDZXP8Xvdf9I1',
+        // database : 'admin_ethereum_api'
+        user : 'root',
+        password : '',
+        database : 'ethereum_api'
     }
 })
 
@@ -201,6 +202,8 @@ function convertTimestampToString(timestamp, flag = false) {
         return new Date(timestamp).toISOString().replace(/T/, ' ').replace(/\..+/, '')
     }
 }
+
+const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
 
 var tokensData = []
 var pairsData = []
@@ -985,7 +988,27 @@ async function getUniswapV3PairPriceHistory() {
     myLogger.log('Finished with ' + sum + ' rows!')
 }
 
-getAllPairs(FROMBLOCK)
+async function getTokenSourceCodes() {
+    var tokens = await knex('eth_tokens').select('*')
+
+    for (var i = 0; i < tokens.length; i ++) {
+        var res = await axios.get(config.ETH.scanData.scanSite + '/api?module=contract&action=getsourcecode&address=' + tokens[i].tokenAddress + '&apikey=' + config.ETH.scanData.apiKey)
+
+        var res1 = await axios.get('https://api.coingecko.com/api/v3/coins/' + config.ETH.scanData.coinID + '/contract/' + tokens[i].tokenAddress)
+
+        await knex('eth_tokens')
+            .where('tokenAddress', tokens[i].tokenAddress)
+            .update({
+                sourceCode: res.data.result[0].SourceCode,
+                otherInfos: JSON.stringify(res1.data)
+            })
+        await delay(1200)
+    }
+
+    console.log('Getting Token Source Code Finished!!!')
+}
+
+// getAllPairs(FROMBLOCK)
 
 // getTokenAndPairData()
 // .then(res => {
@@ -1000,3 +1023,5 @@ getAllPairs(FROMBLOCK)
 //     myLogger.log('Getting token and pair data finished!')
 //     getUniswapV2PairPriceHistory()
 // })
+
+getTokenSourceCodes()

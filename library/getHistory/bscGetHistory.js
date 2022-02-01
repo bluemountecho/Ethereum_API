@@ -768,7 +768,7 @@ async function getOnePartTransactionHistory(fromBlock, toBlock) {
 }
 
 async function writeTransactionHistoryFile(date) {
-    var path = "../../database/ethereum"
+    var path = "../../database/binance"
 
     var rows = (await knex.raw('\
         SELECT\
@@ -987,13 +987,13 @@ async function getUniswapV3PairPriceHistory() {
 
 // getAllPairs(FROMBLOCK)
 
-getTokenAndPairData()
-.then(res => {
-    myLogger.log('Getting token and pair data finished!')
-    myLogger.log(FROMBLOCK + '~' + TOBLOCK + ' ' + pastTableName)
+// getTokenAndPairData()
+// .then(res => {
+//     myLogger.log('Getting token and pair data finished!')
+//     myLogger.log(FROMBLOCK + '~' + TOBLOCK + ' ' + pastTableName)
 
-    getTransactionHistory(FROMBLOCK)
-})
+//     getTransactionHistory(FROMBLOCK)
+// })
 
 // getTokenAndPairData()
 // .then(res => {

@@ -103,5 +103,11 @@ module.exports.ETH = {
         { 'FROMBLOCK': 13502421, 'TOBLOCK': 13699125},
         { 'FROMBLOCK': 13699125, 'TOBLOCK': 13903355},
         { 'FROMBLOCK': 13903355, 'TOBLOCK': 14026168}
-    ]
+    ],
+
+    'scanData': {
+        apiKey: 'P5QXWEDN6PEQE4KB61J5GISXXNEKEYAGFM',
+        scanSite: 'https://api.etherscan.io',
+        coinID: 'ethereum'
+    }
 }

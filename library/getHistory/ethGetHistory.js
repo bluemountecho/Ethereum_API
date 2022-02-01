@@ -991,21 +991,30 @@ async function getUniswapV3PairPriceHistory() {
 async function getTokenSourceCodes() {
     var tokens = await knex('eth_tokens').select('*')
 
+    myLogger.log(tokens.length)
+
     for (var i = 0; i < tokens.length; i ++) {
-        var res = await axios.get(config.ETH.scanData.scanSite + '/api?module=contract&action=getsourcecode&address=' + tokens[i].tokenAddress + '&apikey=' + config.ETH.scanData.apiKey)
+        myLogger.log(i)
 
-        var res1 = await axios.get('https://api.coingecko.com/api/v3/coins/' + config.ETH.scanData.coinID + '/contract/' + tokens[i].tokenAddress)
+        try {
+            var res = await axios.get(config.ETH.scanData.scanSite + '/api?module=contract&action=getsourcecode&address=' + tokens[i].tokenAddress + '&apikey=' + config.ETH.scanData.apiKey)
 
-        await knex('eth_tokens')
-            .where('tokenAddress', tokens[i].tokenAddress)
-            .update({
-                sourceCode: res.data.result[0].SourceCode,
-                otherInfos: JSON.stringify(res1.data)
-            })
+            var res1 = await axios.get('https://api.coingecko.com/api/v3/coins/' + config.ETH.scanData.coinID + '/contract/' + tokens[i].tokenAddress)
+
+            await knex('eth_tokens')
+                .where('tokenAddress', tokens[i].tokenAddress)
+                .update({
+                    sourceCode: res.data.result[0].SourceCode,
+                    otherInfos: JSON.stringify(res1.data)
+                })
+        } catch (err) {
+            myLogger.log(err)
+        }
+        
         await delay(1200)
     }
 
-    console.log('Getting Token Source Code Finished!!!')
+    myLogger.log('Getting Token Source Code Finished!!!')
 }
 
 // getAllPairs(FROMBLOCK)

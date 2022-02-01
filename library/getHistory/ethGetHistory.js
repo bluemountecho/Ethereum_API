@@ -996,21 +996,28 @@ async function getTokenSourceCodes() {
     for (var i = 0; i < tokens.length; i ++) {
         myLogger.log(i)
 
+        var res = ''
+        var res1 = ''
+
         try {
             var res = await axios.get(config.ETH.scanData.scanSite + '/api?module=contract&action=getsourcecode&address=' + tokens[i].tokenAddress + '&apikey=' + config.ETH.scanData.apiKey)
-
-            var res1 = await axios.get('https://api.coingecko.com/api/v3/coins/' + config.ETH.scanData.coinID + '/contract/' + tokens[i].tokenAddress)
-
-            await knex('eth_tokens')
-                .where('tokenAddress', tokens[i].tokenAddress)
-                .update({
-                    sourceCode: res.data.result[0].SourceCode,
-                    otherInfos: JSON.stringify(res1.data)
-                })
         } catch (err) {
-            myLogger.log(err)
+
         }
-        
+
+        try {
+            var res1 = await axios.get('https://api.coingecko.com/api/v3/coins/' + config.ETH.scanData.coinID + '/contract/' + tokens[i].tokenAddress)
+        } catch (err) {
+
+        }
+
+        await knex('eth_tokens')
+            .where('tokenAddress', tokens[i].tokenAddress)
+            .update({
+                sourceCode: res.data.result[0].SourceCode,
+                otherInfos: JSON.stringify(res1.data)
+            })
+
         await delay(1200)
     }
 

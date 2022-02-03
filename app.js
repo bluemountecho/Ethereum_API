@@ -4,12 +4,19 @@ var path = require('path');
 var http = require('http');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+const basicAuth = require('express-basic-auth')
 
 var ethRouter = require('./routes/ethRoutes');
 var bscRouter = require('./routes/bscRoutes');
 var testRouter = require('./routes/testRoutes')
 
 var app = express();
+
+app.use(basicAuth({
+  users: { 'stjepan': 'stjepan' },
+  challenge: true,
+  realm: 'foo',
+}))
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

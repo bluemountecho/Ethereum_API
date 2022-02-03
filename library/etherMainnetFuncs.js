@@ -400,7 +400,7 @@ module.exports.getDailyPairPrice = async function getDailyPairPrice(pairAddr) {
         }
 
         for (var i = 0; i < datas.length; i ++) {
-            datas[i].AVGPRICE = datas[i].TOTALVOLUME0 / datas[i].TOTALVOLUME1
+            datas[i].CLOSEPRICE = datas[i].TOTALVOLUME0 / datas[i].TOTALVOLUME1
         }
 
         datas.sort(function (a, b) {

@@ -458,7 +458,7 @@ module.exports.getTokenInfo = async function getTokenInfo(tokenAddr) {
                 data: []
             }
         } else {
-            console.log(rows[0].otherInfos)
+            console.log(rows)
             var infos = JSON.parse(rows[0].otherInfos)
 
             return {

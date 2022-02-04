@@ -174,7 +174,11 @@ module.exports.getAllTokens = async function getAllTokens() {
             })
         }
 
-        return datas
+        return {
+            status: 'Success',
+            message: 'Getting all tokens completed successfully!',
+            data: datas
+        }
     } catch (err) {
         console.log(err)
     }
@@ -439,5 +443,44 @@ module.exports.getLivePairPrice = async function getLivePairPrice(pairAddr) {
         return datas
     } catch (err) {
         console.log(err)
+    }
+}
+
+module.exports.getTokenInfo = async function getTokenInfo(tokenAddr) {
+    try {
+        var tokenAddress = tokenAddr.toLowerCase()
+        var rows = await knex('eth_tokens').where('tokenAddress', tokenAddress).select('*')
+
+        if (rows.length == 0) {
+            return {
+                status: 'Fail',
+                message: 'Token does not exist!',
+                data: []
+            }
+        } else {
+            var infos = JSON.parse(rows[0].otherInfos)
+
+            return {
+                status: 'Success',
+                message: 'Getting token info completed successfully!',
+                data: [{
+                    address: rows[0].tokenAddress,
+                    symbol: rows[0].tokenSymbol,
+                    address: rows[0].tokenName,
+                    sourceCode: rows[0].sourceCode,
+                    description: infos.description.en,
+                    links: infos.links,
+                    image: infos.image,
+                    totalSupply: infos.market_data.total_supply,
+                    circulatingSupply: infos.market_data.circulating_supply
+                }]
+            }
+        }
+    } catch (err) {
+        return {
+            status: 'Fail(Server error)',
+            message: err,
+            data: []
+        }
     }
 }

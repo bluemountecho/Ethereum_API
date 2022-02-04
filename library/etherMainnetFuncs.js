@@ -458,6 +458,7 @@ module.exports.getTokenInfo = async function getTokenInfo(tokenAddr) {
                 data: []
             }
         } else {
+            console.log(rows[0].otherInfos)
             var infos = JSON.parse(rows[0].otherInfos)
 
             return {
@@ -478,7 +479,7 @@ module.exports.getTokenInfo = async function getTokenInfo(tokenAddr) {
         }
     } catch (err) {
         console.log(err)
-        
+
         return {
             status: 'Fail(Server error)',
             message: err,

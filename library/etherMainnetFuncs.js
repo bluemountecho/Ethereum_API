@@ -477,6 +477,8 @@ module.exports.getTokenInfo = async function getTokenInfo(tokenAddr) {
             }
         }
     } catch (err) {
+        console.log(err)
+        
         return {
             status: 'Fail(Server error)',
             message: err,

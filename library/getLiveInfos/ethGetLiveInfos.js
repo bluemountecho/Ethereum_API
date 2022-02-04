@@ -191,7 +191,7 @@ function convertTimestampToString(timestamp, flag = false) {
 var tokensData = []
 var pairsData = []
 var blocksData = []
-var lastBlockNumber = 14026168
+var lastBlockNumber = 14137477
 
 async function getTokenAndPairData() {
     var res = await knex('eth_tokens').select('*')
@@ -282,14 +282,13 @@ async function getPairDecimals(pairAddress, createdAt) {
                 createdAt: createdAt
             }
 
-            knex('eth_tokens').insert({
+            await knex('eth_tokens').insert({
                 tokenAddress: token0Address,
                 tokenDecimals: res[0][0],
                 tokenSymbol: res[0][1],
                 tokenName: res[0][2],
                 createdAt: createdAt
-            }).then(res => {})
-            .catch(err => {})
+            })
         }
 
         if (tokensData[token1Address]) {
@@ -307,14 +306,13 @@ async function getPairDecimals(pairAddress, createdAt) {
                 createdAt: createdAt
             }
 
-            knex('eth_tokens').insert({
+            await knex('eth_tokens').insert({
                 tokenAddress: token1Address,
                 tokenDecimals: res[1][0],
                 tokenSymbol: res[1][1],
                 tokenName: res[1][2],
                 createdAt: createdAt
-            }).then(res => {})
-            .catch(err => {})
+            })
         }
 
         return [res[1][0] - res[0][0], token0Address, token1Address]

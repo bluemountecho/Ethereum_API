@@ -458,8 +458,21 @@ module.exports.getTokenInfo = async function getTokenInfo(tokenAddr) {
                 data: []
             }
         } else {
-            console.log(rows)
-            var infos = JSON.parse(rows[0].otherInfos)
+            var infos = {
+                description: {
+                    en: ''
+                },
+                links: '',
+                image: '',
+                market_data: {
+                    total_supply: '',
+                    circulating_supply: ''
+                },
+            }
+            
+            if (rows[0].otherInfos != '') {
+                infos = JSON.parse(rows[0].otherInfos)
+            }
 
             return {
                 status: 'Success',

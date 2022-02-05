@@ -996,7 +996,7 @@ async function getTokenSourceCodes() {
 
     for (var i = 0; i < tokens.length; i ++) {
         myLogger.log(i)
-        
+
         try {
             var sourceCode = ''
             // var otherInfos = ''
@@ -1033,6 +1033,54 @@ async function getTokenSourceCodes() {
     }
 
     myLogger.log('Getting Token Source Code Finished!!!')
+}
+
+async function getTokenCoingeckoInfos() {
+    var tokens = await knex('eth_tokens').orderBy('createdAt', 'desc').where('coingeckoInfos', '').select('*')
+
+    myLogger.log('Tokens Length: ' + tokens.length)
+
+    for (var i = 0; i < tokens.length; i ++) {
+        myLogger.log(i)
+
+        try {
+            // var sourceCode = ''
+            var otherInfos = ''
+
+            // try {
+            //     var res = await axios.get(config.ETH.scanData.scanSite + '/api?module=contract&action=getsourcecode&address=' + tokens[i].tokenAddress + '&apikey=' + config.ETH.scanData.apiKey)
+
+            //     sourceCode = res.data.result[0].SourceCode
+            // } catch (err) {
+
+            // }
+
+            try {
+                var res1 = await axios.get('https://api.coingecko.com/api/v3/coins/' + config.ETH.scanData.coinID + '/contract/' + tokens[i].tokenAddress)
+
+                otherInfos = JSON.stringify(res1.data)
+            } catch (err) {
+
+            }
+
+            await knex('eth_tokens')
+                .where('tokenAddress', tokens[i].tokenAddress)
+                .update({
+                    // sourceCode: utf8.encode(sourceCode),
+                    otherInfos: utf8.encode(otherInfos)
+                })
+
+            if (otherInfos != '') {
+                myLogger.log(tokens[i].tokenAddress + ' is added!')
+            }
+
+            await delay(1200)
+        } catch (err) {
+            myLogger.log(err)
+        }
+    }
+
+    myLogger.log('Getting Token Coingecko Info Finished!!!')
 }
 
 async function addMissedTokens() {
@@ -1105,4 +1153,5 @@ async function addMissedTokens() {
 // })
 
 // addMissedTokens()
-getTokenSourceCodes()
+// getTokenSourceCodes()
+getTokenCoingeckoInfos()

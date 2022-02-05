@@ -990,16 +990,14 @@ async function getUniswapV3PairPriceHistory() {
 }
 
 async function getTokenSourceCodes() {
-    var tokens = await knex('eth_tokens').select('*')
+    var tokens = await knex('eth_tokens').orderBy('createdAt', 'desc').select('*')
 
-    myLogger.log(tokens.length)
+    myLogger.log('Tokens Length: ' + tokens.length)
 
     for (var i = 0; i < tokens.length; i ++) {
-        myLogger.log(i)
-
         try {
             var sourceCode = ''
-            var otherInfos = ''
+            // var otherInfos = ''
 
             try {
                 var res = await axios.get(config.ETH.scanData.scanSite + '/api?module=contract&action=getsourcecode&address=' + tokens[i].tokenAddress + '&apikey=' + config.ETH.scanData.apiKey)
@@ -1009,22 +1007,24 @@ async function getTokenSourceCodes() {
 
             }
 
-            try {
-                var res1 = await axios.get('https://api.coingecko.com/api/v3/coins/' + config.ETH.scanData.coinID + '/contract/' + tokens[i].tokenAddress)
+            // try {
+            //     var res1 = await axios.get('https://api.coingecko.com/api/v3/coins/' + config.ETH.scanData.coinID + '/contract/' + tokens[i].tokenAddress)
 
-                otherInfos = JSON.stringify(res1.data)
-            } catch (err) {
+            //     otherInfos = JSON.stringify(res1.data)
+            // } catch (err) {
 
-            }
+            // }
 
             await knex('eth_tokens')
                 .where('tokenAddress', tokens[i].tokenAddress)
                 .update({
                     sourceCode: utf8.encode(sourceCode),
-                    otherInfos: utf8.encode(otherInfos)
+                    // otherInfos: utf8.encode(otherInfos)
                 })
 
-            await delay(1200)
+            myLogger.log(tokens[i].tokenAddress + ' is added!')
+
+            await delay(200)
         } catch (err) {
             myLogger.log(err)
         }
@@ -1102,6 +1102,5 @@ async function addMissedTokens() {
 //     getUniswapV2PairPriceHistory()
 // })
 
-// getTokenSourceCodes()
-
-addMissedTokens()
+// addMissedTokens()
+getTokenSourceCodes()

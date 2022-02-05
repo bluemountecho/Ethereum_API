@@ -3,6 +3,7 @@ const config = require('../../config')
 const process = require('process')
 const HttpsProxyAgent = require('https-proxy-agent');
 const axios = require('axios')
+const utf8 = require('utf8')
 
 const { Console } = require("console");
 const myLogger = new Console({
@@ -1051,8 +1052,8 @@ async function addMissedTokens() {
                 await knex('eth_tokens').insert({
                     tokenAddress: pairs[i].token0Address,
                     tokenDecimals: res[0],
-                    tokenSymbol: res[1],
-                    tokenName: res[2]
+                    tokenSymbol: utf8.encode(res[1]),
+                    tokenName: utf8.encode(res[2])
                 })
 
                 tokenData[pairs[i].token0Address] = true
@@ -1065,8 +1066,8 @@ async function addMissedTokens() {
                 await knex('eth_tokens').insert({
                     tokenAddress: pairs[i].token1Address,
                     tokenDecimals: res[0],
-                    tokenSymbol: res[1],
-                    tokenName: res[2]
+                    tokenSymbol: utf8.encode(res[1]),
+                    tokenName: utf8.encode(res[2])
                 })
 
                 tokenData[pairs[i].token1Address] = true
@@ -1079,6 +1080,8 @@ async function addMissedTokens() {
             myLogger.log(err)
         }
     }
+
+    myLogger.log('Adding missed tokens finished!')
 }
 
 // getAllPairs(FROMBLOCK)

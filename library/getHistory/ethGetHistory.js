@@ -4,6 +4,7 @@ const process = require('process')
 const HttpsProxyAgent = require('https-proxy-agent');
 const axios = require('axios')
 const utf8 = require('utf8')
+const { JSDOM } = require('jsdom')
 
 const { Console } = require("console");
 const myLogger = new Console({
@@ -164,12 +165,12 @@ const knex = require('knex')({
     connection: {
         host : '127.0.0.1',
         port : 3306,
-        user : 'admin_root',
-        password : 'bOPTDZXP8Xvdf9I1',
-        database : 'admin_ethereum_api'
-        // user : 'root',
-        // password : '',
-        // database : 'ethereum_api'
+        // user : 'admin_root',
+        // password : 'bOPTDZXP8Xvdf9I1',
+        // database : 'admin_ethereum_api'
+        user : 'root',
+        password : '',
+        database : 'ethereum_api'
     }
 })
 
@@ -1083,6 +1084,113 @@ async function getTokenCoingeckoInfos() {
     myLogger.log('Getting Token Coingecko Info Finished!!!')
 }
 
+async function getOneTokenScanInfos(tokenAddress, proxy) {
+    var res = await axios('https://etherscan.io/token/' + tokenAddress + '#balances', {
+        httpAgent: new HttpsProxyAgent('https://' + proxy)
+    })
+    var dom = new JSDOM(res.data)
+    var totalSupply = 0
+    
+    try {
+        totalSupply = dom.window.document.querySelector('span[title="Maximum Total Supply"]').parentElement.nextElementSibling.firstElementChild.getAttribute('title').replace(/,/g, '').replace(/ /g, '')
+    } catch (err) {
+
+    }
+
+    var totalHolders = 0
+    
+    try {
+        totalHolders = dom.window.document.querySelector('#sparkholderscontainer').previousElementSibling.textContent.split('(')[0].replace(/,/g, '').replace(/ /g, '').replace(new RegExp('\n', 'g'), '')
+    } catch (err) {
+
+    }
+
+    var links = {}
+
+    try {
+        links['OfficialSite'] = dom.window.document.querySelector('#ContentPlaceHolder1_tr_officialsite_1').firstElementChild.childNodes[3].firstElementChild.getAttribute('href')
+    } catch (err) {
+
+    }
+
+    try {
+        var linkElems = dom.window.document.querySelector('.col-md-8 > .list-inline').childNodes
+    
+        for (var j = 0; j < linkElems.length; j ++) {
+            try {
+                var key = linkElems[j].firstElementChild.getAttribute('data-original-title').split(':')[0]
+
+                if (key == 'Email') {
+                    links[key] = 'mailto:' + linkElems[j].firstElementChild.getAttribute('data-original-title').substr(key.length + 2)
+                } else {
+                    if (key == 'Github') {
+                        links[key] = 'https://' + linkElems[j].firstElementChild.getAttribute('href')
+                    } else {
+                        links[key] = linkElems[j].firstElementChild.getAttribute('href')
+                    }
+                }
+            } catch (err) {
+            }
+        }
+    } catch (err) {
+    }
+
+    res = await axios('https://etherscan.io/token/generic-tokenholders2?m=normal&a=' + tokenAddress, {
+        httpAgent: new HttpsProxyAgent('https://' + proxy)
+    })
+    dom = new JSDOM(res.data)
+
+    var rows = dom.window.document.querySelectorAll('tbody tr')
+    var holders = []
+
+    for (var j = 0; j < rows.length; j ++) {
+        try {
+            var amount = rows[j].childNodes[2].textContent.replace(/,/g, '').replace(/ /g, '')
+            var address = j
+            var elem = rows[j].childNodes[1].querySelector('span[data-toggle="tooltip"]')
+
+            if (elem == null) {
+                address = rows[j].childNodes[1].querySelector('a').textContent
+            } else {
+                var tmp = elem.getAttribute('title').split('(')
+                address = tmp[tmp.length - 1].split(')')[0]
+            }
+
+            holders.push({
+                address: address,
+                amount: amount
+            })
+        } catch (err) {
+
+        }
+    }
+
+    await knex('eth_tokens').where('tokenAddress', tokenAddress).update({
+        totalSupply: totalSupply,
+        totalHolders: totalHolders,
+        links: JSON.stringify(links),
+        holders: JSON.stringify(holders)
+    })
+}
+
+async function getTokenScanInfos() {
+    var tokens = await knex('eth_tokens').orderBy('createdAt', 'desc').select('*')
+
+    for (var i = 0; i < tokens.length; i += 28) {
+        myLogger.log(i)
+        var funcs = []
+
+        for (var j = i; j < i + 28 && j < tokens.length; j ++) {
+            funcs.push(getOneTokenScanInfos(tokens[j].tokenAddress, config.PROXY[j - i]))
+        }
+
+        await Promise.all(funcs)
+        await delay(500)
+    }
+
+    myLogger.log('Getting Token Scan Infos Finished!')
+}
+
 async function addMissedTokens() {
     var pairs = await knex('eth_pairs').orderBy('createdAt', 'asc').select('*')
     var tokens = await knex('eth_tokens').select('*')
@@ -1154,4 +1262,5 @@ async function addMissedTokens() {
 
 // addMissedTokens()
 // getTokenSourceCodes()
-getTokenCoingeckoInfos()
+// getTokenCoingeckoInfos()
+getTokenScanInfos()

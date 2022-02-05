@@ -990,7 +990,7 @@ async function getUniswapV3PairPriceHistory() {
 }
 
 async function getTokenSourceCodes() {
-    var tokens = await knex('eth_tokens').orderBy('createdAt', 'desc').select('*')
+    var tokens = await knex('eth_tokens').orderBy('createdAt', 'desc').where('sourceCode', '').select('*')
 
     myLogger.log('Tokens Length: ' + tokens.length)
 

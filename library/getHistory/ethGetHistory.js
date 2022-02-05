@@ -1182,12 +1182,17 @@ async function getTokenScanInfos() {
         var funcs = []
 
         for (var j = i; j < i + 10 && j < tokens.length; j ++) {
-            // funcs.push(getOneTokenScanInfos(tokens[j].tokenAddress, config.PROXY[j - i]))
-            await getOneTokenScanInfos(tokens[j].tokenAddress, config.PROXY[j - i])
+            funcs.push(getOneTokenScanInfos(tokens[j].tokenAddress, config.PROXY[j - i]))
+            // await getOneTokenScanInfos(tokens[j].tokenAddress, config.PROXY[j - i])
         }
 
-        // await Promise.all(funcs)
-        // await delay(500)
+        try {
+            await Promise.all(funcs)
+        } catch (err) {
+            myLogger.log(err)
+        }
+
+        await delay(500)
     }
 
     myLogger.log('Getting Token Scan Infos Finished!')

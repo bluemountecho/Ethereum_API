@@ -995,6 +995,8 @@ async function getTokenSourceCodes() {
     myLogger.log('Tokens Length: ' + tokens.length)
 
     for (var i = 0; i < tokens.length; i ++) {
+        myLogger.log(i)
+        
         try {
             var sourceCode = ''
             // var otherInfos = ''

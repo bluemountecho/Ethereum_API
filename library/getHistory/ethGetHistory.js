@@ -165,12 +165,12 @@ const knex = require('knex')({
     connection: {
         host : '127.0.0.1',
         port : 3306,
-        // user : 'admin_root',
-        // password : 'bOPTDZXP8Xvdf9I1',
-        // database : 'admin_ethereum_api'
-        user : 'root',
-        password : '',
-        database : 'ethereum_api'
+        user : 'admin_root',
+        password : 'bOPTDZXP8Xvdf9I1',
+        database : 'admin_ethereum_api'
+        // user : 'root',
+        // password : '',
+        // database : 'ethereum_api'
     }
 })
 

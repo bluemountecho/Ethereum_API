@@ -1096,7 +1096,10 @@ async function getOneTokenScanInfos(tokenAddress, proxy) {
         },
         keepAlive: true,
         timeout: 20000,
-        headers:{'Access-Control-Allow-Origin': '*'},
+        headers:{
+            'Access-Control-Allow-Origin': '*',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.99 Safari/537.36'
+        },
         withCredentials: false,
         agent: new HttpsProxyAgent('https://' + proxy)
     })
@@ -1157,7 +1160,10 @@ async function getOneTokenScanInfos(tokenAddress, proxy) {
         },
         keepAlive: true,
         timeout: 20000,
-        headers:{'Access-Control-Allow-Origin': '*'},
+        headers:{
+            'Access-Control-Allow-Origin': '*',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.99 Safari/537.36'
+        },
         withCredentials: false,
         agent: new HttpsProxyAgent('https://' + proxy)
     })
@@ -1199,11 +1205,11 @@ async function getOneTokenScanInfos(tokenAddress, proxy) {
 async function getTokenScanInfos() {
     var tokens = await knex('eth_tokens').orderBy('createdAt', 'desc').select('*')
 
-    for (var i = 0; i < tokens.length; i += 10) {
+    for (var i = 0; i < tokens.length; i += 5) {
         myLogger.log(i)
         var funcs = []
 
-        for (var j = i; j < i + 10 && j < tokens.length; j ++) {
+        for (var j = i; j < i + 5 && j < tokens.length; j ++) {
             funcs.push(getOneTokenScanInfos(tokens[j].tokenAddress, config.PROXY[j - i]))
             // await getOneTokenScanInfos(tokens[j].tokenAddress, config.PROXY[j - i])
         }

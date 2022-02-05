@@ -1075,6 +1075,7 @@ async function addMissedTokens() {
 
             if (i % 1000 == 0) myLogger.log(i + 'line')
         } catch (err) {
+            myLogger.log(pairs[i])
             myLogger.log(err)
         }
     }

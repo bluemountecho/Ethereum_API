@@ -165,12 +165,12 @@ const knex = require('knex')({
     connection: {
         host : '127.0.0.1',
         port : 3306,
-        user : 'admin_root',
-        password : 'bOPTDZXP8Xvdf9I1',
-        database : 'admin_ethereum_api'
-        // user : 'root',
-        // password : '',
-        // database : 'ethereum_api'
+        // user : 'admin_root',
+        // password : 'bOPTDZXP8Xvdf9I1',
+        // database : 'admin_ethereum_api'
+        user : 'root',
+        password : '',
+        database : 'ethereum_api'
     }
 })
 
@@ -1085,9 +1085,20 @@ async function getTokenCoingeckoInfos() {
 }
 
 async function getOneTokenScanInfos(tokenAddress, proxy) {
-    console.log(tokenAddress, proxy)
+    // console.log(tokenAddress, proxy)
     var res = await axios.get('https://etherscan.io/token/' + tokenAddress + '#balances', {
-        httpsAgent: new HttpsProxyAgent('https://' + proxy)
+        // httpsAgent: new HttpsProxyAgent('https://' + proxy)
+        reconnect: {
+            auto: true,
+            delay: 5000, // ms
+            maxAttempts: 5,
+            onTimeout: false
+        },
+        keepAlive: true,
+        timeout: 20000,
+        headers:{'Access-Control-Allow-Origin': '*'},
+        withCredentials: false,
+        agent: new HttpsProxyAgent('https://' + proxy)
     })
     var dom = new JSDOM(res.data)
     var totalSupply = 0
@@ -1137,7 +1148,18 @@ async function getOneTokenScanInfos(tokenAddress, proxy) {
     }
 
     res = await axios.get('https://etherscan.io/token/generic-tokenholders2?m=normal&a=' + tokenAddress, {
-        httpsAgent: new HttpsProxyAgent('https://' + proxy)
+        // httpsAgent: new HttpsProxyAgent('https://' + proxy)
+        reconnect: {
+            auto: true,
+            delay: 5000, // ms
+            maxAttempts: 5,
+            onTimeout: false
+        },
+        keepAlive: true,
+        timeout: 20000,
+        headers:{'Access-Control-Allow-Origin': '*'},
+        withCredentials: false,
+        agent: new HttpsProxyAgent('https://' + proxy)
     })
     dom = new JSDOM(res.data)
 

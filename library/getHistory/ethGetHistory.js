@@ -1067,7 +1067,7 @@ async function getTokenCoingeckoInfos() {
                 .where('tokenAddress', tokens[i].tokenAddress)
                 .update({
                     // sourceCode: utf8.encode(sourceCode),
-                    otherInfos: utf8.encode(otherInfos)
+                    coingeckoInfos: utf8.encode(otherInfos)
                 })
 
             if (otherInfos != '') {

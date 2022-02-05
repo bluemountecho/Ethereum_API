@@ -1020,8 +1020,8 @@ async function getTokenSourceCodes() {
             await knex('eth_tokens')
                 .where('tokenAddress', tokens[i].tokenAddress)
                 .update({
-                    sourceCode: sourceCode,
-                    otherInfos: otherInfos
+                    sourceCode: utf8.encode(sourceCode),
+                    otherInfos: utf8.encode(otherInfos)
                 })
 
             await delay(1200)
@@ -1053,7 +1053,8 @@ async function addMissedTokens() {
                     tokenAddress: pairs[i].token0Address,
                     tokenDecimals: res[0],
                     tokenSymbol: utf8.encode(res[1]),
-                    tokenName: utf8.encode(res[2])
+                    tokenName: utf8.encode(res[2]),
+                    createdAt: pairs[i].createdAt
                 })
 
                 tokenData[pairs[i].token0Address] = true
@@ -1067,7 +1068,8 @@ async function addMissedTokens() {
                     tokenAddress: pairs[i].token1Address,
                     tokenDecimals: res[0],
                     tokenSymbol: utf8.encode(res[1]),
-                    tokenName: utf8.encode(res[2])
+                    tokenName: utf8.encode(res[2]),
+                    createdAt: pairs[i].createdAt
                 })
 
                 tokenData[pairs[i].token1Address] = true

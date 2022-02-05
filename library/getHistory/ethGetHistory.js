@@ -1044,35 +1044,39 @@ async function addMissedTokens() {
     myLogger.log('Pairs Length: ' + pairs.length)
 
     for (var i = 0; i < pairs.length; i ++) {
-        if (!tokenData[pairs[i].token0Address]) {
-            var res = await getTokenInfos(pairs[i].token0Address)
+        try {
+            if (!tokenData[pairs[i].token0Address]) {
+                var res = await getTokenInfos(pairs[i].token0Address)
 
-            await knex('eth_tokens').insert({
-                tokenAddress: pairs[i].token0Address,
-                tokenDecimals: res[0],
-                tokenSymbol: res[1],
-                tokenName: res[2]
-            })
+                await knex('eth_tokens').insert({
+                    tokenAddress: pairs[i].token0Address,
+                    tokenDecimals: res[0],
+                    tokenSymbol: res[1],
+                    tokenName: res[2]
+                })
 
-            tokenData[pairs[i].token0Address] = true
-            myLogger.log(pairs[i].token0Address + ' is added!')
+                tokenData[pairs[i].token0Address] = true
+                myLogger.log(pairs[i].token0Address + ' is added!')
+            }
+
+            if (!tokenData[pairs[i].token1Address]) {
+                var res = await getTokenInfos(pairs[i].token1Address)
+
+                await knex('eth_tokens').insert({
+                    tokenAddress: pairs[i].token1Address,
+                    tokenDecimals: res[0],
+                    tokenSymbol: res[1],
+                    tokenName: res[2]
+                })
+
+                tokenData[pairs[i].token1Address] = true
+                myLogger.log(pairs[i].token1Address + ' is added!')
+            }
+
+            if (i % 1000 == 0) myLogger.log(i + 'line')
+        } catch (err) {
+            myLogger.log(err)
         }
-
-        if (!tokenData[pairs[i].token1Address]) {
-            var res = await getTokenInfos(pairs[i].token1Address)
-
-            await knex('eth_tokens').insert({
-                tokenAddress: pairs[i].token1Address,
-                tokenDecimals: res[0],
-                tokenSymbol: res[1],
-                tokenName: res[2]
-            })
-
-            tokenData[pairs[i].token1Address] = true
-            myLogger.log(pairs[i].token1Address + ' is added!')
-        }
-
-        if (i % 1000 == 0) myLogger.log(i + 'line')
     }
 }
 

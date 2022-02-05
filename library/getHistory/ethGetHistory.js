@@ -1085,7 +1085,7 @@ async function getTokenCoingeckoInfos() {
 }
 
 async function getOneTokenScanInfos(tokenAddress, proxy) {
-    var res = await axios('https://etherscan.io/token/' + tokenAddress + '#balances', {
+    var res = await axios.get('https://etherscan.io/token/' + tokenAddress + '#balances', {
         httpAgent: new HttpsProxyAgent('https://' + proxy)
     })
     var dom = new JSDOM(res.data)
@@ -1135,7 +1135,7 @@ async function getOneTokenScanInfos(tokenAddress, proxy) {
     } catch (err) {
     }
 
-    res = await axios('https://etherscan.io/token/generic-tokenholders2?m=normal&a=' + tokenAddress, {
+    res = await axios.get('https://etherscan.io/token/generic-tokenholders2?m=normal&a=' + tokenAddress, {
         httpAgent: new HttpsProxyAgent('https://' + proxy)
     })
     dom = new JSDOM(res.data)

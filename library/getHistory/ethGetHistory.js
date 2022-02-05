@@ -1032,6 +1032,50 @@ async function getTokenSourceCodes() {
     myLogger.log('Getting Token Source Code Finished!!!')
 }
 
+async function addMissedTokens() {
+    var pairs = await knex('eth_pairs').orderBy('createdAt', 'asc').select('*')
+    var tokens = await knex('eth_tokens').select('*')
+    var tokenData = []
+
+    for (var i = 0; i < tokens.length; i ++) {
+        tokenData[tokens.tokenAddress] = true
+    }
+
+    myLogger.log('Pairs Length: ' + pairs.length)
+
+    for (var i = 0; i < pairs.length; i ++) {
+        if (!tokenData[pairs[i].token0Address]) {
+            var res = await getTokenInfos(pairs[i].token0Address)
+
+            await knex('eth_tokens').insert({
+                tokenAddress: pairs[i].token0Address,
+                tokenDecimals: res[0],
+                tokenSymbol: res[1],
+                tokenName: res[2]
+            })
+
+            tokenData[pairs[i].token0Address] = true
+            myLogger.log(pairs[i].token0Address + ' is added!')
+        }
+
+        if (!tokenData[pairs[i].token1Address]) {
+            var res = await getTokenInfos(pairs[i].token1Address)
+
+            await knex('eth_tokens').insert({
+                tokenAddress: pairs[i].token1Address,
+                tokenDecimals: res[0],
+                tokenSymbol: res[1],
+                tokenName: res[2]
+            })
+
+            tokenData[pairs[i].token1Address] = true
+            myLogger.log(pairs[i].token1Address + ' is added!')
+        }
+
+        if (i % 1000 == 0) myLogger.log(i + 'line')
+    }
+}
+
 // getAllPairs(FROMBLOCK)
 
 // getTokenAndPairData()

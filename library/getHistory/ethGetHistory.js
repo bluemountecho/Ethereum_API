@@ -1176,11 +1176,11 @@ async function getOneTokenScanInfos(tokenAddress, proxy) {
 async function getTokenScanInfos() {
     var tokens = await knex('eth_tokens').orderBy('createdAt', 'desc').select('*')
 
-    for (var i = 0; i < tokens.length; i += 28) {
+    for (var i = 0; i < tokens.length; i += 10) {
         myLogger.log(i)
         var funcs = []
 
-        for (var j = i; j < i + 28 && j < tokens.length; j ++) {
+        for (var j = i; j < i + 10 && j < tokens.length; j ++) {
             funcs.push(getOneTokenScanInfos(tokens[j].tokenAddress, config.PROXY[j - i]))
         }
 

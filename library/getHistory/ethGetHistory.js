@@ -1038,7 +1038,7 @@ async function addMissedTokens() {
     var tokenData = []
 
     for (var i = 0; i < tokens.length; i ++) {
-        tokenData[tokens.tokenAddress] = true
+        tokenData[tokens[i].tokenAddress] = true
     }
 
     myLogger.log('Pairs Length: ' + pairs.length)

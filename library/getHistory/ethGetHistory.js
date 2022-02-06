@@ -5,6 +5,7 @@ const HttpsProxyAgent = require('https-proxy-agent');
 const axios = require('axios')
 const utf8 = require('utf8')
 const { JSDOM } = require('jsdom')
+const https = require('https')
 
 const { Console } = require("console");
 const myLogger = new Console({
@@ -1085,24 +1086,41 @@ async function getTokenCoingeckoInfos() {
 }
 
 async function getOneTokenScanInfos(tokenAddress, proxy) {
-    // console.log(tokenAddress, proxy)
-    var res = await axios.get('https://etherscan.io/token/' + tokenAddress + '#balances', {
-        // httpsAgent: new HttpsProxyAgent('https://' + proxy)
-        // reconnect: {
-        //     auto: true,
-        //     delay: 5000, // ms
-        //     maxAttempts: 5,
-        //     onTimeout: false
+    // console.log(tokenAddress, proxy)      
+    var res = await axios.request({
+        url: 'https://etherscan.io/token/' + tokenAddress + '#balances',
+        // method: 'GET',
+        // httpsAgent: new HttpsProxyAgent('https://' + proxy),
+        // timeout: 20000,
+        headers:{
+            'Access-Control-Allow-Origin': '*',
+        },
+        // proxy: false,
+        reconnect: {
+            auto: true,
+            delay: 5000, // ms
+            maxAttempts: 5,
+            onTimeout: false
+        },
+        keepAlive: true,
+        timeout: 20000,
+        // headers: [{name: 'Access-Control-Allow-Origin', value: '*'}],
+        withCredentials: false,
+        agent: new HttpsProxyAgent('https://' + config.PROXY[process.argv[2]])
+    })
+
+    // var res = await axios.get('https://etherscan.io/token/' + tokenAddress + '#balances', {
+        // httpsAgent: new https.Agent({ keepAlive: true }),
+        // proxy: {
+        //     protocol: 'https',
+        //     host: proxy.split(':')[0],
+        //     port: proxy.split(':')[1]
         // },
-        // keepAlive: true,
         // timeout: 20000,
         // headers:{
         //     'Access-Control-Allow-Origin': '*',
-        //     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.99 Safari/537.36'
         // },
-        // withCredentials: false,
-        // httpsAgent: new HttpsProxyAgent('https://' + proxy)
-    })
+    // })
     var dom = new JSDOM(res.data)
     var totalSupply = 0
     
@@ -1150,23 +1168,39 @@ async function getOneTokenScanInfos(tokenAddress, proxy) {
     } catch (err) {
     }
 
-    res = await axios.get('https://etherscan.io/token/generic-tokenholders2?m=normal&a=' + tokenAddress, {
-        // httpsAgent: new HttpsProxyAgent('https://' + proxy)
-        // reconnect: {
-        //     auto: true,
-        //     delay: 5000, // ms
-        //     maxAttempts: 5,
-        //     onTimeout: false
-        // },
-        // keepAlive: true,
+    res = await axios.request({
+        url: 'https://etherscan.io/token/generic-tokenholders2?m=normal&a=' + tokenAddress,
+        // method: 'GET',
+        // httpsAgent: new HttpsProxyAgent('https://' + proxy),
         // timeout: 20000,
+        headers:{
+            'Access-Control-Allow-Origin': '*',
+        },
+        // proxy: false,
+        reconnect: {
+            auto: true,
+            delay: 5000, // ms
+            maxAttempts: 5,
+            onTimeout: false
+        },
+        keepAlive: true,
+        timeout: 20000,
+        // headers: [{name: 'Access-Control-Allow-Origin', value: '*'}],
+        withCredentials: false,
+        agent: new HttpsProxyAgent('https://' + config.PROXY[process.argv[2]])
+    })
+    // res = await axios.get('https://etherscan.io/token/generic-tokenholders2?m=normal&a=' + tokenAddress, {
+        // httpsAgent: new https.Agent({ keepAlive: true }),
+        // timeout: 20000,
+        // proxy: {
+        //     protocol: 'https',
+        //     host: proxy.split(':')[0],
+        //     port: proxy.split(':')[1]
+        // },
         // headers:{
         //     'Access-Control-Allow-Origin': '*',
-        //     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.99 Safari/537.36'
         // },
-        // withCredentials: false,
-        // httpsAgent: new HttpsProxyAgent('https://' + proxy)
-    })
+    // })
     dom = new JSDOM(res.data)
 
     var rows = dom.window.document.querySelectorAll('tbody tr')

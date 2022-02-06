@@ -2,7 +2,7 @@ var fs = require('fs')
 const config = require('../../config')
 const process = require('process')
 const HttpsProxyAgent = require('https-proxy-agent');
-const axios = require('axios')
+const axios = require('got')
 const utf8 = require('utf8')
 const { JSDOM } = require('jsdom')
 const https = require('https')
@@ -166,12 +166,12 @@ const knex = require('knex')({
     connection: {
         host : '127.0.0.1',
         port : 3306,
-        user : 'admin_root',
-        password : 'bOPTDZXP8Xvdf9I1',
-        database : 'admin_ethereum_api'
-        // user : 'root',
-        // password : '',
-        // database : 'ethereum_api'
+        // user : 'admin_root',
+        // password : 'bOPTDZXP8Xvdf9I1',
+        // database : 'admin_ethereum_api'
+        user : 'root',
+        password : '',
+        database : 'ethereum_api'
     }
 })
 
@@ -1087,41 +1087,41 @@ async function getTokenCoingeckoInfos() {
 
 async function getOneTokenScanInfos(tokenAddress, proxy) {
     // console.log(tokenAddress, proxy)      
-    var res = await axios.request({
-        url: 'https://etherscan.io/token/' + tokenAddress + '#balances',
-        // method: 'GET',
-        // httpsAgent: new HttpsProxyAgent('https://' + proxy),
-        // timeout: 20000,
+    // var res = await axios.request({
+    //     url: 'https://etherscan.io/token/' + tokenAddress + '#balances',
+    //     // method: 'GET',
+    //     // httpsAgent: new HttpsProxyAgent('https://' + proxy),
+    //     // timeout: 20000,
+    //     headers:{
+    //         'Access-Control-Allow-Origin': '*',
+    //     },
+    //     // proxy: false,
+    //     reconnect: {
+    //         auto: true,
+    //         delay: 5000, // ms
+    //         maxAttempts: 5,
+    //         onTimeout: false
+    //     },
+    //     keepAlive: true,
+    //     timeout: 20000,
+    //     // headers: [{name: 'Access-Control-Allow-Origin', value: '*'}],
+    //     withCredentials: false,
+    //     agent: new HttpsProxyAgent('https://' + config.PROXY[process.argv[2]])
+    // })
+
+    var res = await axios.get('https://etherscan.io/token/' + tokenAddress + '#balances', {
+        httpsAgent: new https.Agent({ keepAlive: true }),
+        proxy: {
+            protocol: 'https',
+            host: proxy.split(':')[0],
+            port: proxy.split(':')[1]
+        },
+        timeout: 20000,
         headers:{
             'Access-Control-Allow-Origin': '*',
         },
-        // proxy: false,
-        reconnect: {
-            auto: true,
-            delay: 5000, // ms
-            maxAttempts: 5,
-            onTimeout: false
-        },
-        keepAlive: true,
-        timeout: 20000,
-        // headers: [{name: 'Access-Control-Allow-Origin', value: '*'}],
-        withCredentials: false,
-        agent: new HttpsProxyAgent('https://' + config.PROXY[process.argv[2]])
     })
-
-    // var res = await axios.get('https://etherscan.io/token/' + tokenAddress + '#balances', {
-        // httpsAgent: new https.Agent({ keepAlive: true }),
-        // proxy: {
-        //     protocol: 'https',
-        //     host: proxy.split(':')[0],
-        //     port: proxy.split(':')[1]
-        // },
-        // timeout: 20000,
-        // headers:{
-        //     'Access-Control-Allow-Origin': '*',
-        // },
-    // })
-    var dom = new JSDOM(res.data)
+    var dom = new JSDOM(res.body)
     var totalSupply = 0
     
     try {
@@ -1168,40 +1168,40 @@ async function getOneTokenScanInfos(tokenAddress, proxy) {
     } catch (err) {
     }
 
-    res = await axios.request({
-        url: 'https://etherscan.io/token/generic-tokenholders2?m=normal&a=' + tokenAddress,
-        // method: 'GET',
-        // httpsAgent: new HttpsProxyAgent('https://' + proxy),
-        // timeout: 20000,
+    // res = await axios.request({
+    //     url: 'https://etherscan.io/token/generic-tokenholders2?m=normal&a=' + tokenAddress,
+    //     // method: 'GET',
+    //     // httpsAgent: new HttpsProxyAgent('https://' + proxy),
+    //     // timeout: 20000,
+    //     headers:{
+    //         'Access-Control-Allow-Origin': '*',
+    //     },
+    //     // proxy: false,
+    //     reconnect: {
+    //         auto: true,
+    //         delay: 5000, // ms
+    //         maxAttempts: 5,
+    //         onTimeout: false
+    //     },
+    //     keepAlive: true,
+    //     timeout: 20000,
+    //     // headers: [{name: 'Access-Control-Allow-Origin', value: '*'}],
+    //     withCredentials: false,
+    //     agent: new HttpsProxyAgent('https://' + config.PROXY[process.argv[2]])
+    // })
+    res = await axios.get('https://etherscan.io/token/generic-tokenholders2?m=normal&a=' + tokenAddress, {
+        httpsAgent: new https.Agent({ keepAlive: true }),
+        timeout: 20000,
+        proxy: {
+            protocol: 'https',
+            host: proxy.split(':')[0],
+            port: proxy.split(':')[1]
+        },
         headers:{
             'Access-Control-Allow-Origin': '*',
         },
-        // proxy: false,
-        reconnect: {
-            auto: true,
-            delay: 5000, // ms
-            maxAttempts: 5,
-            onTimeout: false
-        },
-        keepAlive: true,
-        timeout: 20000,
-        // headers: [{name: 'Access-Control-Allow-Origin', value: '*'}],
-        withCredentials: false,
-        agent: new HttpsProxyAgent('https://' + config.PROXY[process.argv[2]])
     })
-    // res = await axios.get('https://etherscan.io/token/generic-tokenholders2?m=normal&a=' + tokenAddress, {
-        // httpsAgent: new https.Agent({ keepAlive: true }),
-        // timeout: 20000,
-        // proxy: {
-        //     protocol: 'https',
-        //     host: proxy.split(':')[0],
-        //     port: proxy.split(':')[1]
-        // },
-        // headers:{
-        //     'Access-Control-Allow-Origin': '*',
-        // },
-    // })
-    dom = new JSDOM(res.data)
+    dom = new JSDOM(res.body)
 
     var rows = dom.window.document.querySelectorAll('tbody tr')
     var holders = []

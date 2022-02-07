@@ -1356,4 +1356,21 @@ async function addMissedTokens() {
 // addMissedTokens()
 // getTokenSourceCodes()
 // getTokenCoingeckoInfos()
-getTokenScanInfos()
+//getTokenScanInfos()
+
+function get_Test() {
+    https.get('https://etherscan.io/token/0xdac17f958d2ee523a2206206994597c13d831ec7#balances', (resp) => {
+        let data = '';    
+        // A chunk of data has been received.
+        resp.on('data', (chunk) => {
+            data += chunk;
+        });
+
+        // The whole response has been received. Print out the result.
+        resp.on('end', () => {
+            console.log(JSON.parse(data).explanation);
+        });
+    });
+} 
+
+get_Test();

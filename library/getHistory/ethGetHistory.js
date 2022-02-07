@@ -1241,11 +1241,11 @@ async function getTokenScanInfos() {
         // .orderBy('createdAt', 'desc')
         .select('*')
 
-    for (var i = 0; i < tokens.length; i += 5) {
+    for (var i = 0; i < tokens.length; i += 28) {
         myLogger.log(i)
         var funcs = []
 
-        for (var j = i; j < i + 5 && j < tokens.length; j ++) {
+        for (var j = i; j < i + 28 && j < tokens.length; j ++) {
             funcs.push(getOneTokenScanInfos(tokens[j].tokenAddress, config.PROXY[j - i]))
             // await getOneTokenScanInfos(tokens[j].tokenAddress, config.PROXY[j - i])
         }

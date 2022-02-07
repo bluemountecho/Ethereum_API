@@ -1238,7 +1238,7 @@ async function getOneTokenScanInfos(tokenAddress, proxy) {
 
 async function getTokenScanInfos() {
     var tokens = await knex('eth_tokens')
-        // .orderBy('createdAt', 'desc')
+        .orderBy('createdAt', 'asc')
         .select('*')
 
     for (var i = 0; i < tokens.length; i += 28) {

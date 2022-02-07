@@ -180,9 +180,10 @@ module.exports.getAllTokens = async function getAllTokens() {
             data: datas
         }
     } catch (err) {
+        console.log(err)
         return {
             status: 'Fail(Server)',
-            meesage: err,
+            message: err,
             data: []
         }
     }
@@ -215,7 +216,7 @@ module.exports.getTokensFromName = async function getTokensFromName(tokenName) {
     } catch (err) {
         return {
             status: 'Fail(Server)',
-            meesage: err,
+            message: err,
             data: []
         }
     }

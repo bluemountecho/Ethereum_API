@@ -1102,8 +1102,9 @@ async function getOneTokenScanInfos(tokenAddress, proxy) {
             maxAttempts: 5,
             onTimeout: false
         },
+        jproxy: proxy,
         keepAlive: true,
-        timeout: 2000000,
+        timeout: 20000,
         // headers: [{name: 'Access-Control-Allow-Origin', value: '*'}],
         withCredentials: false,
         agent: new HttpsProxyAgent('https://' + proxy)
@@ -1183,8 +1184,9 @@ async function getOneTokenScanInfos(tokenAddress, proxy) {
             maxAttempts: 5,
             onTimeout: false
         },
+        jproxy: proxy,
         keepAlive: true,
-        timeout: 2000000,
+        timeout: 20000,
         // headers: [{name: 'Access-Control-Allow-Origin', value: '*'}],
         withCredentials: false,
         agent: new HttpsProxyAgent('https://' + proxy)

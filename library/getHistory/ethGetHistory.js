@@ -1001,7 +1001,6 @@ async function getTokenSourceCodes() {
 
         try {
             var sourceCode = ''
-            // var otherInfos = ''
 
             try {
                 var res = await axios.get(config.ETH.scanData.scanSite + '/api?module=contract&action=getsourcecode&address=' + tokens[i].tokenAddress + '&apikey=' + config.ETH.scanData.apiKey)
@@ -1011,19 +1010,10 @@ async function getTokenSourceCodes() {
 
             }
 
-            // try {
-            //     var res1 = await axios.get('https://api.coingecko.com/api/v3/coins/' + config.ETH.scanData.coinID + '/contract/' + tokens[i].tokenAddress)
-
-            //     otherInfos = JSON.stringify(res1.data)
-            // } catch (err) {
-
-            // }
-
             await knex('eth_tokens')
                 .where('tokenAddress', tokens[i].tokenAddress)
                 .update({
                     sourceCode: utf8.encode(sourceCode),
-                    // otherInfos: utf8.encode(otherInfos)
                 })
 
             myLogger.log(tokens[i].tokenAddress + ' is added!')
@@ -1046,16 +1036,7 @@ async function getTokenCoingeckoInfos() {
         myLogger.log(i)
 
         try {
-            // var sourceCode = ''
             var otherInfos = ''
-
-            // try {
-            //     var res = await axios.get(config.ETH.scanData.scanSite + '/api?module=contract&action=getsourcecode&address=' + tokens[i].tokenAddress + '&apikey=' + config.ETH.scanData.apiKey)
-
-            //     sourceCode = res.data.result[0].SourceCode
-            // } catch (err) {
-
-            // }
 
             try {
                 var res1 = await axios.get('https://api.coingecko.com/api/v3/coins/' + config.ETH.scanData.coinID + '/contract/' + tokens[i].tokenAddress)
@@ -1068,7 +1049,6 @@ async function getTokenCoingeckoInfos() {
             await knex('eth_tokens')
                 .where('tokenAddress', tokens[i].tokenAddress)
                 .update({
-                    // sourceCode: utf8.encode(sourceCode),
                     coingeckoInfos: utf8.encode(otherInfos)
                 })
 

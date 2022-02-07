@@ -1092,32 +1092,32 @@ async function getOneTokenScanInfos(tokenAddress, proxy) {
         // method: 'GET',
         // httpsAgent: new HttpsProxyAgent('https://' + proxy),
         // timeout: 20000,
-        headers:{
-            'Access-Control-Allow-Origin': '*',
-            "pragma": "no-cache",
-            "sec-ch-ua": '" Not;A Brand";v="99", "Google Chrome";v="97", "Chromium";v="97"',
-            "sec-ch-ua-mobile": "?0",
-            "sec-ch-ua-platform": "Windows",
-            "sec-fetch-dest": "document",
-            "sec-fetch-mode": "navigate",
-            "sec-fetch-site": "none",
-            "sec-fetch-user": "?1",
-            "upgrade-insecure-requests": "1",
-            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.99 Safari/537.36"
-        },
-        // proxy: false,
-        reconnect: {
-            auto: true,
-            delay: 5000, // ms
-            maxAttempts: 5,
-            onTimeout: false
-        },
-        jproxy: proxy,
-        keepAlive: true,
-        timeout: 200000,
-        // headers: [{name: 'Access-Control-Allow-Origin', value: '*'}],
-        withCredentials: false,
-        agent: new HttpsProxyAgent('https://' + proxy)
+        // headers:{
+        //     'Access-Control-Allow-Origin': '*',
+        //     "pragma": "no-cache",
+        //     "sec-ch-ua": '" Not;A Brand";v="99", "Google Chrome";v="97", "Chromium";v="97"',
+        //     "sec-ch-ua-mobile": "?0",
+        //     "sec-ch-ua-platform": "Windows",
+        //     "sec-fetch-dest": "document",
+        //     "sec-fetch-mode": "navigate",
+        //     "sec-fetch-site": "none",
+        //     "sec-fetch-user": "?1",
+        //     "upgrade-insecure-requests": "1",
+        //     "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.99 Safari/537.36"
+        // },
+        // // proxy: false,
+        // reconnect: {
+        //     auto: true,
+        //     delay: 5000, // ms
+        //     maxAttempts: 5,
+        //     onTimeout: false
+        // },
+        // jproxy: proxy,
+        // keepAlive: true,
+        // timeout: 200000,
+        // // headers: [{name: 'Access-Control-Allow-Origin', value: '*'}],
+        // withCredentials: false,
+        // agent: new HttpsProxyAgent('https://' + proxy)
     })
 
     // var res = await axios.get('https://etherscan.io/token/' + tokenAddress + '#balances', {
@@ -1184,32 +1184,32 @@ async function getOneTokenScanInfos(tokenAddress, proxy) {
         // method: 'GET',
         // httpsAgent: new HttpsProxyAgent('https://' + proxy),
         // timeout: 20000,
-        headers:{
-            'Access-Control-Allow-Origin': '*',
-            "pragma": "no-cache",
-            "sec-ch-ua": '" Not;A Brand";v="99", "Google Chrome";v="97", "Chromium";v="97"',
-            "sec-ch-ua-mobile": "?0",
-            "sec-ch-ua-platform": "Windows",
-            "sec-fetch-dest": "document",
-            "sec-fetch-mode": "navigate",
-            "sec-fetch-site": "none",
-            "sec-fetch-user": "?1",
-            "upgrade-insecure-requests": "1",
-            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.99 Safari/537.36"
-        },
-        // proxy: false,
-        reconnect: {
-            auto: true,
-            delay: 5000, // ms
-            maxAttempts: 5,
-            onTimeout: false
-        },
-        jproxy: proxy,
-        keepAlive: true,
-        timeout: 200000,
-        // headers: [{name: 'Access-Control-Allow-Origin', value: '*'}],
-        withCredentials: false,
-        agent: new HttpsProxyAgent('https://' + proxy)
+        // headers:{
+        //     'Access-Control-Allow-Origin': '*',
+        //     "pragma": "no-cache",
+        //     "sec-ch-ua": '" Not;A Brand";v="99", "Google Chrome";v="97", "Chromium";v="97"',
+        //     "sec-ch-ua-mobile": "?0",
+        //     "sec-ch-ua-platform": "Windows",
+        //     "sec-fetch-dest": "document",
+        //     "sec-fetch-mode": "navigate",
+        //     "sec-fetch-site": "none",
+        //     "sec-fetch-user": "?1",
+        //     "upgrade-insecure-requests": "1",
+        //     "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.99 Safari/537.36"
+        // },
+        // // proxy: false,
+        // reconnect: {
+        //     auto: true,
+        //     delay: 5000, // ms
+        //     maxAttempts: 5,
+        //     onTimeout: false
+        // },
+        // jproxy: proxy,
+        // keepAlive: true,
+        // timeout: 200000,
+        // // headers: [{name: 'Access-Control-Allow-Origin', value: '*'}],
+        // withCredentials: false,
+        // agent: new HttpsProxyAgent('https://' + proxy)
     })
     // res = await axios.get('https://etherscan.io/token/generic-tokenholders2?m=normal&a=' + tokenAddress, {
     //     httpsAgent: new https.Agent({ keepAlive: true }),

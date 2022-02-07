@@ -8,7 +8,7 @@ const knex = require('knex')({
       database : 'admin_ethereum_api'
     }
 })
-
+const utf8 = require('utf8')
 const baseTokens = require('./etherBaseTokens.json')
 const USDC_ADDRESS = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
 
@@ -163,14 +163,14 @@ module.exports.getLastPriceFromPair = async function getLastPriceFromPair(pairAd
 
 module.exports.getAllTokens = async function getAllTokens() {
     try {
-        var rows = await knex('eth_tokens').select('*')
+        var rows = await knex('eth_tokens').orderBy('createdAt', 'desc').select('*')
         var datas = []
 
         for (var i = 0; i < rows.length; i ++) {
             datas.push({
                 address: rows[i].tokenAddress,
-                symbol: rows[i].tokenSymbol,
-                name: rows[i].tokenName
+                symbol: utf8.decode(rows[i].tokenSymbol),
+                name: utf8.decode(rows[i].tokenName)
             })
         }
 
@@ -180,7 +180,44 @@ module.exports.getAllTokens = async function getAllTokens() {
             data: datas
         }
     } catch (err) {
-        console.log(err)
+        return {
+            status: 'Fail(Server)',
+            meesage: err,
+            data: []
+        }
+    }
+}
+
+module.exports.getTokensFromName = async function getTokensFromName(tokenName) {
+    try {
+        var rows = await knex('eth_tokens')
+            .orderBy('createdAt', 'desc')
+            .where('tokenSymbol', 'like', '%' + tokenName + '%')
+            .orWhere('tokenName', 'like', '%' + tokenName + '%')
+            .orderBy('tokenSymbol=' + tokenName, 'desc')
+            .orderBy('tokenName=' + tokenName, 'desc')
+            .select('*')
+        var datas = []
+
+        for (var i = 0; i < rows.length; i ++) {
+            datas.push({
+                address: rows[i].tokenAddress,
+                symbol: utf8.decode(rows[i].tokenSymbol),
+                name: utf8.decode(rows[i].tokenName)
+            })
+        }
+
+        return {
+            status: 'Success',
+            message: 'Getting tokens with name "' + tokenSymbol + '" is completed successfully!',
+            data: datas
+        }
+    } catch (err) {
+        return {
+            status: 'Fail(Server)',
+            meesage: err,
+            data: []
+        }
     }
 }
 

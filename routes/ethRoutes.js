@@ -23,6 +23,13 @@ router.get('/all_tokens', function (req, res, next) {
   })
 })
 
+router.get('/get_tokens_from_name/:tokenName', function (req, res, next) {
+  etherMainnetFuncs.getTokensFromName(req.params.tokenName)
+  .then(data => {
+    res.send(JSON.stringify(data))
+  })
+})
+
 router.get('/daily_pair_price_history/:pairAddr', function(req, res, next) {
   etherMainnetFuncs.getDailyPairPrice(req.params.pairAddr)
   .then((data) => {

@@ -28,8 +28,8 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/ether_mainnet/api/v1', ethRouter);
-app.use('/bsc_mainnet/api/v1', bscRouter);
+app.use('/eth', ethRouter);
+app.use('/bsc', bscRouter);
 app.use('/test', testRouter)
 
 // catch 404 and forward to error handler

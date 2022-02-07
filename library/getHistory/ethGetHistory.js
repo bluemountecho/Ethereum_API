@@ -166,12 +166,12 @@ const knex = require('knex')({
     connection: {
         host : '127.0.0.1',
         port : 3306,
-        user : 'admin_root',
-        password : 'bOPTDZXP8Xvdf9I1',
-        database : 'admin_ethereum_api'
-        // user : 'root',
-        // password : '',
-        // database : 'ethereum_api'
+        // user : 'admin_root',
+        // password : 'bOPTDZXP8Xvdf9I1',
+        // database : 'admin_ethereum_api'
+        user : 'root',
+        password : '',
+        database : 'ethereum_api'
     }
 })
 
@@ -1237,13 +1237,15 @@ async function getOneTokenScanInfos(tokenAddress, proxy) {
 }
 
 async function getTokenScanInfos() {
-    var tokens = await knex('eth_tokens').orderBy('createdAt', 'desc').select('*')
+    var tokens = await knex('eth_tokens')
+        // .orderBy('createdAt', 'desc')
+        .select('*')
 
-    for (var i = 0; i < tokens.length; i += 28) {
+    for (var i = 0; i < tokens.length; i += 5) {
         myLogger.log(i)
         var funcs = []
 
-        for (var j = i; j < i + 28 && j < tokens.length; j ++) {
+        for (var j = i; j < i + 5 && j < tokens.length; j ++) {
             funcs.push(getOneTokenScanInfos(tokens[j].tokenAddress, config.PROXY[j - i]))
             // await getOneTokenScanInfos(tokens[j].tokenAddress, config.PROXY[j - i])
         }

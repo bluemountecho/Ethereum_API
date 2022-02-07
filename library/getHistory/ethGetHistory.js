@@ -1368,7 +1368,7 @@ function get_Test() {
 
         // The whole response has been received. Print out the result.
         resp.on('end', () => {
-            console.log(JSON.parse(data).explanation);
+            console.log(data);
         });
     });
 } 

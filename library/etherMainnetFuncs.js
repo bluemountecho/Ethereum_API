@@ -195,8 +195,8 @@ module.exports.getTokensFromName = async function getTokensFromName(tokenName) {
             .orderBy('createdAt', 'desc')
             .where('tokenSymbol', 'like', '%' + tokenName + '%')
             .orWhere('tokenName', 'like', '%' + tokenName + '%')
-            .orderByRaw('tokenSymbol=`' + tokenName + '` desc')
-            .orderByRaw('tokenName=`' + tokenName + '` desc')
+            .orderByRaw('tokenSymbol="' + tokenName + '" desc')
+            .orderByRaw('tokenName="' + tokenName + '" desc')
             .select('*')
         var datas = []
 

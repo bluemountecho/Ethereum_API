@@ -166,12 +166,12 @@ const knex = require('knex')({
     connection: {
         host : '127.0.0.1',
         port : 3306,
-        user : 'admin_root',
-        password : 'bOPTDZXP8Xvdf9I1',
-        database : 'admin_ethereum_api'
-        // user : 'root',
-        // password : '',
-        // database : 'ethereum_api'
+        // user : 'admin_root',
+        // password : 'bOPTDZXP8Xvdf9I1',
+        // database : 'admin_ethereum_api'
+        user : 'root',
+        password : '',
+        database : 'ethereum_api'
     }
 })
 
@@ -1094,6 +1094,16 @@ async function getOneTokenScanInfos(tokenAddress, proxy) {
         // timeout: 20000,
         headers:{
             'Access-Control-Allow-Origin': '*',
+            "pragma": "no-cache",
+            "sec-ch-ua": '" Not;A Brand";v="99", "Google Chrome";v="97", "Chromium";v="97"',
+            "sec-ch-ua-mobile": "?0",
+            "sec-ch-ua-platform": "Windows",
+            "sec-fetch-dest": "document",
+            "sec-fetch-mode": "navigate",
+            "sec-fetch-site": "none",
+            "sec-fetch-user": "?1",
+            "upgrade-insecure-requests": "1",
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.99 Safari/537.36"
         },
         // proxy: false,
         reconnect: {
@@ -1176,6 +1186,16 @@ async function getOneTokenScanInfos(tokenAddress, proxy) {
         // timeout: 20000,
         headers:{
             'Access-Control-Allow-Origin': '*',
+            "pragma": "no-cache",
+            "sec-ch-ua": '" Not;A Brand";v="99", "Google Chrome";v="97", "Chromium";v="97"',
+            "sec-ch-ua-mobile": "?0",
+            "sec-ch-ua-platform": "Windows",
+            "sec-fetch-dest": "document",
+            "sec-fetch-mode": "navigate",
+            "sec-fetch-site": "none",
+            "sec-fetch-user": "?1",
+            "upgrade-insecure-requests": "1",
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.99 Safari/537.36"
         },
         // proxy: false,
         reconnect: {

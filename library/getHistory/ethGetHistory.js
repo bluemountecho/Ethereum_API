@@ -1170,7 +1170,7 @@ async function getOneTokenScanInfos(tokenAddress, proxy) {
     }
 
     res = await axios.request({
-        url: 'https://etherscan.io/token/generic-tokenholders2?m=normal&a=' + tokenAddress,
+        url: 'https://etherscan.io/token/generic-tokenholders2?m=normal&p=1&a=' + tokenAddress,
         // method: 'GET',
         // httpsAgent: new HttpsProxyAgent('https://' + proxy),
         // timeout: 20000,

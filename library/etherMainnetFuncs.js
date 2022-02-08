@@ -271,6 +271,8 @@ module.exports.getTokenInfo = async function getTokenInfo(tokenAddr) {
                         github: 'https://github.com/thefortube/trust-assets/blob/master/blockchains/ethereum/assets/' + Web3.utils.toChecksumAddress(tokenAddr) + '/logo.png?raw=true'
                     },
                     totalSupply: rows[0].totalSupply,
+                    totalHolders: rows[0].totalHolders,
+                    holders: rows[0].holders
                 }]
             }
         }

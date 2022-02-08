@@ -203,8 +203,8 @@ module.exports.getTokensFromName = async function getTokensFromName(tokenName) {
         for (var i = 0; i < rows.length; i ++) {
             datas.push({
                 address: rows[i].tokenAddress,
-                symbol: utf8.decode(rows[i].tokenSymbol),
-                name: utf8.decode(rows[i].tokenName)
+                symbol: rows[i].tokenSymbol,
+                name: rows[i].tokenName
             })
         }
 

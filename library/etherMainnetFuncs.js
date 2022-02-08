@@ -248,8 +248,8 @@ module.exports.getTokenInfo = async function getTokenInfo(tokenAddr) {
                 },
             }
             
-            if (rows[0].otherInfos != '') {
-                infos = JSON.parse(rows[0].otherInfos)
+            if (rows[0].coingeckoInfos != '') {
+                infos = JSON.parse(rows[0].coingeckoInfos)
             }
 
             return {

@@ -1234,6 +1234,8 @@ async function getTokenScanInfos() {
         .whereRaw('totalSupply is NULL')
         .select('*')
 
+    myLogger.log(tokens.length)
+
     for (var i = 0; i < tokens.length; i += 5) {
         myLogger.log(i)
         var funcs = []

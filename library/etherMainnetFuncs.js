@@ -11,6 +11,7 @@ const knex = require('knex')({
 const utf8 = require('utf8')
 const baseTokens = require('./etherBaseTokens.json')
 const USDC_ADDRESS = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+const Web3 = require('web3')
 
 var fs = require('fs')
 function convertTimestampToString(timestamp, flag = false) {
@@ -217,6 +218,67 @@ module.exports.getTokensFromName = async function getTokensFromName(tokenName) {
         console.log(err)
         return {
             status: 'Fail(Server)',
+            message: err,
+            data: []
+        }
+    }
+}
+
+module.exports.getTokenInfo = async function getTokenInfo(tokenAddr) {
+    try {
+        var tokenAddress = tokenAddr.toLowerCase()
+        var rows = await knex('eth_tokens').where('tokenAddress', tokenAddress).select('*')
+
+        if (rows.length == 0) {
+            return {
+                status: 'Fail',
+                message: 'Token does not exist!',
+                data: []
+            }
+        } else {
+            var infos = {
+                description: {
+                    en: ''
+                },
+                links: '',
+                image: '',
+                market_data: {
+                    total_supply: '',
+                    circulating_supply: ''
+                },
+            }
+            
+            if (rows[0].otherInfos != '') {
+                infos = JSON.parse(rows[0].otherInfos)
+            }
+
+            return {
+                status: 'Success',
+                message: 'Getting token info completed successfully!',
+                data: [{
+                    address: rows[0].tokenAddress,
+                    symbol: rows[0].tokenSymbol,
+                    address: rows[0].tokenName,
+                    decimals: rows[0].tokenDecimals,
+                    sourceCode: rows[0].sourceCode,
+                    description: infos.description.en,
+                    links: {
+                        coingecko: infos.links,
+                        etherscan: rows[0].links
+                    },
+                    image: {
+                        coingecko: infos.image,
+                        github: 'https://github.com/thefortube/trust-assets/blob/master/blockchains/ethereum/assets/' + Web3.utils.toChecksumAddress(tokenAddr) + '/logo.png?raw=true'
+                    },
+                    totalSupply: rows[0].totalSupply,
+                }]
+            }
+        }
+    } catch (err) {
+        console.log(err)
+
+        return {
+            status: 'Fail(Server error)',
             message: err,
             data: []
         }
@@ -482,60 +544,5 @@ module.exports.getLivePairPrice = async function getLivePairPrice(pairAddr) {
         return datas
     } catch (err) {
         console.log(err)
-    }
-}
-
-module.exports.getTokenInfo = async function getTokenInfo(tokenAddr) {
-    try {
-        var tokenAddress = tokenAddr.toLowerCase()
-        var rows = await knex('eth_tokens').where('tokenAddress', tokenAddress).select('*')
-
-        if (rows.length == 0) {
-            return {
-                status: 'Fail',
-                message: 'Token does not exist!',
-                data: []
-            }
-        } else {
-            var infos = {
-                description: {
-                    en: ''
-                },
-                links: '',
-                image: '',
-                market_data: {
-                    total_supply: '',
-                    circulating_supply: ''
-                },
-            }
-            
-            if (rows[0].otherInfos != '') {
-                infos = JSON.parse(rows[0].otherInfos)
-            }
-
-            return {
-                status: 'Success',
-                message: 'Getting token info completed successfully!',
-                data: [{
-                    address: rows[0].tokenAddress,
-                    symbol: rows[0].tokenSymbol,
-                    address: rows[0].tokenName,
-                    sourceCode: rows[0].sourceCode,
-                    description: infos.description.en,
-                    links: infos.links,
-                    image: infos.image,
-                    totalSupply: infos.market_data.total_supply,
-                    circulatingSupply: infos.market_data.circulating_supply
-                }]
-            }
-        }
-    } catch (err) {
-        console.log(err)
-
-        return {
-            status: 'Fail(Server error)',
-            message: err,
-            data: []
-        }
     }
 }

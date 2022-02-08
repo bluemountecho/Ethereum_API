@@ -351,8 +351,8 @@ module.exports.getPairInfo = async function getPairInfo(pairAddr) {
                 data: []
             }
         } else {
-            var token0Info = await getTokenInfo(rows[0].token0Address)
-            var token1Info = await getTokenInfo(rows[0].token1Address)
+            var token0Info = await this.getTokenInfo(rows[0].token0Address)
+            var token1Info = await this.getTokenInfo(rows[0].token1Address)
 
             return {
                 status: 'Success',

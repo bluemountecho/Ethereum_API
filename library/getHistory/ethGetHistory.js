@@ -1209,25 +1209,25 @@ async function getOneTokenScanInfos(tokenAddress, proxy) {
 }
 
 async function getTokenScanInfos() {
-    var tokens = await knex('eth_tokens')
-        .orderBy('createdAt', 'asc')
-        .select('*')
-    var vis = []
-    var res = await axios.get('http://stjepan:stjepan@51.83.184.35:8888/eth/all_tokens')
+    // var tokens = await knex('eth_tokens')
+    //     .orderBy('createdAt', 'asc')
+    //     .select('*')
+    // var vis = []
+    // var res = await axios.get('http://stjepan:stjepan@51.83.184.35:8888/eth/all_tokens')
 
-    for (var i = 0; i < tokens.length; i ++) {
-        vis[tokens[i].tokenAddress] = true
-    }
+    // for (var i = 0; i < tokens.length; i ++) {
+    //     vis[tokens[i].tokenAddress] = true
+    // }
 
-    myLogger.log(res.data.data)
+    // myLogger.log(res.data.data)
 
-    for (var i = 0; i < res.data.data.length; i ++) {
-        if (!vis[res.data.data[i].address]) {
-            await knex('eth_tokens').insert({
-                tokenAddress: res.data.data[i].address
-            })
-        }
-    }
+    // for (var i = 0; i < res.data.data.length; i ++) {
+    //     if (!vis[res.data.data[i].address]) {
+    //         await knex('eth_tokens').insert({
+    //             tokenAddress: res.data.data[i].address
+    //         })
+    //     }
+    // }
 
     tokens = await knex('eth_tokens')
         .orderBy('createdAt', 'asc')
@@ -1236,11 +1236,11 @@ async function getTokenScanInfos() {
 
     myLogger.log(tokens.length)
 
-    for (var i = 0; i < tokens.length; i += 5) {
+    for (var i = 0; i < tokens.length; i += 10) {
         myLogger.log(i)
         var funcs = []
 
-        for (var j = i; j < i + 5 && j < tokens.length; j ++) {
+        for (var j = i; j < i + 10 && j < tokens.length; j ++) {
             funcs.push(getOneTokenScanInfos(tokens[j].tokenAddress, config.PROXY[j - i]))
             // await getOneTokenScanInfos(tokens[j].tokenAddress, config.PROXY[j - i])
         }
@@ -1251,7 +1251,7 @@ async function getTokenScanInfos() {
             myLogger.log(err)
         }
 
-        await delay(2500)
+        await delay(500)
     }
 
     myLogger.log('Getting Token Scan Infos Finished!')

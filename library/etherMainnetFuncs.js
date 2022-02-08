@@ -224,6 +224,40 @@ module.exports.getTokensFromName = async function getTokensFromName(tokenName) {
     }
 }
 
+module.exports.getTokensFromName = async function getTokensFromName(tokenName) {
+    try {
+        var rows = await knex('eth_tokens')
+            .where('tokenSymbol', 'like', '%' + tokenName + '%')
+            .orWhere('tokenName', 'like', '%' + tokenName + '%')
+            .orderByRaw('LOWER(tokenSymbol)="' + tokenName.toLowerCase() + '" desc')
+            .orderByRaw('LOWER(tokenName)="' + tokenName.toLowerCase() + '" desc')
+            .orderBy('createdAt', 'asc')
+            .select('*')
+        var datas = []
+
+        for (var i = 0; i < rows.length; i ++) {
+            datas.push({
+                address: rows[i].tokenAddress,
+                symbol: rows[i].tokenSymbol,
+                name: rows[i].tokenName
+            })
+        }
+
+        return {
+            status: 'Success',
+            message: 'Getting tokens with name "' + tokenName + '" is completed successfully!',
+            data: datas
+        }
+    } catch (err) {
+        console.log(err)
+        return {
+            status: 'Fail(Server)',
+            message: err,
+            data: []
+        }
+    }
+}
+
 module.exports.getTokenInfo = async function getTokenInfo(tokenAddr) {
     try {
         var tokenAddress = tokenAddr.toLowerCase()

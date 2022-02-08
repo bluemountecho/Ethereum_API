@@ -244,8 +244,8 @@ module.exports.getPairsFromName = async function getPairsFromName(tokenName) {
                 .select('*')
             
             for (var j = 0; j < pairs.length; j ++) {
-                var token0Info = await knex('eth_tokens').where('tokenAddress', pairs[j].token0Address).selecT('*')
-                var token1Info = await knex('eth_tokens').where('tokenAddress', pairs[j].token1Address).selecT('*')
+                var token0Info = await knex('eth_tokens').where('tokenAddress', pairs[j].token0Address).selec('*')
+                var token1Info = await knex('eth_tokens').where('tokenAddress', pairs[j].token1Address).selec('*')
 
                 datas.push({
                     address: pairs[j].pairAddress,

@@ -30,7 +30,7 @@ router.get('/tokens_from_name/:tokenName', function (req, res, next) {
   })
 })
 
-router.get('/tokenInfo/:tokenAddr', function(req, res, next) {
+router.get('/token_info/:tokenAddr', function(req, res, next) {
   etherMainnetFuncs.getTokenInfo(req.params.tokenAddr)
   .then((data) => {
     res.send(JSON.stringify(data))

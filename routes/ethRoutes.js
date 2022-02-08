@@ -44,6 +44,13 @@ router.get('/pairs_from_name/:tokenName', function (req, res, next) {
   })
 })
 
+router.get('/pair_info/:pairAddr', function(req, res, next) {
+  etherMainnetFuncs.getPairInfo(req.params.pairAddr)
+  .then((data) => {
+    res.send(JSON.stringify(data))
+  })
+});
+
 router.get('/daily_pair_price_history/:pairAddr', function(req, res, next) {
   etherMainnetFuncs.getDailyPairPrice(req.params.pairAddr)
   .then((data) => {

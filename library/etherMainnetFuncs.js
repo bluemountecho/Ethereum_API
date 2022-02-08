@@ -224,58 +224,6 @@ module.exports.getTokensFromName = async function getTokensFromName(tokenName) {
     }
 }
 
-module.exports.getPairsFromName = async function getPairsFromName(tokenName) {
-    try {
-        var rows = await knex('eth_tokens')
-            .where('tokenSymbol', 'like', '%' + tokenName + '%')
-            .orWhere('tokenName', 'like', '%' + tokenName + '%')
-            .orderByRaw('LOWER(tokenSymbol)="' + tokenName.toLowerCase() + '" desc')
-            .orderByRaw('LOWER(tokenName)="' + tokenName.toLowerCase() + '" desc')
-            .orderBy('createdAt', 'asc')
-            .select('*')
-        var datas = []
-
-        for (var i = 0; i < rows.length; i ++) {
-            var pairs = await knex('eth_pairs')
-                .where('token0Address', rows[i].tokenAddress)
-                .orWhere('token1Address', rows[i].tokenAddress)
-                .orderBy('blockNumber', 'desc')
-                .orderBy('transactionID', 'desc')
-                .select('*')
-            
-            for (var j = 0; j < pairs.length; j ++) {
-                var token0Info = await knex('eth_tokens').where('tokenAddress', pairs[j].token0Address).select('*')
-                var token1Info = await knex('eth_tokens').where('tokenAddress', pairs[j].token1Address).select('*')
-
-                datas.push({
-                    address: pairs[j].pairAddress,
-                    token0Address: pairs[j].token0Address,
-                    token0Symbol: token0Info[0] ? token0Info[0].tokenSymbol : '',
-                    token1Address: pairs[j].token1Address,
-                    token1Symbol: token1Info[0] ? token1Info[0].tokenSymbol : '',
-                    factoryAddress: pairs[j].factoryAddress,
-                    lastPrice: pairs[j].lastPrice,
-                    createdAt: pairs[j].createdAt,
-                    baseToken: pairs[j].baseToken
-                })
-            }
-        }
-
-        return {
-            status: 'Success',
-            message: 'Getting pairs with name "' + tokenName + '" is completed successfully!',
-            data: datas
-        }
-    } catch (err) {
-        console.log(err)
-        return {
-            status: 'Fail(Server)',
-            message: err,
-            data: []
-        }
-    }
-}
-
 module.exports.getTokenInfo = async function getTokenInfo(tokenAddr) {
     try {
         var tokenAddress = tokenAddr.toLowerCase()
@@ -323,6 +271,97 @@ module.exports.getTokenInfo = async function getTokenInfo(tokenAddr) {
                         github: 'https://github.com/thefortube/trust-assets/blob/master/blockchains/ethereum/assets/' + Web3.utils.toChecksumAddress(tokenAddr) + '/logo.png?raw=true'
                     },
                     totalSupply: rows[0].totalSupply,
+                }]
+            }
+        }
+    } catch (err) {
+        console.log(err)
+
+        return {
+            status: 'Fail(Server error)',
+            message: err,
+            data: []
+        }
+    }
+}
+
+module.exports.getPairsFromName = async function getPairsFromName(tokenName) {
+    try {
+        var rows = await knex('eth_tokens')
+            .where('tokenSymbol', 'like', '%' + tokenName + '%')
+            .orWhere('tokenName', 'like', '%' + tokenName + '%')
+            .orderByRaw('LOWER(tokenSymbol)="' + tokenName.toLowerCase() + '" desc')
+            .orderByRaw('LOWER(tokenName)="' + tokenName.toLowerCase() + '" desc')
+            .orderBy('createdAt', 'asc')
+            .select('*')
+        var datas = []
+
+        for (var i = 0; i < rows.length; i ++) {
+            var pairs = await knex('eth_pairs')
+                .where('token0Address', rows[i].tokenAddress)
+                .orWhere('token1Address', rows[i].tokenAddress)
+                .orderBy('blockNumber', 'desc')
+                .orderBy('transactionID', 'desc')
+                .select('*')
+            
+            for (var j = 0; j < pairs.length; j ++) {
+                var token0Info = await knex('eth_tokens').where('tokenAddress', pairs[j].token0Address).select('*')
+                var token1Info = await knex('eth_tokens').where('tokenAddress', pairs[j].token1Address).select('*')
+
+                datas.push({
+                    address: pairs[j].pairAddress,
+                    token0Address: pairs[j].token0Address,
+                    token0Symbol: token0Info[0] ? token0Info[0].tokenSymbol : '',
+                    token1Address: pairs[j].token1Address,
+                    token1Symbol: token1Info[0] ? token1Info[0].tokenSymbol : '',
+                    // factoryAddress: pairs[j].factoryAddress,
+                    // lastPrice: pairs[j].lastPrice,
+                    // createdAt: pairs[j].createdAt,
+                    // baseToken: pairs[j].baseToken
+                })
+            }
+        }
+
+        return {
+            status: 'Success',
+            message: 'Getting pairs with name "' + tokenName + '" is completed successfully!',
+            data: datas
+        }
+    } catch (err) {
+        console.log(err)
+        return {
+            status: 'Fail(Server)',
+            message: err,
+            data: []
+        }
+    }
+}
+
+module.exports.getPairInfo = async function getPairInfo(pairAddr) {
+    try {
+        var pairAddress = pairAddr.toLowerCase()
+        var rows = await knex('eth_pairs').where('pairAddress', pairAddress).select('*')
+
+        if (rows.length == 0) {
+            return {
+                status: 'Fail',
+                message: 'Pair does not exist!',
+                data: []
+            }
+        } else {
+            var token0Info = await getTokenInfo(rows[0].token0Address)
+            var token1Info = await getTokenInfo(rows[0].token1Address)
+
+            return {
+                status: 'Success',
+                message: 'Getting pair info completed successfully!',
+                data: [{
+                    address: rows[0].pairAddress,
+                    token0Info: token0Info.data[0],
+                    token1Info: token1Info.data[0],
+                    factoryAddress: rows[0].factoryAddress,
+                    lastPrice: rows[0].lastPrice,
+                    createdAt: rows[0].createdAt
                 }]
             }
         }

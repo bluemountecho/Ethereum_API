@@ -272,7 +272,8 @@ module.exports.getTokenInfo = async function getTokenInfo(tokenAddr) {
                     },
                     totalSupply: rows[0].totalSupply,
                     totalHolders: rows[0].totalHolders,
-                    holders: rows[0].holders
+                    holders: rows[0].holders,
+                    createdAt: rows[0].createdAt
                 }]
             }
         }

@@ -192,11 +192,11 @@ module.exports.getAllTokens = async function getAllTokens() {
 module.exports.getTokensFromName = async function getTokensFromName(tokenName) {
     try {
         var rows = await knex('eth_tokens')
-            .orderBy('createdAt', 'desc')
             .where('tokenSymbol', 'like', '%' + tokenName + '%')
             .orWhere('tokenName', 'like', '%' + tokenName + '%')
             .orderByRaw('LOWER(tokenSymbol)="' + tokenName.toLowerCase() + '" desc')
             .orderByRaw('LOWER(tokenName)="' + tokenName.toLowerCase() + '" desc')
+            .orderBy('createdAt', 'asc')
             .select('*')
         var datas = []
 

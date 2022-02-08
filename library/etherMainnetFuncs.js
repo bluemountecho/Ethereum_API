@@ -214,6 +214,7 @@ module.exports.getTokensFromName = async function getTokensFromName(tokenName) {
             data: datas
         }
     } catch (err) {
+        console.log(err)
         return {
             status: 'Fail(Server)',
             message: err,

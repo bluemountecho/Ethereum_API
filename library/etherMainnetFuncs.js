@@ -224,7 +224,7 @@ module.exports.getTokensFromName = async function getTokensFromName(tokenName) {
     }
 }
 
-module.exports.getTokensFromName = async function getTokensFromName(tokenName) {
+module.exports.getPairsFromName = async function getPairsFromName(tokenName) {
     try {
         var rows = await knex('eth_tokens')
             .where('tokenSymbol', 'like', '%' + tokenName + '%')
@@ -236,16 +236,34 @@ module.exports.getTokensFromName = async function getTokensFromName(tokenName) {
         var datas = []
 
         for (var i = 0; i < rows.length; i ++) {
-            datas.push({
-                address: rows[i].tokenAddress,
-                symbol: rows[i].tokenSymbol,
-                name: rows[i].tokenName
-            })
+            var pairs = await knex('eth_pairs')
+                .where('token0Address', rows[i].tokenAddress)
+                .orWhere('token1Address', rows[i].tokenAddress)
+                .orderBy('blockNumber', 'desc')
+                .orderBy('transactionID', 'desc')
+                .select('*')
+            
+            for (var j = 0; j < pairs.length; j ++) {
+                var token0Info = await knex('eth_tokens').where('tokenAddress', pairs[j].token0Address).selecT('*')
+                var token1Info = await knex('eth_tokens').where('tokenAddress', pairs[j].token1Address).selecT('*')
+
+                datas.push({
+                    address: pairs[j].pairAddress,
+                    token0Address: pairs[j].token0Address,
+                    token0Symbol: token0Info[0] ? token0Info[0].tokenSymbol : '',
+                    token1Address: pairs[j].token1Address,
+                    token1Symbol: token1Info[0] ? token1Info[0].tokenSymbol : '',
+                    factoryAddress: pairs[j].factoryAddress,
+                    lastPrice: pairs[j].lastPrice,
+                    createdAt: pairs[j].createdAt,
+                    baseToken: pairs[j].baseToken
+                })
+            }
         }
 
         return {
             status: 'Success',
-            message: 'Getting tokens with name "' + tokenName + '" is completed successfully!',
+            message: 'Getting pairs with name "' + tokenName + '" is completed successfully!',
             data: datas
         }
     } catch (err) {

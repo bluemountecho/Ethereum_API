@@ -210,7 +210,7 @@ module.exports.getTokensFromName = async function getTokensFromName(tokenName) {
 
         return {
             status: 'Success',
-            message: 'Getting tokens with name "' + tokenSymbol + '" is completed successfully!',
+            message: 'Getting tokens with name "' + tokenName + '" is completed successfully!',
             data: datas
         }
     } catch (err) {

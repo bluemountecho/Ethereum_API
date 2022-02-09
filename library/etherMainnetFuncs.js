@@ -381,7 +381,7 @@ module.exports.getPairInfo = async function getPairInfo(pairAddr) {
 async function getDailyPairData(pairAddr) {
     try {
         var pair = pairAddr.toLowerCase()
-        var content = fs.readFileSync('../database/ethereum/transactions/' + pair + '.txt', {encoding:'utf8', flag:'r'})
+        var content = fs.readFileSync('./database/ethereum/transactions/' + pair + '.txt', {encoding:'utf8', flag:'r'})
         var rows = content.split('\n')
         var datas = []
 

@@ -435,7 +435,7 @@ async function getDailyPairData(pairAddr) {
     }
 }
 
-function mergeDailyPairData(rows) {
+async function mergeDailyPairData(rows) {
     var datas = []
     var res = []
 
@@ -496,34 +496,6 @@ function mergeDailyPairData(rows) {
 
 module.exports.getDailyTokenPrice = async function getDailyTokenPrice(tokenAddress) {
     var tokenInfo = await knex('eth_tokens').where('tokenAddress', tokenAddress).select('*')
-    // var token0Address = tokenAddress > USDC_ADDRESS ? USDC_ADDRESS : tokenAddress
-    // var token1Address = tokenAddress < USDC_ADDRESS ? USDC_ADDRESS : tokenAddress
-
-    // var rows = await knex('eth_pairs')
-    //     .where('token0Address', token0Address)
-    //     .where('token1Address', token1Address)
-    //     .select('*')
-
-    // if (rows.length) {
-    //     var res = mergeDailyPairData(rows)
-
-    //     if (token0Address != USDC_ADDRESS) {
-    //         for (var i = 0; i < res.length; i ++) {
-    //             var tmp = 1.0 / res[i].LOWPRICE
-
-    //             res[i].LOWPRICE = 1.0 / res[i].HIGHPRICE
-    //             res[i].HIGHPRICE = tmp
-    //             res[i].AVGPRICE = 1.0 / res[i].AVGPRICE
-    //         }
-    //     }
-
-    //     return {
-    //         message: 'Success!',
-    //         symbol: tokenInfo[0].tokenSymbol,
-    //         name: tokenInfo[0].tokenName,
-    //         data: res
-    //     }
-    // }
 
     for (var i = 0; i < baseTokens.length; i ++) {
         var funcs = []
@@ -549,8 +521,8 @@ module.exports.getDailyTokenPrice = async function getDailyTokenPrice(tokenAddre
         )
 
         var rows = await Promise.all(funcs)
-        var res1 = mergeDailyPairData(rows[0])
-        var res2 = mergeDailyPairData(rows[1])
+        var res1 = await mergeDailyPairData(rows[0])
+        var res2 = await mergeDailyPairData(rows[1])
 
         if (rows[0].length) {
             if (rows[0][0].token1Address != tokenAddress) {
@@ -614,7 +586,7 @@ module.exports.getDailyTokenPrice = async function getDailyTokenPrice(tokenAddre
 
 module.exports.getDailyPairPrice = async function getDailyPairPrice(pairAddr) {
     try {
-        var datas = await this.getDailyPairData(pairAddr)
+        var datas = await getDailyPairData(pairAddr)
 
         return datas
     } catch (err) {

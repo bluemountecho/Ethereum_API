@@ -294,7 +294,6 @@ module.exports.getPairsFromName = async function getPairsFromName(tokenName) {
             .where('tokenSymbol', 'like', '%' + tokenName + '%')
             .orWhere('tokenName', 'like', '%' + tokenName + '%')
             .orderByRaw('LOWER(tokenSymbol)="' + tokenName.toLowerCase() + '" desc')
-            .orderByRaw('LOWER(tokenName)="' + tokenName.toLowerCase() + '" desc')
             .orderBy('createdAt', 'asc')
             .select('*')
         var datas = []
@@ -388,6 +387,32 @@ function getDailyPairData(pairAddr) {
 
         for (var i = 0; i < rows.length - 1; i ++) {
             datas.push(JSON.parse(rows[i]))
+        }
+
+        var livePairs = (await knex.raw('\
+        SELECT\
+            eth_live.pairAddress AS PAIRADDRESS,\
+            CONCAT(YEAR( eth_live.swapAt ), "-", MONTH( eth_live.swapAt ), "-", DAY( eth_live.swapAt )) AS SWAPAT,\
+            avg( eth_live.swapPrice ) AS AVGPRICE,\
+            max( eth_live.swapPrice ) AS MAXPRICE,\
+            min( eth_live.swapPrice ) AS MINPRICE,\
+            sum( eth_live.swapAmount0 * ( eth_pairs.baseToken * 2 - 1 ) * ( eth_live.isBuy * - 2 + 1 ) ) AS VOLUME0,\
+            sum( eth_live.swapAmount1 * ( eth_pairs.baseToken * - 2 + 1 ) * ( eth_live.isBuy * - 2 + 1 ) ) AS VOLUME1,\
+            sum( eth_live.swapAmount0 ) AS TOTALVOLUME0,\
+            sum( eth_live.swapAmount1 ) AS TOTALVOLUME1,\
+            count( eth_live.swapMaker ) AS SWAPCOUNT \
+        FROM\
+            eth_live\
+            LEFT JOIN eth_pairs ON eth_pairs.pairAddress = eth_live.pairAddress \
+        WHERE\
+            eth_live.pairAddress="' + pairAddr + '"\
+        GROUP BY\
+            DATE( eth_live.swapAt ) \
+        ORDER BY\
+            DATE( eth_live.swapAt)'))[0]
+
+        for (var i = 0; i < livePairs.length; i ++) {
+            datas.push(livePairs[i])
         }
 
         for (var i = 0; i < datas.length; i ++) {
@@ -589,27 +614,7 @@ module.exports.getDailyTokenPrice = async function getDailyTokenPrice(tokenAddre
 
 module.exports.getDailyPairPrice = async function getDailyPairPrice(pairAddr) {
     try {
-        var pair = pairAddr.toLowerCase()
-        var content = fs.readFileSync('./database/ethereum/transactions/' + pair + '.txt', {encoding:'utf8', flag:'r'})
-        var rows = content.split('\n')
-        var datas = []
-
-        for (var i = 0; i < rows.length - 1; i ++) {
-            datas.push(JSON.parse(rows[i]))
-        }
-
-        for (var i = 0; i < datas.length; i ++) {
-            datas[i].CLOSEPRICE = datas[i].TOTALVOLUME0 / datas[i].TOTALVOLUME1
-        }
-
-        datas.sort(function (a, b) {
-            var ad = (new Date(a.SWAPAT)).getTime()
-            var bd = (new Date(b.SWAPAT)).getTime()
-
-            if (ad < bd) return -1
-            if (ad > bd) return 1
-            return 0
-        })
+        var datas = await this.getDailyPairData(pairAddr)
 
         return datas
     } catch (err) {

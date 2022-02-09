@@ -51,8 +51,15 @@ router.get('/pair_info/:pairAddr', function(req, res, next) {
   })
 });
 
-router.get('/daily_pair_price_history/:pairAddr', function(req, res, next) {
+router.get('/daily_pair_price/:pairAddr', function(req, res, next) {
   etherMainnetFuncs.getDailyPairPrice(req.params.pairAddr)
+  .then((data) => {
+    res.send(JSON.stringify(data))
+  })
+});
+
+router.get('/daily_token_price/:tokenAddr', function(req, res, next) {
+  etherMainnetFuncs.getDailyTokenPrice(req.params.tokenAddr)
   .then((data) => {
     res.send(JSON.stringify(data))
   })
@@ -65,21 +72,7 @@ router.get('/live_pair_price/:pairAddr', function(req, res, next) {
   })
 });
 
-router.get('/daily_token_price_history/:tokenAddr', function(req, res, next) {
-  etherMainnetFuncs.getDailyTokenPrice(req.params.tokenAddr)
-  .then((data) => {
-    res.send(JSON.stringify(data))
-  })
-});
-
 router.get('/live_token_price/:tokenAddr', function(req, res, next) {
-  // etherMainnetFuncs.getLiveTokenPrice(req.params.tokenAddr)
-  // .then((data) => {
-  //   res.send(JSON.stringify(data))
-  // })
-});
-
-router.get('/pairInfo/:pairAddr', function(req, res, next) {
   // etherMainnetFuncs.getLiveTokenPrice(req.params.tokenAddr)
   // .then((data) => {
   //   res.send(JSON.stringify(data))

@@ -378,7 +378,7 @@ module.exports.getPairInfo = async function getPairInfo(pairAddr) {
     }
 }
 
-function getDailyPairData(pairAddr) {
+async function getDailyPairData(pairAddr) {
     try {
         var pair = pairAddr.toLowerCase()
         var content = fs.readFileSync('./database/ethereum/transactions/' + pair + '.txt', {encoding:'utf8', flag:'r'})
@@ -389,7 +389,7 @@ function getDailyPairData(pairAddr) {
             datas.push(JSON.parse(rows[i]))
         }
 
-        var livePairs = await knex.raw('\
+        var livePairs = (await knex.raw('\
         SELECT\
             eth_live.pairAddress AS PAIRADDRESS,\
             CONCAT(YEAR( eth_live.swapAt ), "-", MONTH( eth_live.swapAt ), "-", DAY( eth_live.swapAt )) AS SWAPAT,\
@@ -409,9 +409,7 @@ function getDailyPairData(pairAddr) {
         GROUP BY\
             DATE( eth_live.swapAt ) \
         ORDER BY\
-            DATE( eth_live.swapAt)')
-        
-        livePairs = livePairs[0]
+            DATE( eth_live.swapAt)'))[0]
 
         for (var i = 0; i < livePairs.length; i ++) {
             datas.push(livePairs[i])
@@ -442,7 +440,7 @@ function mergeDailyPairData(rows) {
     var res = []
 
     for (var i = 0; i < rows.length; i ++) {
-        var oneData = getDailyPairData(rows[i].pairAddress)
+        var oneData = await getDailyPairData(rows[i].pairAddress)
 
         for (var j = 0; j < oneData.length; j ++) {
             if (!datas[oneData[j].SWAPAT]) {

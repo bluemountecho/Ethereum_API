@@ -258,7 +258,7 @@ module.exports.getTokenInfo = async function getTokenInfo(tokenAddr) {
                 data: [{
                     address: rows[0].tokenAddress,
                     symbol: rows[0].tokenSymbol,
-                    address: rows[0].tokenName,
+                    name: rows[0].tokenName,
                     decimals: rows[0].tokenDecimals,
                     sourceCode: rows[0].sourceCode,
                     description: infos.description.en,

@@ -411,9 +411,9 @@ async function getDailyPairData(pairAddr) {
         // ORDER BY\
         //     DATE( eth_live.swapAt)'))[0]
 
-        for (var i = 0; i < livePairs.length; i ++) {
-            datas.push(livePairs[i])
-        }
+        // for (var i = 0; i < livePairs.length; i ++) {
+        //     datas.push(livePairs[i])
+        // }
 
         for (var i = 0; i < datas.length; i ++) {
             datas[i].AVGPRICE = datas[i].TOTALVOLUME0 / datas[i].TOTALVOLUME1

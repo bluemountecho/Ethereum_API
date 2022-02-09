@@ -494,14 +494,15 @@ async function mergeDailyPairData(rows) {
     return res
 }
 
-module.exports.getDailyTokenPrice = async function getDailyTokenPrice(tokenAddress) {
+module.exports.getDailyTokenPrice = async function getDailyTokenPrice(tokenAddr) {
+    var tokenAddress = tokenAddr.toLowerCase()
     var tokenInfo = await knex('eth_tokens').where('tokenAddress', tokenAddress).select('*')
 
     for (var i = 0; i < baseTokens.length; i ++) {
         var funcs = []
 
-        token0Address = tokenAddress > baseTokens[i] ? baseTokens[i] : tokenAddress
-        token1Address = tokenAddress < baseTokens[i] ? baseTokens[i] : tokenAddress
+        var token0Address = tokenAddress > baseTokens[i] ? baseTokens[i] : tokenAddress
+        var token1Address = tokenAddress < baseTokens[i] ? baseTokens[i] : tokenAddress
 
         funcs.push(
             knex('eth_pairs')

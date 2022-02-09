@@ -389,7 +389,7 @@ function getDailyPairData(pairAddr) {
             datas.push(JSON.parse(rows[i]))
         }
 
-        var livePairs = (await knex.raw('\
+        var livePairs = await knex.raw('\
         SELECT\
             eth_live.pairAddress AS PAIRADDRESS,\
             CONCAT(YEAR( eth_live.swapAt ), "-", MONTH( eth_live.swapAt ), "-", DAY( eth_live.swapAt )) AS SWAPAT,\
@@ -409,7 +409,9 @@ function getDailyPairData(pairAddr) {
         GROUP BY\
             DATE( eth_live.swapAt ) \
         ORDER BY\
-            DATE( eth_live.swapAt)'))[0]
+            DATE( eth_live.swapAt)')
+        
+        livePairs = livePairs[0]
 
         for (var i = 0; i < livePairs.length; i ++) {
             datas.push(livePairs[i])

@@ -381,7 +381,7 @@ module.exports.getPairInfo = async function getPairInfo(pairAddr) {
 async function getDailyPairData(pairAddr) {
     try {
         var pair = pairAddr.toLowerCase()
-        var content = fs.readFileSync('./database/ethereum/transactions/' + pair + '.txt', {encoding:'utf8', flag:'r'})
+        var content = fs.readFileSync('../database/ethereum/transactions/' + pair + '.txt', {encoding:'utf8', flag:'r'})
         var rows = content.split('\n')
         var datas = []
 
@@ -521,8 +521,8 @@ module.exports.getDailyTokenPrice = async function getDailyTokenPrice(tokenAddre
         )
 
         var rows = await Promise.all(funcs)
-        var res1 = await mergeDailyPairData(rows[0])
-        var res2 = await mergeDailyPairData(rows[1])
+        var res1 = mergeDailyPairData(rows[0])
+        var res2 = mergeDailyPairData(rows[1])
 
         if (rows[0].length) {
             if (rows[0][0].token1Address != tokenAddress) {

@@ -595,6 +595,127 @@ module.exports.getDailyPairPrice = async function getDailyPairPrice(pairAddr) {
     }
 }
 
+async function getLivePairData(token0Address, token1Address) {
+    var rows = await knex('eth_live')
+        .join('eth_pairs', 'eth_pairs.pairAddress', '=', 'eth_live.pairAddress')
+        .where('eth_pairs.token0Address', token0Address)
+        .where('eth_pairs.token1Address', token1Address)
+        .select('eth_live.*')
+
+    return rows
+}
+
+async function mergeLivePairData(token0Address, token1Address) {
+    var datas = []
+    var res = []
+
+    var oneData = await getLivePairData(token0Address, token1Address)
+
+    for (var j = 0; j < oneData.length; j ++) {
+        if (!datas[oneData[j].swapAt]) {
+            datas[oneData[j].swapAt] = []
+        }
+
+        datas[oneData[j].swapAt].push(oneData[j])
+    }
+
+    for (var key in datas) {
+        var swapAt = key
+        var swapAmount0 = 0
+        var swapAmount1 = 0
+
+        for (var i = 0; i < datas[key].length; i ++) {
+            swapAmount0 += datas[key][i].swapAmount0
+            swapAmount1 += datas[key][i].swapAmount1
+        }
+
+        res.push({
+            SWAPAT: swapAt,
+            SWAPAMOUNT0: swapAmount0,
+            SWAPAMOUNT1: swapAmount1,
+            PRICE: swapAmount0 / swapAmount1
+        })
+    }
+
+    res.sort(function (a, b) {
+        var ad = (new Date(a.SWAPAT)).getTime()
+        var bd = (new Date(b.SWAPAT)).getTime()
+
+        if (ad < bd) return -1
+        if (ad > bd) return 1
+        return 0
+    })
+
+    return res
+}
+
+module.exports.getLiveTokenPrice = async function getLiveTokenPrice(tokenAddr) {
+    var tokenAddress = tokenAddr.toLowerCase()
+    var tokenInfo = await knex('eth_tokens').where('tokenAddress', tokenAddress).select('*')
+
+    for (var i = 0; i < baseTokens.length; i ++) {
+        var funcs = []
+
+        var token0Address = tokenAddress > baseTokens[i] ? baseTokens[i] : tokenAddress
+        var token1Address = tokenAddress < baseTokens[i] ? baseTokens[i] : tokenAddress
+
+        var res1 = await mergeLivePairData(token0Address, token1Address)
+
+        var token2Address = USDC_ADDRESS > baseTokens[i] ? baseTokens[i] : USDC_ADDRESS
+        var token3Address = USDC_ADDRESS < baseTokens[i] ? baseTokens[i] : USDC_ADDRESS
+        
+        var res2 = await mergeLivePairData(token2Address, token3Address)
+
+        if (res1.length) {
+            if (token1Address != tokenAddress) {
+                for (var j = 0; j < res1.length; j ++) {
+                    res1[j].PRICE = 1.0 / res1[j].PRICE
+                }
+            }
+        }
+
+        if (res2.length) {
+            if (token2Address != USDC_ADDRESS) {
+                for (var j = 0; j < res2.length; j ++) {
+                    res2[j].PRICE = 1.0 / res2[j].PRICE
+                }
+            }
+        }
+
+        if (res1.length > 0 && res2.length > 0) {
+            for (var j = 0; j < res1.length; j ++) {
+                var jd = (new Date(res1[j].SWAPAT)).getTime()
+
+                for (var k = res2.length - 1; k >= 0; k --) {
+                    var kd = (new Date(res1[j].SWAPAT)).getTime()
+
+                    if (kd <= jd) break
+                }
+
+                if (k < 0) break
+                
+                res1[j].PRICE = res1[j].PRICE * res2[k].PRICE
+            }
+
+            if (j == res1.length) {
+                return {
+                    message: 'Success!',
+                    symbol: tokenInfo[0].tokenSymbol,
+                    name: tokenInfo[0].tokenName,
+                    data: res1
+                }
+            }
+        }
+    }
+    
+    return {
+        message: "Can't find swap route!",
+        data: {
+
+        }
+    }
+}
+
 module.exports.getLivePairPrice = async function getLivePairPrice(pairAddr) {
     try {
         var pair = pairAddr.toLowerCase()

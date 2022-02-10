@@ -600,7 +600,7 @@ async function getLivePairData(token0Address, token1Address) {
         .join('eth_pairs', 'eth_pairs.pairAddress', '=', 'eth_live.pairAddress')
         .where('eth_pairs.token0Address', token0Address)
         .where('eth_pairs.token1Address', token1Address)
-        .select('eth_live.*')
+        .select('eth_live.*, CONCAT(YEAR( eth_live.swapAt ), "-", MONTH( eth_live.swapAt ), "-", DAY( eth_live.swapAt ), " ", HOUR(eth_live.swapAt), ":", MINUTE(eth_live.swapAt), ":", SECOND(eth_live.swapAt)) as SWAPAT')
 
     return rows
 }
@@ -612,15 +612,15 @@ async function mergeLivePairData(token0Address, token1Address) {
     var oneData = await getLivePairData(token0Address, token1Address)
 
     for (var j = 0; j < oneData.length; j ++) {
-        if (!datas[oneData[j].swapAt]) {
-            datas[oneData[j].swapAt] = []
+        if (!datas[oneData[j].SWAPAT]) {
+            datas[oneData[j].SWAPAT] = []
         }
 
-        datas[oneData[j].swapAt].push(oneData[j])
+        datas[oneData[j].SWAPAT].push(oneData[j])
     }
 
     for (var key in datas) {
-        var swapAt = key
+        var SWAPAT = key
         var swapAmount0 = 0
         var swapAmount1 = 0
 
@@ -630,7 +630,7 @@ async function mergeLivePairData(token0Address, token1Address) {
         }
 
         res.push({
-            SWAPAT: swapAt,
+            SWAPAT: SWAPAT,
             SWAPAMOUNT0: swapAmount0,
             SWAPAMOUNT1: swapAmount1,
             PRICE: swapAmount0 / swapAmount1

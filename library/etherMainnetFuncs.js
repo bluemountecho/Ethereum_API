@@ -410,7 +410,7 @@ module.exports.getPairInfo = async function getPairInfo(pairAddr) {
             var baseDecimals = rows[0].baseToken == 0 ? token0Info.data[0].decimals : token1Info.data[0].decimals
             const contract = new web3.eth.Contract(minERC20ABI, baseToken)
             var res = await contract.methods.balanceOf(rows[0].pairAddress).call()
-            var tokenPrice = await this.getPriceOfToken(tokenAddress)
+            var tokenPrice = await this.getPriceOfToken(baseToken)
 
             res = res / 10 ** baseDecimals
             res = res * tokenPrice.data.price * 2

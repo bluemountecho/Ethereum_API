@@ -603,11 +603,12 @@ module.exports.getDailyPairPrice = async function getDailyPairPrice(pairAddr) {
     }
 }
 
-async function getLivePairData(token0Address, token1Address) {
+async function getLivePairData(token0Address, token1Address, fromTime) {
     var rows = await knex('eth_live')
         .join('eth_pairs', 'eth_pairs.pairAddress', '=', 'eth_live.pairAddress')
         .where('eth_pairs.token0Address', token0Address)
         .where('eth_pairs.token1Address', token1Address)
+        .where('eth_live.swapAt', '>', fromTime)
         .orderBy('eth_live.swapAt')
         .select('eth_live.*', knex.raw('CONCAT(YEAR( eth_live.swapAt ), "-", MONTH( eth_live.swapAt ), "-", DAY( eth_live.swapAt ), " ", HOUR(eth_live.swapAt), ":", MINUTE(eth_live.swapAt), ":", SECOND(eth_live.swapAt)) as SWAPAT'))
 
@@ -658,7 +659,7 @@ async function mergeLivePairData(token0Address, token1Address) {
     return res
 }
 
-module.exports.getLiveTokenPrice = async function getLiveTokenPrice(tokenAddr) {
+module.exports.getLiveTokenPrice = async function getLiveTokenPrice(tokenAddr, fromTime) {
     var tokenAddress = tokenAddr.toLowerCase()
     var tokenInfo = await knex('eth_tokens').where('tokenAddress', tokenAddress).select('*')
 
@@ -668,12 +669,12 @@ module.exports.getLiveTokenPrice = async function getLiveTokenPrice(tokenAddr) {
         var token0Address = tokenAddress > baseTokens[i] ? baseTokens[i] : tokenAddress
         var token1Address = tokenAddress < baseTokens[i] ? baseTokens[i] : tokenAddress
 
-        var res1 = await mergeLivePairData(token0Address, token1Address)
+        var res1 = await mergeLivePairData(token0Address, token1Address, fromTime)
 
         var token2Address = USDC_ADDRESS > baseTokens[i] ? baseTokens[i] : USDC_ADDRESS
         var token3Address = USDC_ADDRESS < baseTokens[i] ? baseTokens[i] : USDC_ADDRESS
         
-        var res2 = await mergeLivePairData(token2Address, token3Address)
+        var res2 = await mergeLivePairData(token2Address, token3Address, fromTime)
 
         if (res1.length) {
             if (token1Address != tokenAddress) {

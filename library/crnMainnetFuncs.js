@@ -8,11 +8,11 @@ const knex = require('knex')({
     //   database : 'admin_ethereum_api'
         user: 'root',
         password: '',
-        database : 'admin_ethereum_api'
+        database : 'ethereum_api'
     }
 })
 const utf8 = require('utf8')
-const baseTokens = require('./etherBaseTokens.json')
+const baseTokens = require('./crnBaseTokens.json')
 const USDC_ADDRESS = "0x66e428c3f67a68878562e79A0234c1F83c208770"
 const Web3 = require('web3')
 

@@ -1,6 +1,6 @@
 var express = require('express')
 var router = express.Router()
-var etherMainnetFuncs = require('../library/etherMainnetFuncs')
+var etherMainnetFuncs = require('../library/crnMainnetFuncs')
 
 // router.get('/usd_price/:tokenAddr', function(req, res, next) {
 //   etherMainnetFuncs.getPriceOfToken(req.params.tokenAddr.toLowerCase())

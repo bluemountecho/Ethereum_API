@@ -662,26 +662,6 @@ module.exports.getLiveTokenPrice = async function getLiveTokenPrice(tokenAddr) {
     var tokenAddress = tokenAddr.toLowerCase()
     var tokenInfo = await knex('eth_tokens').where('tokenAddress', tokenAddress).select('*')
 
-    var token0Address = USDC_ADDRESS > tokenAddress ? tokenAddress : USDC_ADDRESS
-    var token1Address = USDC_ADDRESS < tokenAddress ? tokenAddress : USDC_ADDRESS
-
-    var res1 = await mergeLivePairData(token0Address, token1Address)
-
-    if (res1.length) {
-        if (token1Address != tokenAddress) {
-            for (var j = 0; j < res1.length; j ++) {
-                res1[j].PRICE = 1.0 / res1[j].PRICE
-            }
-        }
-
-        return {
-            message: 'Success!',
-            symbol: tokenInfo[0].tokenSymbol,
-            name: tokenInfo[0].tokenName,
-            data: res1
-        }
-    }
-
     for (var i = 0; i < baseTokens.length; i ++) {
         var funcs = []
 

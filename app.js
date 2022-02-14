@@ -8,15 +8,15 @@ const basicAuth = require('express-basic-auth')
 
 var ethRouter = require('./routes/ethRoutes');
 var bscRouter = require('./routes/bscRoutes');
-var testRouter = require('./routes/testRoutes')
+var testRouter = require('./routes/crnRoutes')
 
 var app = express();
 
-app.use(basicAuth({
-  users: { 'stjepan': 'stjepan' },
-  challenge: true,
-  realm: 'foo',
-}))
+// app.use(basicAuth({
+//   users: { 'stjepan': 'stjepan' },
+//   challenge: true,
+//   realm: 'foo',
+// }))
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -30,7 +30,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/eth', ethRouter);
 app.use('/bsc', bscRouter);
-app.use('/test', testRouter)
+app.use('/crn', testRouter)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

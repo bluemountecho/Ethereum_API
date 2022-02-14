@@ -13,6 +13,57 @@ const baseTokens = require('./etherBaseTokens.json')
 const USDC_ADDRESS = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
 const Web3 = require('web3')
 
+const minERC20ABI = [
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        }
+      ],
+      "name": "balanceOf",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "totalSupply",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+]
+
+const options = {
+    // Enable auto reconnection
+    reconnect: {
+        auto: true,
+        delay: 5000, // ms
+        maxAttempts: 5,
+        onTimeout: false
+    },
+    keepAlive: true,
+    timeout: 20000,
+    headers: [{name: 'Access-Control-Allow-Origin', value: '*'}],
+    withCredentials: false,
+};
+
+const web3 = new Web3(new Web3.providers.HttpProvider('https://eth-mainnet.alchemyapi.io/v2/KDRotLOmW8M21flLsKNaLN4IO5lB_6PN', options))
+
 var fs = require('fs')
 function convertTimestampToString(timestamp, flag = false) {
     if (flag == false) {
@@ -39,7 +90,7 @@ module.exports.getPriceOfToken = async function getPriceOfToken(tokenAddress) {
             var price = token0Address == USDC_ADDRESS ? rows[0].lastPrice : (1.0 / rows[0].lastPrice)
 
             return {
-                message: 'Success!',
+                stats: 'Success!',
                 data: {
                     price: price.toFixed(20),
                     symbol: tokenInfo[0].tokenSymbol,
@@ -88,7 +139,7 @@ module.exports.getPriceOfToken = async function getPriceOfToken(tokenAddress) {
 
             if (res1 * res2 > 0) {
                 return {
-                    message: 'Success!',
+                    stats: 'Success!',
                     data: {
                         price: (res1 * res2).toFixed(20),
                         symbol: tokenInfo[0].tokenSymbol,
@@ -99,6 +150,7 @@ module.exports.getPriceOfToken = async function getPriceOfToken(tokenAddress) {
         }
         
         return {
+            status: 'Fail',
             message: "Can't find swap route!",
             data: {
 
@@ -108,7 +160,7 @@ module.exports.getPriceOfToken = async function getPriceOfToken(tokenAddress) {
         console.log(e)
         
         return {
-            message: 'Error occured!',
+            stats: 'Fail(Server error)',
             data: {
                 
             }
@@ -129,6 +181,7 @@ module.exports.getLastPriceFromPair = async function getLastPriceFromPair(pairAd
 
         if (price == 0) {
             return {
+                status: 'Fail',
                 message: "Can't find swap route!",
                 data: {
 
@@ -136,7 +189,7 @@ module.exports.getLastPriceFromPair = async function getLastPriceFromPair(pairAd
             }
         } else {
             return {
-                message: "Success!",
+                stats: "Success!",
                 data: {
                     token0: {
                         price: price1.data.price / price,
@@ -353,6 +406,12 @@ module.exports.getPairInfo = async function getPairInfo(pairAddr) {
         } else {
             var token0Info = await this.getTokenInfo(rows[0].token0Address)
             var token1Info = await this.getTokenInfo(rows[0].token1Address)
+            var baseToken = rows[0].baseToken == 0 ? rows[0].token0Address : rows[0].token1Address
+            var baseDecimals = rows[0].baseToken == 0 ? token0Info.tokenDecimals : token1Info.tokenDecimals
+            const contract = new web3.eth.Contract(minERC20ABI, baseToken)
+            var res = await contract.methods.balanceOf(rows[0].pairAddress).call()
+
+            res = res / 10 ** baseDecimals
 
             return {
                 status: 'Success',
@@ -363,7 +422,8 @@ module.exports.getPairInfo = async function getPairInfo(pairAddr) {
                     token1Info: token1Info.data[0],
                     factoryAddress: rows[0].factoryAddress,
                     lastPrice: rows[0].lastPrice,
-                    createdAt: rows[0].createdAt
+                    createdAt: rows[0].createdAt,
+                    liquidity: res.toFixed(20)
                 }]
             }
         }
@@ -568,7 +628,7 @@ module.exports.getDailyTokenPrice = async function getDailyTokenPrice(tokenAddr)
 
             if (j == res1.length) {
                 return {
-                    message: 'Success!',
+                    status: 'Success!',
                     symbol: tokenInfo[0].tokenSymbol,
                     name: tokenInfo[0].tokenName,
                     data: res1
@@ -578,10 +638,9 @@ module.exports.getDailyTokenPrice = async function getDailyTokenPrice(tokenAddr)
     }
     
     return {
+        status: 'Fail',
         message: "Can't find swap route!",
-        data: {
-
-        }
+        data: []
     }
 }
 
@@ -590,7 +649,10 @@ module.exports.getDailyPairPrice = async function getDailyPairPrice(pairAddr) {
         var pairInfo = (await knex('eth_pairs').where('pairAddress', pairAddr).select('*'))[0]
         var datas = await getDailyPairData(pairAddr)
 
-        return datas
+        return {
+            status: 'Success!',
+            data: datas
+        }
     } catch (err) {
         return {
             status: 'Fail(Server error)',
@@ -704,7 +766,7 @@ module.exports.getLiveTokenPrice = async function getLiveTokenPrice(tokenAddr) {
 
             if (j == res1.length) {
                 return {
-                    message: 'Success!',
+                    status: 'Success!',
                     symbol: tokenInfo[0].tokenSymbol,
                     name: tokenInfo[0].tokenName,
                     data: res1
@@ -715,9 +777,7 @@ module.exports.getLiveTokenPrice = async function getLiveTokenPrice(tokenAddr) {
     
     return {
         message: "Can't find swap route!",
-        data: {
-
-        }
+        data: []
     }
 }
 
@@ -739,8 +799,45 @@ module.exports.getLivePairPrice = async function getLivePairPrice(pairAddr) {
             })
         }
 
-        return datas
+        return {
+            status: 'Success!',
+            data: datas
+        }
     } catch (err) {
-        console.log(err)
+        return {
+            message: "Can't find swap route!",
+            data: []
+        }
+    }
+}
+
+module.exports.getDailyMarketCap = async function getDailyMarketCap(tokenAddr) {
+    try {
+        var tokenAddress = tokenAddr.toLowerCase()
+        var data = (await this.getDailyTokenPrice(tokenAddress)).data
+        const contract = new web3.eth.Contract(minERC20ABI, tokenAddress)
+        var totalSupply = await contract.methods.totalSupply().call()
+        var tokenInfo = await this.getTokenInfo(tokenAddress)
+        var res = []
+
+        totalSupply = totalSupply / 10 ** tokenInfo.tokenDecimals
+
+        for (var i = 0; i < data.length; i ++) {
+            res.push({
+                DATE: data[i].SWAPAT,
+                MARKETCAP: data[i].AVGPRICE * totalSupply
+            })
+        }
+
+        return {
+            status: 'Success!',
+            data: res
+        }
+    } catch (err) {
+        return {
+            status: 'Fail(Server error)',
+            message: err,
+            data: []
+        }
     }
 }

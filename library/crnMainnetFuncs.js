@@ -608,6 +608,7 @@ async function getLivePairData(token0Address, token1Address) {
         .join('eth_pairs', 'eth_pairs.pairAddress', '=', 'eth_live.pairAddress')
         .where('eth_pairs.token0Address', token0Address)
         .where('eth_pairs.token1Address', token1Address)
+        .orderBy('eth_live.swapAt')
         .select('eth_live.*', knex.raw('CONCAT(YEAR( eth_live.swapAt ), "-", MONTH( eth_live.swapAt ), "-", DAY( eth_live.swapAt ), " ", HOUR(eth_live.swapAt), ":", MINUTE(eth_live.swapAt), ":", SECOND(eth_live.swapAt)) as SWAPAT'))
 
     return rows
@@ -645,14 +646,14 @@ async function mergeLivePairData(token0Address, token1Address) {
         })
     }
 
-    res.sort(function (a, b) {
-        var ad = (new Date(a.SWAPAT)).getTime()
-        var bd = (new Date(b.SWAPAT)).getTime()
+    // res.sort(function (a, b) {
+    //     var ad = (new Date(a.SWAPAT)).getTime()
+    //     var bd = (new Date(b.SWAPAT)).getTime()
 
-        if (ad < bd) return -1
-        if (ad > bd) return 1
-        return 0
-    })
+    //     if (ad < bd) return -1
+    //     if (ad > bd) return 1
+    //     return 0
+    // })
 
     return res
 }

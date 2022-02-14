@@ -280,7 +280,12 @@ module.exports.getTokensFromName = async function getTokensFromName(tokenName) {
 module.exports.getTokenInfo = async function getTokenInfo(tokenAddr) {
     try {
         var tokenAddress = tokenAddr.toLowerCase()
+        const contract = new web3.eth.Contract(minERC20ABI, tokenAddress)
         var rows = await knex('eth_tokens').where('tokenAddress', tokenAddress).select('*')
+        var totalSupply = await contract.methods.totalSupply().call()
+        var tokenPrice = await this.getPriceOfToken(tokenAddress)
+
+        totalSupply = totalSupply / 10 ** rows[0].tokenDecimals
 
         if (rows.length == 0) {
             return {
@@ -323,6 +328,7 @@ module.exports.getTokenInfo = async function getTokenInfo(tokenAddr) {
                         coingecko: infos.image,
                         github: 'https://github.com/thefortube/trust-assets/blob/master/blockchains/ethereum/assets/' + Web3.utils.toChecksumAddress(tokenAddr) + '/logo.png?raw=true'
                     },
+                    marketCap: totalSupply * tokenPrice.data.price,
                     totalSupply: rows[0].totalSupply,
                     totalHolders: rows[0].totalHolders,
                     holders: rows[0].holders,

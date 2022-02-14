@@ -615,11 +615,11 @@ async function getLivePairData(token0Address, token1Address, fromTime) {
     return rows
 }
 
-async function mergeLivePairData(token0Address, token1Address) {
+async function mergeLivePairData(token0Address, token1Address, fromTime) {
     var datas = []
     var res = []
 
-    var oneData = await getLivePairData(token0Address, token1Address)
+    var oneData = await getLivePairData(token0Address, token1Address, fromTime)
 
     for (var j = 0; j < oneData.length; j ++) {
         if (!datas[oneData[j].SWAPAT]) {

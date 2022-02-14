@@ -820,6 +820,8 @@ module.exports.getDailyMarketCap = async function getDailyMarketCap(tokenAddr) {
         var tokenInfo = await this.getTokenInfo(tokenAddress)
         var res = []
 
+        console.log(totalSupply, tokenInfo.tokenDecimals)
+
         totalSupply = totalSupply / 10 ** tokenInfo.tokenDecimals
 
         for (var i = 0; i < data.length; i ++) {

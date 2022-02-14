@@ -404,8 +404,8 @@ module.exports.getPairInfo = async function getPairInfo(pairAddr) {
                 data: []
             }
         } else {
-            var token0Info = await this.getTokenInfo(rows[0].token0Address)
-            var token1Info = await this.getTokenInfo(rows[0].token1Address)
+            var token0Info = (await knex('eth_tokens').where('tokenAddress', rows[0].token0Address).select('*'))[0]
+            var token1Info = (await knex('eth_tokens').where('tokenAddress', rows[0].token1Address).select('*'))[0]
             var baseToken = rows[0].baseToken == 0 ? rows[0].token0Address : rows[0].token1Address
             var baseDecimals = rows[0].baseToken == 0 ? token0Info.tokenDecimals : token1Info.tokenDecimals
             const contract = new web3.eth.Contract(minERC20ABI, baseToken)
@@ -817,10 +817,8 @@ module.exports.getDailyMarketCap = async function getDailyMarketCap(tokenAddr) {
         var data = (await this.getDailyTokenPrice(tokenAddress)).data
         const contract = new web3.eth.Contract(minERC20ABI, tokenAddress)
         var totalSupply = await contract.methods.totalSupply().call()
-        var tokenInfo = await this.getTokenInfo(tokenAddress)
+        var tokenInfo = (await knex('eth_tokens').where('tokenAddress', tokenAddress).select('*'))[0]
         var res = []
-
-        console.log(totalSupply, tokenInfo.tokenDecimals)
 
         totalSupply = totalSupply / 10 ** tokenInfo.tokenDecimals
 

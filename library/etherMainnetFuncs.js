@@ -413,7 +413,7 @@ module.exports.getPairInfo = async function getPairInfo(pairAddr) {
             var tokenPrice = await this.getPriceOfToken(tokenAddress)
 
             res = res / 10 ** baseDecimals
-            res = res * tokenPrice.data.price
+            res = res * tokenPrice.data.price * 2
 
             return {
                 status: 'Success',

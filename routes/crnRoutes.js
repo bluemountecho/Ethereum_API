@@ -2,6 +2,8 @@ var express = require('express')
 var router = express.Router()
 var etherMainnetFuncs = require('../library/crnMainnetFuncs')
 
+const cors = require("cors");
+
 // router.get('/usd_price/:tokenAddr', function(req, res, next) {
 //   etherMainnetFuncs.getPriceOfToken(req.params.tokenAddr.toLowerCase())
 //   .then((data) => {
@@ -72,7 +74,7 @@ router.get('/live_pair_price/:pairAddr', function(req, res, next) {
   })
 });
 
-router.get('/live_token_price/:tokenAddr', function(req, res, next) {
+router.get('/live_token_price/:tokenAddr', cors(), function(req, res, next) {
   etherMainnetFuncs.getLiveTokenPrice(req.params.tokenAddr)
   .then((data) => {
     res.send(JSON.stringify(data))

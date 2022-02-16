@@ -730,16 +730,17 @@ module.exports.getLivePairPrice = async function getLivePairPrice(pairAddr) {
         var pair = pairAddr.toLowerCase()
         var rows = await knex('eth_live').where('pairAddress', pair).orderBy('swapAt', 'asc').select('*')
         var datas = []
+        // getPriceOfToken
 
         for (var i = 0; i < rows.length; i ++) {
             datas.push({
                 SWAPAT: rows[i].swapAt,
                 PRICE: rows[i].swapPrice,
-                SWAPAMOUNT0: rows[i].swapAmount0,
-                SWAPAMOUNT1: rows[i].swapAmount1,
-                SWAPMAKER: rows[i].swapMaker,
-                SWAPTRANSACTION: rows[i].swapTransactionHash,
-                BUYORSELL: rows[i].isBuy ? 'BUY' : 'SELL'
+                // SWAPAMOUNT0: rows[i].swapAmount0,
+                // SWAPAMOUNT1: rows[i].swapAmount1,
+                // SWAPMAKER: rows[i].swapMaker,
+                // SWAPTRANSACTION: rows[i].swapTransactionHash,
+                // BUYORSELL: rows[i].isBuy ? 'BUY' : 'SELL'
             })
         }
 

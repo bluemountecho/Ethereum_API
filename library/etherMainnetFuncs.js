@@ -192,12 +192,12 @@ module.exports.getLastPriceFromPair = async function getLastPriceFromPair(pairAd
                 stats: "Success!",
                 data: {
                     token0: {
-                        price: price1.data.price / price,
+                        price: (price1.data.price / price).toFixed(20),
                         symbol: token0Info.tokenSymbol,
                         name: token0Info.tokenName
                     },
                     token1: {
-                        price: price0.data.price * price,
+                        price: (price0.data.price * price).toFixed(20),
                         symbol: token1Info.tokenSymbol,
                         name: token1Info.tokenName
                     }
@@ -328,9 +328,9 @@ module.exports.getTokenInfo = async function getTokenInfo(tokenAddr) {
                         coingecko: infos.image,
                         github: 'https://github.com/thefortube/trust-assets/blob/master/blockchains/ethereum/assets/' + Web3.utils.toChecksumAddress(tokenAddr) + '/logo.png?raw=true'
                     },
-                    marketCap: totalSupply * tokenPrice.data.price,
-                    totalSupply: rows[0].totalSupply,
-                    totalHolders: rows[0].totalHolders,
+                    marketCap: (totalSupply * tokenPrice.data.price).toFixed(20),
+                    totalSupply: (rows[0].totalSupply).toFixed(20),
+                    totalHolders: (rows[0].totalHolders).toFixed(20),
                     holders: rows[0].holders,
                     createdAt: rows[0].createdAt
                 }]
@@ -429,7 +429,7 @@ module.exports.getPairInfo = async function getPairInfo(pairAddr) {
                     token0Info: token0Info.data[0],
                     token1Info: token1Info.data[0],
                     factoryAddress: rows[0].factoryAddress,
-                    lastPrice: rows[0].lastPrice,
+                    lastPrice: (rows[0].lastPrice).toFixed(20),
                     createdAt: rows[0].createdAt,
                     liquidity: res.toFixed(20)
                 }]
@@ -540,13 +540,13 @@ async function mergeDailyPairData(rows) {
 
         res.push({
             SWAPAT: swapAt,
-            TOTALVOLUME0: totalVolume0,
-            TOTALVOLUME1: totalVolume1,
-            VOLUME0: volume0,
-            VOLUME1: volume1,
-            LOWPRICE: minPrice,
-            HIGHPRICE: maxPrice,
-            AVGPRICE: totalVolume0 / totalVolume1
+            TOTALVOLUME0: totalVolume0.toFixed(20),
+            TOTALVOLUME1: totalVolume1.toFixed(20),
+            VOLUME0: volume0.toFixed(20),
+            VOLUME1: volume1.toFixed(20),
+            LOWPRICE: minPrice.toFixed(20),
+            HIGHPRICE: maxPrice.toFixed(20),
+            AVGPRICE: (totalVolume0 / totalVolume1).toFixed(20)
         })
     }
 
@@ -706,9 +706,9 @@ async function mergeLivePairData(token0Address, token1Address) {
 
         res.push({
             SWAPAT: SWAPAT,
-            SWAPAMOUNT0: swapAmount0,
-            SWAPAMOUNT1: swapAmount1,
-            PRICE: swapAmount0 / swapAmount1
+            SWAPAMOUNT0: swapAmount0.toFixed(20),
+            SWAPAMOUNT1: swapAmount1.toFixed(20),
+            PRICE: (swapAmount0 / swapAmount1).toFixed(20)
         })
     }
 
@@ -744,7 +744,7 @@ module.exports.getLiveTokenPrice = async function getLiveTokenPrice(tokenAddr) {
         if (res1.length) {
             if (token1Address != tokenAddress) {
                 for (var j = 0; j < res1.length; j ++) {
-                    res1[j].PRICE = 1.0 / res1[j].PRICE
+                    res1[j].PRICE = (1.0 / res1[j].PRICE).toFixed(20)
                 }
             }
         }
@@ -769,7 +769,7 @@ module.exports.getLiveTokenPrice = async function getLiveTokenPrice(tokenAddr) {
 
                 if (k < 0) break
                 
-                res1[j].PRICE = res1[j].PRICE * res2[k].PRICE
+                res1[j].PRICE = (res1[j].PRICE * res2[k].PRICE).toFixed(20)
             }
 
             if (j == res1.length) {
@@ -798,9 +798,9 @@ module.exports.getLivePairPrice = async function getLivePairPrice(pairAddr) {
         for (var i = 0; i < rows.length; i ++) {
             datas.push({
                 SWAPAT: rows[i].swapAt,
-                PRICE: rows[i].swapPrice,
-                SWAPAMOUNT0: rows[i].swapAmount0,
-                SWAPAMOUNT1: rows[i].swapAmount1,
+                PRICE: (rows[i].swapPrice).toFixed(20),
+                SWAPAMOUNT0: (rows[i].swapAmount0).toFixed(20),
+                SWAPAMOUNT1: (rows[i].swapAmount1).toFixed(20),
                 SWAPMAKER: rows[i].swapMaker,
                 SWAPTRANSACTION: rows[i].swapTransactionHash,
                 BUYORSELL: rows[i].isBuy ? 'BUY' : 'SELL'
@@ -833,7 +833,7 @@ module.exports.getDailyMarketCap = async function getDailyMarketCap(tokenAddr) {
         for (var i = 0; i < data.length; i ++) {
             res.push({
                 DATE: data[i].SWAPAT,
-                MARKETCAP: data[i].AVGPRICE * totalSupply
+                MARKETCAP: (data[i].AVGPRICE * totalSupply).toFixed(20)
             })
         }
 

@@ -725,10 +725,10 @@ module.exports.getLiveTokenPrice = async function getLiveTokenPrice(tokenAddr) {
     }
 }
 
-module.exports.getLivePairPrice = async function getLivePairPrice(pairAddr) {
+module.exports.getLivePairPrice = async function getLivePairPrice(pairAddr, time) {
     try {
         var pair = pairAddr.toLowerCase()
-        var rows = await knex('eth_live').where('pairAddress', pair).orderBy('swapAt', 'asc').select('*')
+        var rows = await knex('eth_live').where('pairAddress', pair).where('swapAt', '>', time).orderBy('swapAt', 'asc').select('*')
         var datas = []
         // getPriceOfToken
 

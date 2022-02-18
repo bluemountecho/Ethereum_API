@@ -65,8 +65,8 @@ router.get('/daily_token_price/:tokenAddr', function(req, res, next) {
   })
 });
 
-router.get('/live_pair_price/:pairAddr', function(req, res, next) {
-  etherMainnetFuncs.getLivePairPrice(req.params.pairAddr)
+router.get('/live_pair_price/:pairAddr/:time', function(req, res, next) {
+  etherMainnetFuncs.getLivePairPrice(req.params.pairAddr, req.params.time)
   .then((data) => {
     res.send(JSON.stringify(data))
   })

@@ -746,16 +746,13 @@ module.exports.getLivePairPrice = async function getLivePairPrice(pairAddr, time
             }
         }
 
-        console.log(baseToken)
-        console.log(price)
-
         for (var i = 0; i < rows.length; i ++) {
             var tmp = rows[i].swapPrice
 
             if (baseToken == 1) {
-                tmp = tmp * price
+                tmp = 1 / tmp * price
             } else {
-                tmp = 1 / tmp * price;
+                tmp = tmp * price;
             }
 
             datas.push({

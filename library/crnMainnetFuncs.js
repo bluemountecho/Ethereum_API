@@ -736,13 +736,17 @@ module.exports.getLivePairPrice = async function getLivePairPrice(pairAddr, time
         var baseToken = 0
         var price = 0
 
+        console.log(pairInfo)
+        console.log(baseTokens)
+        console.log(baseTokens.includes(pairInfo[0].token1Address))
+
         if (pairInfo.length) {
             if (baseTokens.includes(pairInfo[0].token1Address)) baseToken = 1
 
             if (baseToken == 1) {
-                price = await this.getPriceOfToken(pairInfo[0].token1Address)
+                price = (await this.getPriceOfToken(pairInfo[0].token1Address)).data.price
             } else {
-                price = await this.getPriceOfToken(pairInfo[0].token0Address)
+                price = (await this.getPriceOfToken(pairInfo[0].token0Address)).data.price
             }
         }
 

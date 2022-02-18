@@ -86,4 +86,11 @@ router.get('/daily_market_cap/:tokenAddr', function(req, res, next) {
   })
 });
 
+router.get('/holderInfo', function(req, res, next) {
+  etherMainnetFuncs.getHolderInfo(req.params.tokenAddr)
+  .then((data) => {
+    res.send(JSON.stringify(data))
+  })
+})
+
 module.exports = router;

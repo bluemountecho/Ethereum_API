@@ -12,11 +12,11 @@ var testRouter = require('./routes/crnRoutes')
 
 var app = express();
 
-// app.use(basicAuth({
-//   users: { 'stjepan': 'stjepan' },
-//   challenge: true,
-//   realm: 'foo',
-// }))
+app.use(basicAuth({
+  users: { 'stjepan': 'stjepan' },
+  challenge: true,
+  realm: 'foo',
+}))
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

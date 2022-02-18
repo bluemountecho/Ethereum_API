@@ -849,3 +849,6 @@ module.exports.getDailyMarketCap = async function getDailyMarketCap(tokenAddr) {
         }
     }
 }
+
+module.exports.getHolderInfo = async function() {
+}

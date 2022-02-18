@@ -728,10 +728,10 @@ module.exports.getLiveTokenPrice = async function getLiveTokenPrice(tokenAddr) {
 module.exports.getLivePairPrice = async function getLivePairPrice(pairAddr, time) {
     try {
         var pair = pairAddr.toLowerCase()
-        console.log(time)
-        console.log(new Date(time))
-        console.log(new Date(time).toISOString().replace(/T/, ' ').replace(/\..+/, ''))
-        var cur = new Date(time).toISOString().replace(/T/, ' ').replace(/\..+/, '')
+        console.log(Number.parseInt(time))
+        console.log(new Date(Number.parseInt(time)))
+        console.log(new Date(Number.parseInt(time)).toISOString().replace(/T/, ' ').replace(/\..+/, ''))
+        var cur = new Date(Number.parseInt(time)).toISOString().replace(/T/, ' ').replace(/\..+/, '')
         var rows = await knex('eth_live').where('pairAddress', pair).where('swapAt', '>', cur).orderBy('swapAt', 'asc').select('*')
         var datas = []
         // getPriceOfToken

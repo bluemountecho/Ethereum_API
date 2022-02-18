@@ -142,7 +142,7 @@ const options = {
     }
 };
 
-const web3 = new Web3(new Web3.providers.HttpProvider('https://eth-mainnet.alchemyapi.io/v2/aHb_aSqhmtQHA9ekTkyfjhjRnwzyqNeM', options))
+const web3 = new Web3(new Web3.providers.HttpProvider('https://eth-mainnet.alchemyapi.io/v2/SszaZPuxxxVhD6TKaCScBk7SQN4EEO8t', options))
 const knex = require('knex')({
     client: 'mysql',
     connection: {
@@ -191,7 +191,7 @@ function convertTimestampToString(timestamp, flag = false) {
 var tokensData = []
 var pairsData = []
 var blocksData = []
-var lastBlockNumber = 14137477
+var lastBlockNumber = 14222227
 
 async function getTokenAndPairData() {
     var res = await knex('eth_tokens').select('*')

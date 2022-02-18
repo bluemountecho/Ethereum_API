@@ -732,11 +732,32 @@ module.exports.getLivePairPrice = async function getLivePairPrice(pairAddr, time
         var rows = await knex('eth_live').where('pairAddress', pair).where('swapAt', '>', cur).orderBy('swapAt', 'asc').select('*')
         var datas = []
         // getPriceOfToken
+        var pairInfo = await knex('eth_pairs').where('pairAddress', pair).select('*')
+        var baseToken = 0
+        var price = 0
+
+        if (pairInfo.length) {
+            if (baseTokens.includes(pairInfo[0].token1Address)) baseToken = 1
+
+            if (baseToken == 1) {
+                price = await this.getPriceOfToken(pairInfo[0].token1Address)
+            } else {
+                price = await this.getPriceOfToken(pairInfo[0].token0Address)
+            }
+        }
 
         for (var i = 0; i < rows.length; i ++) {
+            var tmp = rows[i].swapPrice
+
+            if (baseToken == 1) {
+                tmp = tmp * price
+            } else {
+                tmp = 1 / tmp * price;
+            }
+
             datas.push({
                 SWAPAT: rows[i].swapAt,
-                PRICE: rows[i].swapPrice,
+                PRICE: tmp,
                 // SWAPAMOUNT0: rows[i].swapAmount0,
                 // SWAPAMOUNT1: rows[i].swapAmount1,
                 // SWAPMAKER: rows[i].swapMaker,

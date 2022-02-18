@@ -736,12 +736,8 @@ module.exports.getLivePairPrice = async function getLivePairPrice(pairAddr, time
         var baseToken = 0
         var price = 0
 
-        console.log(pairInfo)
-        console.log(baseTokens)
-        console.log(baseTokens.includes(pairInfo[0].token1Address))
-
         if (pairInfo.length) {
-            if (baseTokens.includes(pairInfo[0].token1Address)) baseToken = 1
+            if (baseTokens.includes(Web3.utils.toChecksumAddress(pairInfo[0].token1Address))) baseToken = 1
 
             if (baseToken == 1) {
                 price = (await this.getPriceOfToken(pairInfo[0].token1Address)).data.price
@@ -749,9 +745,6 @@ module.exports.getLivePairPrice = async function getLivePairPrice(pairAddr, time
                 price = (await this.getPriceOfToken(pairInfo[0].token0Address)).data.price
             }
         }
-
-        console.log(baseToken)
-        console.log(price)
 
         for (var i = 0; i < rows.length; i ++) {
             var tmp = rows[i].swapPrice

@@ -730,6 +730,7 @@ module.exports.getLivePairPrice = async function getLivePairPrice(pairAddr, time
         var pair = pairAddr.toLowerCase()
         console.log(time)
         console.log(new Date(time))
+        console.log(new Date(time).toISOString().replace(/T/, ' ').replace(/\..+/, ''))
         var cur = new Date(time).toISOString().replace(/T/, ' ').replace(/\..+/, '')
         var rows = await knex('eth_live').where('pairAddress', pair).where('swapAt', '>', cur).orderBy('swapAt', 'asc').select('*')
         var datas = []

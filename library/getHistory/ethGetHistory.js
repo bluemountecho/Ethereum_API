@@ -222,7 +222,7 @@ async function getURL(url, proxy) {
     request({
         'url': url,
         'method': "GET",
-        // 'proxy': 'http://' + proxy
+        'proxy': 'http://' + proxy
     }, function (error, response, body) {
         if (!error && response.statusCode == 200) {
             defer.resolve(body)

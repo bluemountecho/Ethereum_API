@@ -1247,7 +1247,7 @@ async function getTokenScanInfos() {
     myLogger.log(tokens.length)
 
     for (var i = 0; i < tokens.length; i ++) {
-        await knex('eth_tokes').insert({
+        await knex('eth_tokens').insert({
             tokenAddress: tokens[i].address
         })
         myLogger.log(i)

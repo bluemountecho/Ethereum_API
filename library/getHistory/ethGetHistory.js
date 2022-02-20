@@ -1327,6 +1327,6 @@ async function addMissedTokens() {
 // })
 
 // addMissedTokens()
-getTokenSourceCodes()
-// getTokenCoingeckoInfos()
+// getTokenSourceCodes()
+getTokenCoingeckoInfos()
 // getTokenScanInfos()

@@ -329,7 +329,7 @@ module.exports.getTokenInfo = async function getTokenInfo(tokenAddr) {
                         github: 'https://github.com/thefortube/trust-assets/blob/master/blockchains/ethereum/assets/' + Web3.utils.toChecksumAddress(tokenAddr) + '/logo.png?raw=true'
                     },
                     marketCap: (totalSupply * tokenPrice.data.price).toFixed(30),
-                    totalSupply: (rows[0].totalSupply).toFixed(30),
+                    totalSupply: (rows[0].totalSupply ? rows[0].totalSupply : 0).toFixed(30),
                     totalHolders: rows[0].totalHolders,
                     holders: rows[0].holders,
                     createdAt: rows[0].createdAt

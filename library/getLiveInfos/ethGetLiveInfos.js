@@ -6,6 +6,7 @@ const myLogger = new Console({
   stdout: fs.createWriteStream("eth_live_" + convertTimestampToString(new Date())  + ".txt"),
   stderr: fs.createWriteStream("eth_live_" + convertTimestampToString(new Date())  + ".txt"),
 });
+const utf8 = require('utf8')
 
 Web3 = require('web3')
 
@@ -285,8 +286,8 @@ async function getPairDecimals(pairAddress, createdAt) {
             await knex('eth_tokens').insert({
                 tokenAddress: token0Address,
                 tokenDecimals: res[0][0],
-                tokenSymbol: res[0][1],
-                tokenName: res[0][2],
+                tokenSymbol: utf8.encode(res[0][1]),
+                tokenName: utf8.encode(res[0][2]),
                 createdAt: createdAt
             })
         }
@@ -309,8 +310,8 @@ async function getPairDecimals(pairAddress, createdAt) {
             await knex('eth_tokens').insert({
                 tokenAddress: token1Address,
                 tokenDecimals: res[1][0],
-                tokenSymbol: res[1][1],
-                tokenName: res[1][2],
+                tokenSymbol: utf8.encode(res[1][1]),
+                tokenName: utf8.encode(res[1][2]),
                 createdAt: createdAt
             })
         }

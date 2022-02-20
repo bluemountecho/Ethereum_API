@@ -330,7 +330,7 @@ module.exports.getTokenInfo = async function getTokenInfo(tokenAddr) {
                     },
                     marketCap: (totalSupply * tokenPrice.data.price).toFixed(30),
                     totalSupply: (rows[0].totalSupply).toFixed(30),
-                    totalHolders: (rows[0].totalHolders).toFixed(30),
+                    totalHolders: rows[0].totalHolders,
                     holders: rows[0].holders,
                     createdAt: rows[0].createdAt
                 }]

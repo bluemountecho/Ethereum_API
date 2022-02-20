@@ -1326,7 +1326,7 @@ async function addMissedTokens() {
 //     getUniswapV2PairPriceHistory()
 // })
 
-addMissedTokens()
-// getTokenSourceCodes()
+// addMissedTokens()
+getTokenSourceCodes()
 // getTokenCoingeckoInfos()
 // getTokenScanInfos()

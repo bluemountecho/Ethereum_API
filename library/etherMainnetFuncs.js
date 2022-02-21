@@ -457,31 +457,31 @@ async function getDailyPairData(pairAddr) {
             datas.push(JSON.parse(rows[i]))
         }
 
-        // var livePairs = (await knex.raw('\
-        // SELECT\
-        //     eth_live.pairAddress AS PAIRADDRESS,\
-        //     CONCAT(YEAR( eth_live.swapAt ), "-", MONTH( eth_live.swapAt ), "-", DAY( eth_live.swapAt )) AS SWAPAT,\
-        //     avg( eth_live.swapPrice ) AS AVGPRICE,\
-        //     max( eth_live.swapPrice ) AS MAXPRICE,\
-        //     min( eth_live.swapPrice ) AS MINPRICE,\
-        //     sum( eth_live.swapAmount0 * ( eth_pairs.baseToken * 2 - 1 ) * ( eth_live.isBuy * - 2 + 1 ) ) AS VOLUME0,\
-        //     sum( eth_live.swapAmount1 * ( eth_pairs.baseToken * - 2 + 1 ) * ( eth_live.isBuy * - 2 + 1 ) ) AS VOLUME1,\
-        //     sum( eth_live.swapAmount0 ) AS TOTALVOLUME0,\
-        //     sum( eth_live.swapAmount1 ) AS TOTALVOLUME1,\
-        //     count( eth_live.swapMaker ) AS SWAPCOUNT \
-        // FROM\
-        //     eth_live\
-        //     LEFT JOIN eth_pairs ON eth_pairs.pairAddress = eth_live.pairAddress \
-        // WHERE\
-        //     eth_live.pairAddress="' + pairAddr + '"\
-        // GROUP BY\
-        //     DATE( eth_live.swapAt ) \
-        // ORDER BY\
-        //     DATE( eth_live.swapAt)'))[0]
+        var livePairs = (await knex.raw('\
+        SELECT\
+            eth_live.pairAddress AS PAIRADDRESS,\
+            CONCAT(YEAR( eth_live.swapAt ), "-", MONTH( eth_live.swapAt ), "-", DAY( eth_live.swapAt )) AS SWAPAT,\
+            avg( eth_live.swapPrice ) AS AVGPRICE,\
+            max( eth_live.swapPrice ) AS MAXPRICE,\
+            min( eth_live.swapPrice ) AS MINPRICE,\
+            sum( eth_live.swapAmount0 * ( eth_pairs.baseToken * 2 - 1 ) * ( eth_live.isBuy * - 2 + 1 ) ) AS VOLUME0,\
+            sum( eth_live.swapAmount1 * ( eth_pairs.baseToken * - 2 + 1 ) * ( eth_live.isBuy * - 2 + 1 ) ) AS VOLUME1,\
+            sum( eth_live.swapAmount0 ) AS TOTALVOLUME0,\
+            sum( eth_live.swapAmount1 ) AS TOTALVOLUME1,\
+            count( eth_live.swapMaker ) AS SWAPCOUNT \
+        FROM\
+            eth_live\
+            LEFT JOIN eth_pairs ON eth_pairs.pairAddress = eth_live.pairAddress \
+        WHERE\
+            eth_live.pairAddress="' + pairAddr + '"\
+        GROUP BY\
+            DATE( eth_live.swapAt ) \
+        ORDER BY\
+            DATE( eth_live.swapAt)'))[0]
 
-        // for (var i = 0; i < livePairs.length; i ++) {
-        //     datas.push(livePairs[i])
-        // }
+        for (var i = 0; i < livePairs.length; i ++) {
+            datas.push(livePairs[i])
+        }
 
         for (var i = 0; i < datas.length; i ++) {
             datas[i].AVGPRICE = datas[i].TOTALVOLUME0 / datas[i].TOTALVOLUME1
@@ -622,12 +622,14 @@ module.exports.getDailyTokenPrice = async function getDailyTokenPrice(tokenAddr)
                 var jd = (new Date(res1[j].SWAPAT)).getTime()
 
                 for (var k = res2.length - 1; k >= 0; k --) {
-                    var kd = (new Date(res1[j].SWAPAT)).getTime()
+                    var kd = (new Date(res2[k].SWAPAT)).getTime()
 
                     if (kd <= jd) break
                 }
 
-                if (k < 0) break
+                if (k < 0) {
+                    k = 0
+                }
 
                 res1[j].AVGPRICE = res1[j].AVGPRICE * res2[k].AVGPRICE
                 res1[j].HIGHPRICE = res1[j].HIGHPRICE * res2[k].HIGHPRICE
@@ -762,7 +764,7 @@ module.exports.getLiveTokenPrice = async function getLiveTokenPrice(tokenAddr) {
                 var jd = (new Date(res1[j].SWAPAT)).getTime()
 
                 for (var k = res2.length - 1; k >= 0; k --) {
-                    var kd = (new Date(res1[j].SWAPAT)).getTime()
+                    var kd = (new Date(res2[k].SWAPAT)).getTime()
 
                     if (kd <= jd) break
                 }

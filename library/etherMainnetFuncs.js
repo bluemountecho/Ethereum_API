@@ -741,13 +741,12 @@ module.exports.getLiveTokenPrice = async function getLiveTokenPrice(tokenAddr) {
 
         var token0Address = tokenAddress > baseTokens[i] ? baseTokens[i] : tokenAddress
         var token1Address = tokenAddress < baseTokens[i] ? baseTokens[i] : tokenAddress
-
-        var res1 = await mergeLivePairData(token0Address, token1Address)
-
         var token2Address = USDC_ADDRESS > baseTokens[i] ? baseTokens[i] : USDC_ADDRESS
         var token3Address = USDC_ADDRESS < baseTokens[i] ? baseTokens[i] : USDC_ADDRESS
-        
-        var res2 = await mergeLivePairData(token2Address, token3Address)
+
+        var res = await Promise.all([mergeLivePairData(token0Address, token1Address), mergeLivePairData(token2Address, token3Address)])
+        var res1 = res[0]
+        var res2 = res[1]
 
         if (res1.length) {
             if (token1Address != tokenAddress) {

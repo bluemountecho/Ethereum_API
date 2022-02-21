@@ -222,7 +222,7 @@ async function getURL(url, proxy) {
     request({
         'url': url,
         'method': "GET",
-        // 'proxy': 'http://' + proxy
+        'proxy': 'http://' + proxy
     }, function (error, response, body) {
         if (!error && response.statusCode == 200) {
             defer.resolve(body)
@@ -1200,20 +1200,20 @@ async function getOneTokenScanInfos(tokenAddress, proxy) {
         }
     }
 
-    // await knex('eth_tokens').where('tokenAddress', tokenAddress).update({
-    //     totalSupply: totalSupply,
-    //     totalHolders: totalHolders,
-    //     links: JSON.stringify(links),
-    //     holders: JSON.stringify(holders)
-    // })
-
-    await knex('eth_tokens').insert({
-        tokenAddress: tokenAddress,
+    await knex('eth_tokens').where('tokenAddress', tokenAddress).update({
         totalSupply: totalSupply,
         totalHolders: totalHolders,
         links: JSON.stringify(links),
         holders: JSON.stringify(holders)
     })
+
+    // await knex('eth_tokens').insert({
+    //     tokenAddress: tokenAddress,
+    //     totalSupply: totalSupply,
+    //     totalHolders: totalHolders,
+    //     links: JSON.stringify(links),
+    //     holders: JSON.stringify(holders)
+    // })
 }
 
 async function getTokenScanInfos() {
@@ -1237,30 +1237,28 @@ async function getTokenScanInfos() {
     //     }
     // }
 
-    // tokens = await knex('eth_tokens')
-    //     .orderBy('createdAt', 'asc')
-    //     .whereRaw('totalSupply is NULL')
-    //     .select('*')
+    tokens = await knex('eth_tokens')
+        // .orderBy('createdAt', 'asc')
+        .whereRaw('totalSupply is NULL')
+        .select('*')
 
-    var tokens = (await axios.get('http://stjepan:stjepan@51.83.184.35:8888/eth/all_tokens')).data.data
+    // var tokens = (await axios.get('http://stjepan:stjepan@51.83.184.35:8888/eth/all_tokens')).data.data
 
     myLogger.log(tokens.length)
 
-    for (var i = 0; i < tokens.length; i ++) {
-        await knex('eth_tokens').insert({
-            tokenAddress: tokens[i].address
-        })
-        myLogger.log(i)
-    }
+    // for (var i = 0; i < tokens.length; i ++) {
+    //     await knex('eth_tokens').insert({
+    //         tokenAddress: tokens[i].address
+    //     })
+    //     myLogger.log(i)
+    // }
 
-    return
-
-    for (var i = 0; i < tokens.length; i += 10) {
+    for (var i = 0; i < tokens.length; i += 5) {
         myLogger.log(i)
         var funcs = []
 
-        for (var j = i; j < i + 10 && j < tokens.length; j ++) {
-            funcs.push(getOneTokenScanInfos(tokens[j].address, config.PROXY[j - i]))
+        for (var j = i; j < i + 5 && j < tokens.length; j ++) {
+            funcs.push(getOneTokenScanInfos(tokens[j].tokenAddress, config.PROXY[j - i]))
             // await getOneTokenScanInfos(tokens[j].tokenAddress, config.PROXY[j - i])
         }
 
@@ -1270,7 +1268,7 @@ async function getTokenScanInfos() {
             myLogger.log(err)
         }
 
-        await delay(500)
+        await delay(1000)
     }
 
     myLogger.log('Getting Token Scan Infos Finished!')

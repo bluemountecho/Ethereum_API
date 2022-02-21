@@ -769,7 +769,9 @@ module.exports.getLiveTokenPrice = async function getLiveTokenPrice(tokenAddr) {
                     if (kd <= jd) break
                 }
 
-                if (k < 0) break
+                if (k < 0) {
+                    k = 0
+                }
                 
                 res1[j].PRICE = (res1[j].PRICE * res2[k].PRICE).toFixed(30)
             }

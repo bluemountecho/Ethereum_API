@@ -627,6 +627,8 @@ module.exports.getDailyTokenPrice = async function getDailyTokenPrice(tokenAddr)
                     var kd = (new Date(res2[k].SWAPAT)).getTime()
 
                     if (kd > jd || k >= res2.length) break
+
+                    k ++
                 }
 
                 k --
@@ -771,6 +773,7 @@ module.exports.getLiveTokenPrice = async function getLiveTokenPrice(tokenAddr) {
                     var kd = (new Date(res2[k].SWAPAT)).getTime()
 
                     if (kd > jd || k >= res2.length) break
+                    k ++
                 }
 
                 k --

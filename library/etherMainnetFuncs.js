@@ -515,8 +515,6 @@ async function mergeDailyPairData(rows) {
                 datas[oneData[j].SWAPAT] = []
             }
 
-            console.log(convertTimestampToString(oneData[j].SWAPAT, true))
-
             datas[oneData[j].SWAPAT].push(oneData[j])
         }
     }

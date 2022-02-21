@@ -618,18 +618,20 @@ module.exports.getDailyTokenPrice = async function getDailyTokenPrice(tokenAddr)
         }
 
         if (rows[0].length > 0 && rows[1].length > 0) {
+            var k = 0
+
             for (var j = 0; j < res1.length; j ++) {
                 var jd = (new Date(res1[j].SWAPAT)).getTime()
 
-                for (var k = res2.length - 1; k >= 0; k --) {
+                while (true) {
                     var kd = (new Date(res2[k].SWAPAT)).getTime()
 
-                    if (kd <= jd) break
+                    if (kd > jd || k >= res2.length) break
                 }
 
-                if (k < 0) {
-                    k = 0
-                }
+                k --
+
+                if (k < 0) k = 0
 
                 res1[j].AVGPRICE = res1[j].AVGPRICE * res2[k].AVGPRICE
                 res1[j].HIGHPRICE = res1[j].HIGHPRICE * res2[k].HIGHPRICE
@@ -760,18 +762,20 @@ module.exports.getLiveTokenPrice = async function getLiveTokenPrice(tokenAddr) {
         }
 
         if (res1.length > 0 && res2.length > 0) {
+            var k = 0
+
             for (var j = 0; j < res1.length; j ++) {
                 var jd = (new Date(res1[j].SWAPAT)).getTime()
-
-                for (var k = res2.length - 1; k >= 0; k --) {
+                
+                while (true) {
                     var kd = (new Date(res2[k].SWAPAT)).getTime()
 
-                    if (kd <= jd) break
+                    if (kd > jd || k >= res2.length) break
                 }
 
-                if (k < 0) {
-                    k = 0
-                }
+                k --
+
+                if (k < 0) k = 0
                 
                 res1[j].PRICE = (res1[j].PRICE * res2[k].PRICE).toFixed(30)
             }

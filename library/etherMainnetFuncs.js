@@ -450,38 +450,34 @@ async function getDailyPairData(pairAddr) {
     try {
         var pair = pairAddr.toLowerCase()
         var datas = []
+        var content = fs.readFileSync('./database/ethereum/transactions/' + pair + '.txt', {encoding:'utf8', flag:'r'})
+        var rows = content.split('\n')
 
-        try {
-            var content = fs.readFileSync('./database/ethereum/transactions/' + pair + '.txt', {encoding:'utf8', flag:'r'})
-            var rows = content.split('\n')
-
-            for (var i = 0; i < rows.length - 1; i ++) {
-                datas.push(JSON.parse(rows[i]))
-            }
-        } catch (err) {
+        for (var i = 0; i < rows.length - 1; i ++) {
+            datas.push(JSON.parse(rows[i]))
         }
 
-        var livePairs = (await knex.raw('\
-        SELECT\
-            eth_live.pairAddress AS PAIRADDRESS,\
-            CONCAT(YEAR( eth_live.swapAt ), "-", MONTH( eth_live.swapAt ), "-", DAY( eth_live.swapAt )) AS SWAPAT,\
-            avg( eth_live.swapPrice ) AS AVGPRICE,\
-            max( eth_live.swapPrice ) AS MAXPRICE,\
-            min( eth_live.swapPrice ) AS MINPRICE,\
-            sum( eth_live.swapAmount0 * ( eth_pairs.baseToken * 2 - 1 ) * ( eth_live.isBuy * - 2 + 1 ) ) AS VOLUME0,\
-            sum( eth_live.swapAmount1 * ( eth_pairs.baseToken * - 2 + 1 ) * ( eth_live.isBuy * - 2 + 1 ) ) AS VOLUME1,\
-            sum( eth_live.swapAmount0 ) AS TOTALVOLUME0,\
-            sum( eth_live.swapAmount1 ) AS TOTALVOLUME1,\
-            count( eth_live.swapMaker ) AS SWAPCOUNT \
-        FROM\
-            eth_live\
-            LEFT JOIN eth_pairs ON eth_pairs.pairAddress = eth_live.pairAddress \
-        WHERE\
-            eth_live.pairAddress="' + pair + '"\
-        GROUP BY\
-            DATE( eth_live.swapAt ) \
-        ORDER BY\
-            DATE( eth_live.swapAt)'))[0]
+        // var livePairs = (await knex.raw('\
+        // SELECT\
+        //     eth_live.pairAddress AS PAIRADDRESS,\
+        //     CONCAT(YEAR( eth_live.swapAt ), "-", MONTH( eth_live.swapAt ), "-", DAY( eth_live.swapAt )) AS SWAPAT,\
+        //     avg( eth_live.swapPrice ) AS AVGPRICE,\
+        //     max( eth_live.swapPrice ) AS MAXPRICE,\
+        //     min( eth_live.swapPrice ) AS MINPRICE,\
+        //     sum( eth_live.swapAmount0 * ( eth_pairs.baseToken * 2 - 1 ) * ( eth_live.isBuy * - 2 + 1 ) ) AS VOLUME0,\
+        //     sum( eth_live.swapAmount1 * ( eth_pairs.baseToken * - 2 + 1 ) * ( eth_live.isBuy * - 2 + 1 ) ) AS VOLUME1,\
+        //     sum( eth_live.swapAmount0 ) AS TOTALVOLUME0,\
+        //     sum( eth_live.swapAmount1 ) AS TOTALVOLUME1,\
+        //     count( eth_live.swapMaker ) AS SWAPCOUNT \
+        // FROM\
+        //     eth_live\
+        //     LEFT JOIN eth_pairs ON eth_pairs.pairAddress = eth_live.pairAddress \
+        // WHERE\
+        //     eth_live.pairAddress="' + pair + '"\
+        // GROUP BY\
+        //     DATE( eth_live.swapAt ) \
+        // ORDER BY\
+        //     DATE( eth_live.swapAt)'))[0]
 
         for (var i = 0; i < livePairs.length; i ++) {
             datas.push(livePairs[i])

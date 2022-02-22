@@ -510,8 +510,6 @@ async function mergeDailyPairData(rows, token0Address, token1Address) {
         sum( eth_live.swapAmount0 ) AS TOTALVOLUME0,\
         sum( eth_live.swapAmount1 ) AS TOTALVOLUME1,\
         count( eth_live.swapMaker ) AS SWAPCOUNT \
-    JOIN\
-        eth_pairs on eth_pairs.pairAddress=eth_live.pairAddress\
     FROM\
         eth_live\
         LEFT JOIN eth_pairs ON eth_pairs.pairAddress = eth_live.pairAddress \

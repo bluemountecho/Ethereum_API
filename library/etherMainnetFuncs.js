@@ -457,32 +457,6 @@ async function getDailyPairData(pairAddr) {
             datas.push(JSON.parse(rows[i]))
         }
 
-        // var livePairs = (await knex.raw('\
-        // SELECT\
-        //     eth_live.pairAddress AS PAIRADDRESS,\
-        //     CONCAT(YEAR( eth_live.swapAt ), "-", MONTH( eth_live.swapAt ), "-", DAY( eth_live.swapAt )) AS SWAPAT,\
-        //     avg( eth_live.swapPrice ) AS AVGPRICE,\
-        //     max( eth_live.swapPrice ) AS MAXPRICE,\
-        //     min( eth_live.swapPrice ) AS MINPRICE,\
-        //     sum( eth_live.swapAmount0 * ( eth_pairs.baseToken * 2 - 1 ) * ( eth_live.isBuy * - 2 + 1 ) ) AS VOLUME0,\
-        //     sum( eth_live.swapAmount1 * ( eth_pairs.baseToken * - 2 + 1 ) * ( eth_live.isBuy * - 2 + 1 ) ) AS VOLUME1,\
-        //     sum( eth_live.swapAmount0 ) AS TOTALVOLUME0,\
-        //     sum( eth_live.swapAmount1 ) AS TOTALVOLUME1,\
-        //     count( eth_live.swapMaker ) AS SWAPCOUNT \
-        // FROM\
-        //     eth_live\
-        //     LEFT JOIN eth_pairs ON eth_pairs.pairAddress = eth_live.pairAddress \
-        // WHERE\
-        //     eth_live.pairAddress="' + pair + '"\
-        // GROUP BY\
-        //     DATE( eth_live.swapAt ) \
-        // ORDER BY\
-        //     DATE( eth_live.swapAt)'))[0]
-
-        // for (var i = 0; i < livePairs.length; i ++) {
-        //     datas.push(livePairs[i])
-        // }
-
         for (var i = 0; i < datas.length; i ++) {
             datas[i].AVGPRICE = datas[i].TOTALVOLUME0 / datas[i].TOTALVOLUME1
         }
@@ -503,7 +477,7 @@ async function getDailyPairData(pairAddr) {
     }
 }
 
-async function mergeDailyPairData(rows) {
+async function mergeDailyPairData(rows, token0Address, token1Address) {
     var datas = []
     var res = []
     var funcs = []
@@ -522,6 +496,38 @@ async function mergeDailyPairData(rows) {
 
             datas[oneDatas[i][j].SWAPAT].push(oneDatas[i][j])
         }
+    }
+    
+    var livePairs = (await knex.raw('\
+    SELECT\
+        eth_live.pairAddress AS PAIRADDRESS,\
+        CONCAT(YEAR( eth_live.swapAt ), "-", MONTH( eth_live.swapAt ), "-", DAY( eth_live.swapAt )) AS SWAPAT,\
+        avg( eth_live.swapPrice ) AS AVGPRICE,\
+        max( eth_live.swapPrice ) AS MAXPRICE,\
+        min( eth_live.swapPrice ) AS MINPRICE,\
+        sum( eth_live.swapAmount0 * ( eth_pairs.baseToken * 2 - 1 ) * ( eth_live.isBuy * - 2 + 1 ) ) AS VOLUME0,\
+        sum( eth_live.swapAmount1 * ( eth_pairs.baseToken * - 2 + 1 ) * ( eth_live.isBuy * - 2 + 1 ) ) AS VOLUME1,\
+        sum( eth_live.swapAmount0 ) AS TOTALVOLUME0,\
+        sum( eth_live.swapAmount1 ) AS TOTALVOLUME1,\
+        count( eth_live.swapMaker ) AS SWAPCOUNT \
+    JOIN\
+        eth_pairs on eth_pairs.pairAddress=eth_live.pairAddress\
+    FROM\
+        eth_live\
+        LEFT JOIN eth_pairs ON eth_pairs.pairAddress = eth_live.pairAddress \
+    WHERE\
+        eth_pairs.token0Address="' + token0Address + '" and eth_pairs.token1Address="' + token1Address + '"\
+    GROUP BY\
+        DATE( eth_live.swapAt ) \
+    ORDER BY\
+        DATE( eth_live.swapAt)'))[0]
+
+    for (var i = 0; i < livePairs.length; i ++) {
+        if (!datas[livePairs[i].SWAPAT]) {
+            datas[livePairs[i].SWAPAT] = []
+        }
+
+        datas[livePairs[i].SWAPAT].push(livePairs[i])
     }
 
     for (var key in datas) {
@@ -584,19 +590,19 @@ module.exports.getDailyTokenPrice = async function getDailyTokenPrice(tokenAddr)
                 .select('*')
         )
 
-        token0Address = USDC_ADDRESS > baseTokens[i] ? baseTokens[i] : USDC_ADDRESS
-        token1Address = USDC_ADDRESS < baseTokens[i] ? baseTokens[i] : USDC_ADDRESS
+        var token2Address = USDC_ADDRESS > baseTokens[i] ? baseTokens[i] : USDC_ADDRESS
+        var token3Address = USDC_ADDRESS < baseTokens[i] ? baseTokens[i] : USDC_ADDRESS
 
         funcs.push(
             knex('eth_pairs')
-                .where('token0Address', token0Address)
-                .where('token1Address', token1Address)
+                .where('token0Address', token2Address)
+                .where('token1Address', token3Address)
                 .select('*')
         )
 
         var rows = await Promise.all(funcs)
-        var res1 = await mergeDailyPairData(rows[0])
-        var res2 = await mergeDailyPairData(rows[1])
+        var res1 = await mergeDailyPairData(rows[0], token0Address, token1Address)
+        var res2 = await mergeDailyPairData(rows[1], token2Address, token3Address)
 
         if (rows[0].length) {
             if (rows[0][0].token1Address != tokenAddress) {

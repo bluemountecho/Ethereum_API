@@ -486,19 +486,7 @@ async function mergeDailyPairData(rows, token0Address, token1Address) {
         funcs.push(getDailyPairData(rows[i].pairAddress))
     }
 
-    var oneDatas = await Promise.all(funcs)
-
-    for (var i = 0; i < rows.length; i ++) {
-        for (var j = 0; j < oneDatas[i].length; j ++) {
-            if (!datas[oneDatas[i][j].SWAPAT]) {
-                datas[oneDatas[i][j].SWAPAT] = []
-            }
-
-            datas[oneDatas[i][j].SWAPAT].push(oneDatas[i][j])
-        }
-    }
-    
-    var livePairs = (await knex.raw('\
+    funcs.push(knex.raw('\
     SELECT\
         eth_live.pairAddress AS PAIRADDRESS,\
         CONCAT(YEAR( eth_live.swapAt ), "-", MONTH( eth_live.swapAt ), "-", DAY( eth_live.swapAt )) AS SWAPAT,\
@@ -518,7 +506,21 @@ async function mergeDailyPairData(rows, token0Address, token1Address) {
     GROUP BY\
         DATE( eth_live.swapAt ) \
     ORDER BY\
-        DATE( eth_live.swapAt)'))[0]
+        DATE( eth_live.swapAt)'))
+
+    var oneDatas = await Promise.all(funcs)
+
+    for (var i = 0; i < rows.length; i ++) {
+        for (var j = 0; j < oneDatas[i].length; j ++) {
+            if (!datas[oneDatas[i][j].SWAPAT]) {
+                datas[oneDatas[i][j].SWAPAT] = []
+            }
+
+            datas[oneDatas[i][j].SWAPAT].push(oneDatas[i][j])
+        }
+    }
+    
+    var livePairs = oneDatas[rows.length][0]
 
     for (var i = 0; i < livePairs.length; i ++) {
         if (!datas[livePairs[i].SWAPAT]) {

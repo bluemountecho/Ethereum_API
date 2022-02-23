@@ -13,7 +13,7 @@ var testRouter = require('./routes/crnRoutes')
 var app = express();
 
 app.use(basicAuth({
-  users: { 'stjepan': 'stjepan' },
+  users: { 'user': 'pass' },
   challenge: true,
   realm: 'foo',
 }))

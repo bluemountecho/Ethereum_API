@@ -192,7 +192,7 @@ function convertTimestampToString(timestamp, flag = false) {
 var tokensData = []
 var pairsData = []
 var blocksData = []
-var lastBlockNumber = 14241815
+var lastBlockNumber = 14261565
 
 async function getTokenAndPairData() {
     var res = await knex('eth_tokens').select('*')
@@ -344,7 +344,7 @@ async function writeTransactionHistoryFile(deleteDate, writeDate) {
             eth_live\
             LEFT JOIN eth_pairs ON eth_pairs.pairAddress = eth_live.pairAddress \
         WHERE\
-            eth_live.swapAt<"' + writeDate + ' ' + '00:00:00' + '"\
+            DATE(eth_live.swapAt)="' + writeDate + '"\
         GROUP BY\
             eth_live.pairAddress,\
             DATE( eth_live.swapAt ) \
@@ -356,7 +356,7 @@ async function writeTransactionHistoryFile(deleteDate, writeDate) {
         fs.appendFile(fileName, JSON.stringify(rows[i]) + '\n', "utf8", (err) => { })
     }
 
-    rows = (await knex.raw('select CONCAT(YEAR( eth_live.swapAt ), "-", MONTH( eth_live.swapAt ), "-", DAY( eth_live.swapAt )) AS SWAPAT, swapMaker as SWAPMAKER, pairAddress from eth_live where eth_live.swapAt<"' + writeDate + ' ' + '00:00:00' + '" order by swapAt'))[0]
+    rows = (await knex.raw('select CONCAT(YEAR( eth_live.swapAt ), "-", MONTH( eth_live.swapAt ), "-", DAY( eth_live.swapAt )) AS SWAPAT, swapMaker as SWAPMAKER, pairAddress from eth_live where DATE(eth_live.swapAt)="' + writeDate + '" order by swapAt'))[0]
 
     for (var i = 0; i < rows.length; i ++) {
         var fileName = path + '/swapers/' + rows[i].pairAddress + '.txt'
@@ -793,7 +793,7 @@ async function init() {
         var tmpDate2 = convertTimestampToString(resBlock.timestamp * 1000 - 7 * 86400 * 1000, true)
 
         if (tmpDate1.split(' ')[0] != tmpDate2.split(' ')[0]) {
-            writeTransactionHistoryFile(tmpDate2.split(' ')[0], convertTimestampToString(resBlock.timestamp, true).split(' ')[0])
+            writeTransactionHistoryFile(tmpDate2.split(' ')[0], convertTimestampToString(resBlock.timestamp - 86400 * 1000, true).split(' ')[0])
         }
         
         if (curBlock > blockNumber) {
@@ -808,9 +808,7 @@ async function init() {
     setTimeout(init, 100)
 }
 
-// getTokenAndPairData()
-// .then(res => {
-//     init()
-// })
-
-writeTransactionHistoryFile('2022-02-16', '2022-02-23')
+getTokenAndPairData()
+.then(res => {
+    init()
+})

@@ -502,7 +502,7 @@ async function mergeDailyPairData(rows, token0Address, token1Address) {
         eth_live\
         LEFT JOIN eth_pairs ON eth_pairs.pairAddress = eth_live.pairAddress \
     WHERE\
-        eth_pairs.token0Address="' + token0Address + '" and eth_pairs.token1Address="' + token1Address + '"\
+        eth_pairs.token0Address="' + token0Address + '" and eth_pairs.token1Address="' + token1Address + '" and DATE( eth_live.swapAt )="' + convertTimestampToString(new Date().getTime(), true).split(' ')[0] + '"\
     GROUP BY\
         DATE( eth_live.swapAt ) \
     ORDER BY\

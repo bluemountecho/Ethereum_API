@@ -301,6 +301,10 @@ async function getTokenTotalTrnasactions(tokenAddress) {
     return total
 }
 
+async function getLast24HourInfos(tokenAddress) {
+
+}
+
 module.exports.getTokenInfo = async function getTokenInfo(tokenAddr) {
     try {
         var tokenAddress = tokenAddr.toLowerCase()
@@ -752,21 +756,37 @@ module.exports.getDailyPairPrice = async function getDailyPairPrice(pairAddr) {
     }
 }
 
-async function getLivePairData(token0Address, token1Address) {
-    var rows = await knex('eth_live')
-        .join('eth_pairs', 'eth_pairs.pairAddress', '=', 'eth_live.pairAddress')
-        .where('eth_pairs.token0Address', token0Address)
-        .where('eth_pairs.token1Address', token1Address)
-        .select('eth_live.*', knex.raw('CONCAT(YEAR( eth_live.swapAt ), "-", MONTH( eth_live.swapAt ), "-", DAY( eth_live.swapAt ), " ", HOUR(eth_live.swapAt), ":", MINUTE(eth_live.swapAt), ":", SECOND(eth_live.swapAt)) as SWAPAT'))
+async function getLivePairData(token0Address, token1Address, flag) {
+    var rows 
+
+    if (flag) {
+        var date = convertTimestampToString(new Date().getTime() - 86400 * 1000, true).split(' ')[0] + ' 00:00:00'
+
+        console.log(date)
+
+        rows = await knex('eth_live')
+            .join('eth_pairs', 'eth_pairs.pairAddress', '=', 'eth_live.pairAddress')
+            .where('eth_pairs.token0Address', token0Address)
+            .where('eth_pairs.token1Address', token1Address)
+            .where('eth_live.swapAt', '>=', date)
+            .select('eth_live.*', knex.raw('CONCAT(YEAR( eth_live.swapAt ), "-", MONTH( eth_live.swapAt ), "-", DAY( eth_live.swapAt ), " ", HOUR(eth_live.swapAt), ":", MINUTE(eth_live.swapAt), ":", SECOND(eth_live.swapAt)) as SWAPAT'))
+    } else {
+        rows = await knex('eth_live')
+            .join('eth_pairs', 'eth_pairs.pairAddress', '=', 'eth_live.pairAddress')
+            .where('eth_pairs.token0Address', token0Address)
+            .where('eth_pairs.token1Address', token1Address)
+            .select('eth_live.*', knex.raw('CONCAT(YEAR( eth_live.swapAt ), "-", MONTH( eth_live.swapAt ), "-", DAY( eth_live.swapAt ), " ", HOUR(eth_live.swapAt), ":", MINUTE(eth_live.swapAt), ":", SECOND(eth_live.swapAt)) as SWAPAT'))
+    }
 
     return rows
 }
 
-async function mergeLivePairData(token0Address, token1Address) {
+async function mergeLivePairData(token0Address, token1Address, flag) {
     var datas = []
     var res = []
 
-    var oneData = await getLivePairData(token0Address, token1Address)
+    var oneData = await getLivePairData(token0Address, token1Address, flag)
+    var token1Price = await this.getPriceOfToken(token1Address)
 
     for (var j = 0; j < oneData.length; j ++) {
         if (!datas[oneData[j].SWAPAT]) {
@@ -788,8 +808,7 @@ async function mergeLivePairData(token0Address, token1Address) {
 
         res.push({
             SWAPAT: SWAPAT,
-            SWAPAMOUNT0: swapAmount0.toFixed(30),
-            SWAPAMOUNT1: swapAmount1.toFixed(30),
+            SWAPAMOUNT: (swapAmount1 * token1Price.data.price).toFixed(30),
             PRICE: (swapAmount0 / swapAmount1).toFixed(30)
         })
     }
@@ -806,7 +825,7 @@ async function mergeLivePairData(token0Address, token1Address) {
     return res
 }
 
-module.exports.getLiveTokenPrice = async function getLiveTokenPrice(tokenAddr) {
+module.exports.getLiveTokenPrice = async function getLiveTokenPrice(tokenAddr, flag = false) {
     var tokenAddress = tokenAddr.toLowerCase()
     var tokenInfo = await knex('eth_tokens').where('tokenAddress', tokenAddress).select('*')
 
@@ -818,7 +837,7 @@ module.exports.getLiveTokenPrice = async function getLiveTokenPrice(tokenAddr) {
         var token2Address = USDC_ADDRESS > baseTokens[i] ? baseTokens[i] : USDC_ADDRESS
         var token3Address = USDC_ADDRESS < baseTokens[i] ? baseTokens[i] : USDC_ADDRESS
 
-        var res = await Promise.all([mergeLivePairData(token0Address, token1Address), mergeLivePairData(token2Address, token3Address)])
+        var res = await Promise.all([mergeLivePairData(token0Address, token1Address, flag), mergeLivePairData(token2Address, token3Address, flag)])
         var res1 = res[0]
         var res2 = res[1]
 

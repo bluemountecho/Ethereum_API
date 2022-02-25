@@ -277,6 +277,26 @@ module.exports.getTokensFromName = async function getTokensFromName(tokenName) {
     }
 }
 
+async function getTokenTotalTrnasactions(tokenAddress) {
+    var rows = await knex('eth_pairs').where('token0Address', tokenAddress).orWhere('token1Address', tokenAddress).select('*')
+    var total = 0
+
+    for (var i = 0; i < rows.length; i ++) {
+        try {
+            var content = fs.readFileSync('./database/ethereum/transactions/' + rows[i].pairAddress + '.txt', {encoding:'utf8', flag:'r'})
+            var datas = content.split('\n')
+
+            for (var j = 0; j < datas.length; j ++) {
+                total += datas[j].SWAPCOUNT
+            }
+        } catch (err) {
+
+        }
+    }
+
+    return total
+}
+
 module.exports.getTokenInfo = async function getTokenInfo(tokenAddr) {
     try {
         var tokenAddress = tokenAddr.toLowerCase()
@@ -290,6 +310,7 @@ module.exports.getTokenInfo = async function getTokenInfo(tokenAddr) {
         var funcs = []
 
         funcs.push(this.getPriceOfToken(tokenAddress))
+        funcs.push(getTokenTotalTrnasactions(tokenAddress))
 
         var res = await Promise.all(funcs)
 
@@ -338,7 +359,7 @@ module.exports.getTokenInfo = async function getTokenInfo(tokenAddr) {
                     totalSupply: (totalSupply).toFixed(30),
                     totalHolders: rows[0].totalHolders,
                     holders: JSON.parse(rows[0].holders),
-                    totalTransactions: 0,
+                    totalTransactions: res[1],
                     last24hTransactions: 0,
                     last24hVolume: 0,
                     currentPrice: res[0].data.price,

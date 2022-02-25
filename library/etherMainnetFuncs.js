@@ -288,10 +288,9 @@ async function getTokenTotalTrnasactions(tokenAddress) {
             
             for (var j = 0; j < datas.length; j ++) {
                 datas[j] = JSON.parse(datas[j])
-                console.log(datas[j])
             }
 
-            console.log(datas[0])
+            console.log(datas)
 
             for (var j = 0; j < datas.length; j ++) {
                 console.log(datas[j].SWAPCOUNT)

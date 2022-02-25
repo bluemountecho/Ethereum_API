@@ -287,8 +287,8 @@ async function getTokenTotalTrnasactions(tokenAddress) {
             var datas = content.split('\n')
             
             for (var j = 0; j < datas.length; j ++) {
-                console.log(datas[j])
                 datas[j] = JSON.parse(datas[j])
+                console.log(datas[j])
             }
 
             console.log(datas[0])

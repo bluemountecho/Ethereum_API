@@ -397,27 +397,27 @@ module.exports.getTokenInfo = async function getTokenInfo(tokenAddr) {
                     priceChanges: {
                         priceChange30Min: {
                             price: res[2].price30,
-                            changePercent: (100 - (res[0].data.price / res[2].price30 * 100)).toFixed(2)
+                            changePercent: -(100 - (res[0].data.price / res[2].price30 * 100)).toFixed(2)
                         },
                         priceChange1Hour: {
                             price: res[2].price1,
-                            changePercent: (100 - (res[0].data.price / res[2].price1 * 100)).toFixed(2)
+                            changePercent: -(100 - (res[0].data.price / res[2].price1 * 100)).toFixed(2)
                         },
                         priceChange2Hour: {
                             price: res[2].price2,
-                            changePercent: (100 - (res[0].data.price / res[2].price2 * 100)).toFixed(2)
+                            changePercent: -(100 - (res[0].data.price / res[2].price2 * 100)).toFixed(2)
                         },
                         priceChange6Hour: {
                             price: res[2].price6,
-                            changePercent: (100 - (res[0].data.price / res[2].price6 * 100)).toFixed(2)
+                            changePercent: -(100 - (res[0].data.price / res[2].price6 * 100)).toFixed(2)
                         },
                         priceChange12Hour: {
                             price: res[2].price12,
-                            changePercent: (100 - (res[0].data.price / res[2].price12 * 100)).toFixed(2)
+                            changePercent: -(100 - (res[0].data.price / res[2].price12 * 100)).toFixed(2)
                         },
                         priceChange24Hour: {
                             price: res[2].price24,
-                            changePercent: (100 - (res[0].data.price / res[2].price24 * 100)).toFixed(2)
+                            changePercent: -(100 - (res[0].data.price / res[2].price24 * 100)).toFixed(2)
                         },
                     },
                     createdAt: rows[0].createdAt

@@ -288,15 +288,24 @@ module.exports.getLast24HourInfos = async function getLast24HourInfos(tokenAddre
     var date2ago = new Date().getTime() - 2 * 3600 * 1000
     var date1ago = new Date().getTime() - 3600 * 1000
     var date30ago = new Date().getTime() - 1800 * 1000
+    var today = convertTimestampToString(new Date().getTime(), true).split(' ')[0] + ' 00:00:00'
 
+    today = new Date(today).getTime()
     ret.totalVolume = 0
     ret.totalTransactions = 0
+    ret.todayTransactions = 0
     ret.price30 = ret.price1 = ret.price2 = ret.price6 = ret.price12 = ret.price24 = -1
 
     for (var i = res.length - 1; i >= 0; i --) {
-        if (new Date(res[i].SWAPAT).getTime() >= date24ago) {
+        var tmpTime = new Date(res[i].SWAPAT).getTime()
+
+        if (tmpTime >= date24ago) {
             ret.totalVolume += Number.parseFloat(res[i].SWAPAMOUNTINUSD)
             ret.totalTransactions ++
+        }
+        
+        if (tmpTime >= today) {
+            ret.todayTransactions ++
         }
         
         if (ret.price30 < 0 && new Date(res[i].SWAPAT).getTime() < date30ago) {
@@ -390,7 +399,7 @@ module.exports.getTokenInfo = async function getTokenInfo(tokenAddr) {
                     totalSupply: (totalSupply).toFixed(30),
                     totalHolders: rows[0].totalHolders,
                     holders: JSON.parse(rows[0].holders),
-                    totalTransactions: res[1],
+                    totalTransactions: res[1] + res[2].todayTransactions,
                     last24hTransactions: res[2].totalTransactions,
                     last24hVolume: res[2].totalVolume,
                     currentPrice: res[0].data.price,

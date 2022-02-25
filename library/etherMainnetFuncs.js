@@ -304,7 +304,7 @@ async function getTokenTotalTrnasactions(tokenAddress) {
 module.exports.getLast24HourInfos = async function getLast24HourInfos(tokenAddress) {
     var res = await this.getLiveTokenPrice(tokenAddress, true)
 
-    console.log(res[0])
+    console.log(res.data[0])
 }
 
 module.exports.getTokenInfo = async function getTokenInfo(tokenAddr) {
@@ -764,8 +764,6 @@ async function getLivePairData(token0Address, token1Address, flag) {
 
     if (flag) {
         var date = convertTimestampToString(new Date().getTime() - 86400 * 1000, true).split(' ')[0] + ' 00:00:00'
-
-        console.log(date)
 
         rows = await knex('eth_live')
             .join('eth_pairs', 'eth_pairs.pairAddress', '=', 'eth_live.pairAddress')

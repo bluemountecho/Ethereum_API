@@ -781,12 +781,12 @@ async function getLivePairData(token0Address, token1Address, flag) {
     return rows
 }
 
-async function mergeLivePairData(token0Address, token1Address, flag) {
+module.exports.mergeLivePairData = async function mergeLivePairData(token0Address, token1Address, flag) {
     var datas = []
     var res = []
 
     var oneData = await getLivePairData(token0Address, token1Address, flag)
-    var token1Price = await getPriceOfToken(token1Address)
+    var token1Price = await this.getPriceOfToken(token1Address)
 
     for (var j = 0; j < oneData.length; j ++) {
         if (!datas[oneData[j].SWAPAT]) {
@@ -837,7 +837,7 @@ module.exports.getLiveTokenPrice = async function getLiveTokenPrice(tokenAddr, f
         var token2Address = USDC_ADDRESS > baseTokens[i] ? baseTokens[i] : USDC_ADDRESS
         var token3Address = USDC_ADDRESS < baseTokens[i] ? baseTokens[i] : USDC_ADDRESS
 
-        var res = await Promise.all([mergeLivePairData(token0Address, token1Address, flag), mergeLivePairData(token2Address, token3Address, flag)])
+        var res = await Promise.all([this.mergeLivePairData(token0Address, token1Address, flag), this.mergeLivePairData(token2Address, token3Address, flag)])
         var res1 = res[0]
         var res2 = res[1]
 

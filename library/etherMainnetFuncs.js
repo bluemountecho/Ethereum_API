@@ -311,7 +311,7 @@ module.exports.getLast24HourInfos = async function getLast24HourInfos(tokenAddre
 
     for (var i = res.length - 1; i >= 0; i --) {
         if (new Date(res[i].SWAPAT).getTime() >= date24ago) {
-            ret.totalVolume += res[i].SWAPAMOUNTINUSD
+            ret.totalVolume += Number.parseFloat(res[i].SWAPAMOUNTINUSD)
             ret.totalTransactions ++
         }
     }

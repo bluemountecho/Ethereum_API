@@ -808,7 +808,9 @@ module.exports.mergeLivePairData = async function mergeLivePairData(token0Addres
 
         res.push({
             SWAPAT: SWAPAT,
-            SWAPAMOUNT: (swapAmount1 * token1Price.data.price).toFixed(30),
+            SWAPAMOUNT0: swapAmount0,
+            SWAPAMOUNT1: swapAmount1,
+            SWAPAMOUNTINUSD: (swapAmount1 * token1Price.data.price).toFixed(30),
             PRICE: (swapAmount0 / swapAmount1).toFixed(30)
         })
     }

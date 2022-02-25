@@ -281,10 +281,14 @@ async function getTokenTotalTrnasactions(tokenAddress) {
     var rows = await knex('eth_pairs').where('token0Address', tokenAddress).orWhere('token1Address', tokenAddress).select('*')
     var total = 0
 
+    console.log(rows)
+
     for (var i = 0; i < rows.length; i ++) {
         try {
             var content = fs.readFileSync('./database/ethereum/transactions/' + rows[i].pairAddress + '.txt', {encoding:'utf8', flag:'r'})
             var datas = content.split('\n')
+
+            console.log(datas[0])
 
             for (var j = 0; j < datas.length; j ++) {
                 total += datas[j].SWAPCOUNT

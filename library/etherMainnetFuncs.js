@@ -383,8 +383,8 @@ module.exports.getTokenInfo = async function getTokenInfo(tokenAddr) {
                     totalHolders: rows[0].totalHolders,
                     holders: JSON.parse(rows[0].holders),
                     totalTransactions: res[1],
-                    last24hTransactions: ret.totalTransactions,
-                    last24hVolume: ret.totalVolume,
+                    last24hTransactions: res[2].totalTransactions,
+                    last24hVolume: res[2].totalVolume,
                     currentPrice: res[0].data.price,
                     priceChanges: [],
                     createdAt: rows[0].createdAt

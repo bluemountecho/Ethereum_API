@@ -786,7 +786,6 @@ module.exports.mergeLivePairData = async function mergeLivePairData(token0Addres
     var res = []
 
     var oneData = await getLivePairData(token0Address, token1Address, flag)
-    var token1Price = await this.getPriceOfToken(token1Address)
 
     for (var j = 0; j < oneData.length; j ++) {
         if (!datas[oneData[j].SWAPAT]) {
@@ -810,7 +809,6 @@ module.exports.mergeLivePairData = async function mergeLivePairData(token0Addres
             SWAPAT: SWAPAT,
             SWAPAMOUNT0: swapAmount0,
             SWAPAMOUNT1: swapAmount1,
-            SWAPAMOUNTINUSD: (swapAmount1 * token1Price.data.price).toFixed(30),
             PRICE: (swapAmount0 / swapAmount1).toFixed(30)
         })
     }
@@ -880,6 +878,7 @@ module.exports.getLiveTokenPrice = async function getLiveTokenPrice(tokenAddr, f
                 if (k < 0) k = 0
                 
                 res1[j].PRICE = (res1[j].PRICE * res2[k].PRICE).toFixed(30)
+                res1[j].SWAPAMOUNTINUSD = ((token0Address == baseTokens[i] ? res1[j].swapAmount0 : res1[j].swapAmount1) * res2[k].PRICE)
             }
 
             if (j == res1.length) {

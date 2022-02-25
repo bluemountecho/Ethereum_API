@@ -76,28 +76,6 @@ function convertTimestampToString(timestamp, flag = false) {
 module.exports.getPriceOfToken = async function getPriceOfToken(tokenAddress) {
     try {
         var tokenInfo = await knex('eth_tokens').where('tokenAddress', tokenAddress).select('*')
-        var token0Address = tokenAddress > USDC_ADDRESS ? USDC_ADDRESS : tokenAddress
-        var token1Address = tokenAddress < USDC_ADDRESS ? USDC_ADDRESS : tokenAddress
-
-        var rows = await knex('eth_pairs')
-            .select('*')
-            .where('token0Address', token0Address)
-            .where('token1Address', token1Address)
-            .orderBy('blockNumber', 'desc')
-            .orderBy('transactionID', 'desc')
-
-        if (rows.length && rows[0].lastPrice > 0) {
-            var price = token0Address == USDC_ADDRESS ? rows[0].lastPrice : (1.0 / rows[0].lastPrice)
-
-            return {
-                stats: 'Success!',
-                data: {
-                    price: price.toFixed(30),
-                    symbol: tokenInfo[0].tokenSymbol,
-                    name: tokenInfo[0].tokenName
-                }
-            }
-        }
 
         for (var i = 0; i < baseTokens.length; i ++) {
             var funcs = []

@@ -298,6 +298,8 @@ async function getTokenTotalTrnasactions(tokenAddress) {
         }
     }
 
+    console.log(total)
+
     return total
 }
 

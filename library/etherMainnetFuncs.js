@@ -302,9 +302,21 @@ async function getTokenTotalTrnasactions(tokenAddress) {
 }
 
 module.exports.getLast24HourInfos = async function getLast24HourInfos(tokenAddress) {
-    var res = await this.getLiveTokenPrice(tokenAddress, true)
+    var res = (await this.getLiveTokenPrice(tokenAddress, true)).data
+    var ret = {}
+    var date24ago = new Date().getTime() - 86400 * 1000
 
-    console.log(res.data[0])
+    ret.totalVolume = 0
+    ret.totalTransactions = 0
+
+    for (var i = res.length - 1; i >= 0; i --) {
+        if (new Date(res[i].SWAPAT).getTime() >= date24ago) {
+            ret.totalVolume += res[i].SWAPAMOUNTINUSD
+            ret.totalTransactions ++
+        }
+    }
+
+    return ret
 }
 
 module.exports.getTokenInfo = async function getTokenInfo(tokenAddr) {
@@ -371,8 +383,8 @@ module.exports.getTokenInfo = async function getTokenInfo(tokenAddr) {
                     totalHolders: rows[0].totalHolders,
                     holders: JSON.parse(rows[0].holders),
                     totalTransactions: res[1],
-                    last24hTransactions: 0,
-                    last24hVolume: 0,
+                    last24hTransactions: ret.totalTransactions,
+                    last24hVolume: ret.totalVolume,
                     currentPrice: res[0].data.price,
                     priceChanges: [],
                     createdAt: rows[0].createdAt

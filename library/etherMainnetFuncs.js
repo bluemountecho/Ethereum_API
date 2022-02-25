@@ -287,6 +287,12 @@ module.exports.getTokenInfo = async function getTokenInfo(tokenAddr) {
 
         totalSupply = totalSupply / 10 ** rows[0].tokenDecimals
 
+        var funcs = []
+
+        funcs.push(this.getPriceOfToken(tokenAddress))
+
+        var res = await Promise.all(funcs)
+
         if (rows.length == 0) {
             return {
                 status: 'Fail',
@@ -331,7 +337,12 @@ module.exports.getTokenInfo = async function getTokenInfo(tokenAddr) {
                     marketCap: (totalSupply * tokenPrice.data.price).toFixed(30),
                     totalSupply: (totalSupply).toFixed(30),
                     totalHolders: rows[0].totalHolders,
-                    holders: rows[0].holders,
+                    holders: JSON.parse(rows[0].holders),
+                    totalTransactions: 0,
+                    last24hTransactions: 0,
+                    last24hVolume: 0,
+                    currentPrice: res[0].data.price,
+                    priceChanges: [],
                     createdAt: rows[0].createdAt
                 }]
             }

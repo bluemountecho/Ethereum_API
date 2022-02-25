@@ -288,7 +288,7 @@ async function getTokenTotalTrnasactions(tokenAddress) {
             var content = fs.readFileSync('./database/ethereum/transactions/' + rows[i].pairAddress + '.txt', {encoding:'utf8', flag:'r'})
             var datas = content.split('\n')
 
-            console.log(datas[0])
+            console.log(datas[0].SWAPCOUNT)
 
             for (var j = 0; j < datas.length; j ++) {
                 total += Number.parseInt(datas[j].SWAPCOUNT)

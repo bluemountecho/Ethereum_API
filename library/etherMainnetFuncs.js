@@ -301,8 +301,10 @@ async function getTokenTotalTrnasactions(tokenAddress) {
     return total
 }
 
-async function getLast24HourInfos(tokenAddress) {
+module.exports.getLast24HourInfos = async function getLast24HourInfos(tokenAddress) {
+    var res = await this.getLiveTokenPrice(tokenAddress, true)
 
+    console.log(res[0])
 }
 
 module.exports.getTokenInfo = async function getTokenInfo(tokenAddr) {
@@ -319,6 +321,7 @@ module.exports.getTokenInfo = async function getTokenInfo(tokenAddr) {
 
         funcs.push(this.getPriceOfToken(tokenAddress))
         funcs.push(getTokenTotalTrnasactions(tokenAddress))
+        funcs.push(getLast24HourInfos(tokenAddress))
 
         var res = await Promise.all(funcs)
 

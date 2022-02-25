@@ -321,7 +321,7 @@ module.exports.getTokenInfo = async function getTokenInfo(tokenAddr) {
 
         funcs.push(this.getPriceOfToken(tokenAddress))
         funcs.push(getTokenTotalTrnasactions(tokenAddress))
-        funcs.push(getLast24HourInfos(tokenAddress))
+        funcs.push(this.getLast24HourInfos(tokenAddress))
 
         var res = await Promise.all(funcs)
 

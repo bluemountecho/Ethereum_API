@@ -283,14 +283,44 @@ module.exports.getLast24HourInfos = async function getLast24HourInfos(tokenAddre
     var res = (await this.getLiveTokenPrice(tokenAddress, true)).data
     var ret = {}
     var date24ago = new Date().getTime() - 86400 * 1000
+    var date12ago = new Date().getTime() - 12 * 3600 * 1000
+    var date6ago = new Date().getTime() - 6 * 3600 * 1000
+    var date2ago = new Date().getTime() - 2 * 3600 * 1000
+    var date1ago = new Date().getTime() - 3600 * 1000
+    var date30ago = new Date().getTime() - 1800 * 1000
 
     ret.totalVolume = 0
     ret.totalTransactions = 0
+    ret.price30 = ret.price1 = ret.price2 = ret.price6 = ret.price12 = ret.price24 = -1
 
     for (var i = res.length - 1; i >= 0; i --) {
         if (new Date(res[i].SWAPAT).getTime() >= date24ago) {
             ret.totalVolume += Number.parseFloat(res[i].SWAPAMOUNTINUSD)
             ret.totalTransactions ++
+        }
+        
+        if (ret.price30 < 0 && new Date(res[i].SWAPAT).getTime() < date30ago) {
+            ret.price30 = res[i].PRICE
+        }
+
+        if (ret.price1 < 0 && new Date(res[i].SWAPAT).getTime() < date1ago) {
+            ret.price1 = res[i].PRICE
+        }
+
+        if (ret.price2 < 0 && new Date(res[i].SWAPAT).getTime() < date2ago) {
+            ret.price2 = res[i].PRICE
+        }
+
+        if (ret.price6 < 0 && new Date(res[i].SWAPAT).getTime() < date6ago) {
+            ret.price6 = res[i].PRICE
+        }
+
+        if (ret.price12 < 0 && new Date(res[i].SWAPAT).getTime() < date12ago) {
+            ret.price12 = res[i].PRICE
+        }
+
+        if (ret.price24 < 0 && new Date(res[i].SWAPAT).getTime() < date24ago) {
+            ret.price24 = res[i].PRICE
         }
     }
 
@@ -364,7 +394,32 @@ module.exports.getTokenInfo = async function getTokenInfo(tokenAddr) {
                     last24hTransactions: res[2].totalTransactions,
                     last24hVolume: res[2].totalVolume,
                     currentPrice: res[0].data.price,
-                    priceChanges: [],
+                    priceChanges: {
+                        priceChange30Min: {
+                            price: res[2].price30,
+                            changePercent: (100 - (res[0].data.price / res[2].price30 * 100)).toFixed(2)
+                        },
+                        priceChange1Hour: {
+                            price: res[2].price1,
+                            changePercent: (100 - (res[0].data.price / res[2].price1 * 100)).toFixed(2)
+                        },
+                        priceChange2Hour: {
+                            price: res[2].price2,
+                            changePercent: (100 - (res[0].data.price / res[2].price2 * 100)).toFixed(2)
+                        },
+                        priceChange6Hour: {
+                            price: res[2].price6,
+                            changePercent: (100 - (res[0].data.price / res[2].price6 * 100)).toFixed(2)
+                        },
+                        priceChange12Hour: {
+                            price: res[2].price12,
+                            changePercent: (100 - (res[0].data.price / res[2].price12 * 100)).toFixed(2)
+                        },
+                        priceChange24Hour: {
+                            price: res[2].price24,
+                            changePercent: (100 - (res[0].data.price / res[2].price24 * 100)).toFixed(2)
+                        },
+                    },
                     createdAt: rows[0].createdAt
                 }]
             }

@@ -365,7 +365,7 @@ async function writeTransactionHistoryFile(deleteDate, writeDate) {
 
     await knex('eth_live').where('swapAt', '<', deleteDate + ' ' + '00:00:00').delete()
 
-    myLogger.log("WRITE TRANSACTION HISTORY FILE FINISHED!!!")
+    console.log(writeDate + " WRITE TRANSACTION HISTORY FILE FINISHED!!!")
 }
 
 async function init() {
@@ -812,4 +812,7 @@ async function init() {
 // .then(res => {
 //     init()
 // })
-writeTransactionHistoryFile('2021-01-01', '2022-02-23')
+writeTransactionHistoryFile('2021-01-01', '2022-02-24')
+writeTransactionHistoryFile('2021-01-01', '2022-02-25')
+writeTransactionHistoryFile('2021-01-01', '2022-02-26')
+writeTransactionHistoryFile('2021-01-01', '2022-02-27')

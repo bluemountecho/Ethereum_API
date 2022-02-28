@@ -308,27 +308,27 @@ module.exports.getLast24HourInfos = async function getLast24HourInfos(tokenAddre
             ret.todayTransactions ++
         }
         
-        if (ret.price30 < 0 && new Date(res[i].SWAPAT).getTime() < date30ago) {
+        if (ret.price30 == 0 && new Date(res[i].SWAPAT).getTime() < date30ago) {
             ret.price30 = res[i].PRICE
         }
 
-        if (ret.price1 < 0 && new Date(res[i].SWAPAT).getTime() < date1ago) {
+        if (ret.price1  ==  0 && new Date(res[i].SWAPAT).getTime() < date1ago) {
             ret.price1 = res[i].PRICE
         }
 
-        if (ret.price2 < 0 && new Date(res[i].SWAPAT).getTime() < date2ago) {
+        if (ret.price2  ==  0 && new Date(res[i].SWAPAT).getTime() < date2ago) {
             ret.price2 = res[i].PRICE
         }
 
-        if (ret.price6 < 0 && new Date(res[i].SWAPAT).getTime() < date6ago) {
+        if (ret.price6  ==  0 && new Date(res[i].SWAPAT).getTime() < date6ago) {
             ret.price6 = res[i].PRICE
         }
 
-        if (ret.price12 < 0 && new Date(res[i].SWAPAT).getTime() < date12ago) {
+        if (ret.price12  ==  0 && new Date(res[i].SWAPAT).getTime() < date12ago) {
             ret.price12 = res[i].PRICE
         }
 
-        if (ret.price24 < 0 && new Date(res[i].SWAPAT).getTime() < date24ago) {
+        if (ret.price24  ==  0 && new Date(res[i].SWAPAT).getTime() < date24ago) {
             ret.price24 = res[i].PRICE
         }
     }

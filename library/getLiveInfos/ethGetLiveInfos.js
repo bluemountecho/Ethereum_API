@@ -192,7 +192,7 @@ function convertTimestampToString(timestamp, flag = false) {
 var tokensData = []
 var pairsData = []
 var blocksData = []
-var lastBlockNumber = 14261565
+var lastBlockNumber = 14293560
 
 async function getTokenAndPairData() {
     var res = await knex('eth_tokens').select('*')

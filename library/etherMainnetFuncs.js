@@ -294,7 +294,7 @@ module.exports.getLast24HourInfos = async function getLast24HourInfos(tokenAddre
     ret.totalVolume = 0
     ret.totalTransactions = 0
     ret.todayTransactions = 0
-    ret.price30 = ret.price1 = ret.price2 = ret.price6 = ret.price12 = ret.price24 = -1
+    ret.price30 = ret.price1 = ret.price2 = ret.price6 = ret.price12 = ret.price24 = 0
 
     for (var i = res.length - 1; i >= 0; i --) {
         var tmpTime = new Date(res[i].SWAPAT).getTime()
@@ -385,16 +385,6 @@ module.exports.getTokenInfo = async function getTokenInfo(tokenAddr) {
                     symbol: rows[0].tokenSymbol,
                     name: rows[0].tokenName,
                     decimals: rows[0].tokenDecimals,
-                    sourceCode: rows[0].sourceCode,
-                    description: infos.description.en,
-                    links: {
-                        coingecko: infos.links,
-                        etherscan: rows[0].links
-                    },
-                    image: {
-                        coingecko: infos.image,
-                        github: 'https://github.com/thefortube/trust-assets/blob/master/blockchains/ethereum/assets/' + Web3.utils.toChecksumAddress(tokenAddr) + '/logo.png?raw=true'
-                    },
                     marketCap: (totalSupply * tokenPrice.data.price).toFixed(30),
                     totalSupply: (totalSupply).toFixed(30),
                     totalHolders: rows[0].totalHolders,
@@ -406,30 +396,40 @@ module.exports.getTokenInfo = async function getTokenInfo(tokenAddr) {
                     priceChanges: {
                         priceChange30Min: {
                             price: res[2].price30,
-                            changePercent: -(100 - (res[0].data.price / res[2].price30 * 100)).toFixed(2)
+                            changePercent: res[2].price30 == 0 ? 0 : -(100 - (res[0].data.price / res[2].price30 * 100)).toFixed(2)
                         },
                         priceChange1Hour: {
                             price: res[2].price1,
-                            changePercent: -(100 - (res[0].data.price / res[2].price1 * 100)).toFixed(2)
+                            changePercent: res[2].price1 == 0 ? 0 : -(100 - (res[0].data.price / res[2].price1 * 100)).toFixed(2)
                         },
                         priceChange2Hour: {
                             price: res[2].price2,
-                            changePercent: -(100 - (res[0].data.price / res[2].price2 * 100)).toFixed(2)
+                            changePercent: res[2].price2 == 0 ? 0 : -(100 - (res[0].data.price / res[2].price2 * 100)).toFixed(2)
                         },
                         priceChange6Hour: {
                             price: res[2].price6,
-                            changePercent: -(100 - (res[0].data.price / res[2].price6 * 100)).toFixed(2)
+                            changePercent: res[2].price6 == 0 ? 0 : -(100 - (res[0].data.price / res[2].price6 * 100)).toFixed(2)
                         },
                         priceChange12Hour: {
                             price: res[2].price12,
-                            changePercent: -(100 - (res[0].data.price / res[2].price12 * 100)).toFixed(2)
+                            changePercent: res[2].price12 == 0 ? 0 : -(100 - (res[0].data.price / res[2].price12 * 100)).toFixed(2)
                         },
                         priceChange24Hour: {
                             price: res[2].price24,
-                            changePercent: -(100 - (res[0].data.price / res[2].price24 * 100)).toFixed(2)
+                            changePercent: res[2].price24 == 0 ? 0 : -(100 - (res[0].data.price / res[2].price24 * 100)).toFixed(2)
                         },
                     },
-                    createdAt: rows[0].createdAt
+                    createdAt: rows[0].createdAt,
+                    sourceCode: rows[0].sourceCode,
+                    description: infos.description.en,
+                    links: {
+                        coingecko: infos.links,
+                        etherscan: rows[0].links
+                    },
+                    image: {
+                        coingecko: infos.image,
+                        github: 'https://github.com/thefortube/trust-assets/blob/master/blockchains/ethereum/assets/' + Web3.utils.toChecksumAddress(tokenAddr) + '/logo.png?raw=true'
+                    },
                 }]
             }
         }

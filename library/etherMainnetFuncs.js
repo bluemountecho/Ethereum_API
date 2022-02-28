@@ -193,9 +193,9 @@ module.exports.getLastPriceFromPair = async function getLastPriceFromPair(pairAd
     }
 }
 
-module.exports.getAllTokens = async function getAllTokens() {
+module.exports.getAllTokens = async function getAllTokens(page = 0) {
     try {
-        var rows = await knex('eth_tokens').orderBy('createdAt', 'desc').select('*')
+        var rows = await knex('eth_tokens').orderBy('createdAt', 'desc').limit(100).offset(page * 100).select('*')
         var datas = []
 
         for (var i = 0; i < rows.length; i ++) {
@@ -1012,7 +1012,4 @@ module.exports.getDailyMarketCap = async function getDailyMarketCap(tokenAddr) {
             data: []
         }
     }
-}
-
-module.exports.getHolderInfo = async function() {
 }

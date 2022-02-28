@@ -9,15 +9,15 @@ router.get('/last_price/:tokenAddr', function(req, res, next) {
   })
 });
 
-// router.get('/pair_price/:pairAddr', function(req, res, next) {
-//   etherMainnetFuncs.getLastPriceFromPair(req.params.pairAddr)
-//   .then((data) => {
-//     res.send(JSON.stringify(data))
-//   })
-// });
+router.get('/last_pair_price/:pairAddr', function(req, res, next) {
+  etherMainnetFuncs.getLastPriceFromPair(req.params.pairAddr)
+  .then((data) => {
+    res.send(JSON.stringify(data))
+  })
+});
 
 router.get('/all_tokens', function (req, res, next) {
-  etherMainnetFuncs.getAllTokens()
+  etherMainnetFuncs.getAllTokens(req.query.page ? req.query.page : 0)
   .then(data => {
     res.send(JSON.stringify(data))
   })
@@ -85,12 +85,5 @@ router.get('/daily_market_cap/:tokenAddr', function(req, res, next) {
     res.send(JSON.stringify(data))
   })
 });
-
-router.get('/holderInfo', function(req, res, next) {
-  etherMainnetFuncs.getHolderInfo(req.params.tokenAddr)
-  .then((data) => {
-    res.send(JSON.stringify(data))
-  })
-})
 
 module.exports = router;

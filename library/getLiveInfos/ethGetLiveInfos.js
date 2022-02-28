@@ -793,7 +793,7 @@ async function init() {
         var tmpDate2 = convertTimestampToString(resBlock.timestamp * 1000 - 7 * 86400 * 1000, true)
 
         if (tmpDate1.split(' ')[0] != tmpDate2.split(' ')[0]) {
-            writeTransactionHistoryFile(tmpDate2.split(' ')[0], convertTimestampToString(resBlock.timestamp - 86400 * 1000, true).split(' ')[0])
+            writeTransactionHistoryFile(tmpDate2.split(' ')[0], convertTimestampToString(resBlock.timestamp * 1000 - 86400 * 1000, true).split(' ')[0])
         }
         
         if (curBlock > blockNumber) {

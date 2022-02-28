@@ -729,7 +729,7 @@ module.exports.getDailyTokenPrice = async function getDailyTokenPrice(tokenAddr,
         if (rows[0].length > 0 && rows[1].length > 0) {
             var k = 0
 
-            for (var j = 0; j < res1.length; j ++) {
+            for (var j = res1.length - 1; j >= 0; j --) {
                 var jd = (new Date(res1[j].SWAPAT)).getTime()
 
                 while (true) {
@@ -750,14 +750,12 @@ module.exports.getDailyTokenPrice = async function getDailyTokenPrice(tokenAddr,
                 res1[j].HIGHPRICE = res1[j].HIGHPRICE * res2[k].HIGHPRICE
                 res1[j].LOWPRICE = res1[j].LOWPRICE * res2[k].LOWPRICE
             }
-
-            if (j == res1.length) {
-                return {
-                    status: 'Success!',
-                    symbol: tokenInfo[0].tokenSymbol,
-                    name: tokenInfo[0].tokenName,
-                    data: res1
-                }
+            
+            return {
+                status: 'Success!',
+                symbol: tokenInfo[0].tokenSymbol,
+                name: tokenInfo[0].tokenName,
+                data: res1
             }
         }
     }
@@ -856,7 +854,7 @@ async function getLivePairData(token0Address, token1Address, flag) {
     return rows
 }
 
-module.exports.mergeLivePairData = async function mergeLivePairData(token0Address, token1Address, flag) {
+module.exports.mergeLivePairData = async function mergeLivePairData(token0Address, token1Address, flag, page = -1) {
     var datas = []
     var res = []
 
@@ -892,10 +890,20 @@ module.exports.mergeLivePairData = async function mergeLivePairData(token0Addres
         var ad = (new Date(a.SWAPAT)).getTime()
         var bd = (new Date(b.SWAPAT)).getTime()
 
-        if (ad < bd) return -1
-        if (ad > bd) return 1
+        if (ad > bd) return -1
+        if (ad < bd) return 1
         return 0
     })
+
+    if (page >= 0) {
+        var pageData = []
+
+        for (var i = page * 100; i < page * 100 + 100 && i < res.length; i ++) {
+            pageData.push(res[i])
+        }
+
+        return pageData
+    }
 
     return res
 }
@@ -912,7 +920,7 @@ module.exports.getLiveTokenPrice = async function getLiveTokenPrice(tokenAddr, f
         var token2Address = USDC_ADDRESS > baseTokens[i] ? baseTokens[i] : USDC_ADDRESS
         var token3Address = USDC_ADDRESS < baseTokens[i] ? baseTokens[i] : USDC_ADDRESS
 
-        var res = await Promise.all([this.mergeLivePairData(token0Address, token1Address, flag), this.mergeLivePairData(token2Address, token3Address, flag)])
+        var res = await Promise.all([this.mergeLivePairData(token0Address, token1Address, flag, page), this.mergeLivePairData(token2Address, token3Address, flag)])
         var res1 = res[0]
         var res2 = res[1]
 
@@ -976,7 +984,7 @@ module.exports.getLiveTokenPrice = async function getLiveTokenPrice(tokenAddr, f
 module.exports.getLivePairPrice = async function getLivePairPrice(pairAddr, page = 0) {
     try {
         var pair = pairAddr.toLowerCase()
-        var rows = await knex('eth_live').where('pairAddress', pair).orderBy('swapAt', 'asc').select('*')
+        var rows = await knex('eth_live').where('pairAddress', pair).orderBy('swapAt', 'desc').limit(100).offset(page * 100).select('*')
         var datas = []
 
         for (var i = 0; i < rows.length; i ++) {
@@ -1006,7 +1014,7 @@ module.exports.getLivePairPrice = async function getLivePairPrice(pairAddr, page
 module.exports.getDailyMarketCap = async function getDailyMarketCap(tokenAddr, page = 0) {
     try {
         var tokenAddress = tokenAddr.toLowerCase()
-        var data = (await this.getDailyTokenPrice(tokenAddress)).data
+        var data = (await this.getDailyTokenPrice(tokenAddress, page)).data
         const contract = new web3.eth.Contract(minERC20ABI, tokenAddress)
         var totalSupply = await contract.methods.totalSupply().call()
         var tokenInfo = (await knex('eth_tokens').where('tokenAddress', tokenAddress).select('*'))[0]

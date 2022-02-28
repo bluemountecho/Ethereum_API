@@ -808,7 +808,8 @@ async function init() {
     setTimeout(init, 100)
 }
 
-getTokenAndPairData()
-.then(res => {
-    init()
-})
+// getTokenAndPairData()
+// .then(res => {
+//     init()
+// })
+writeTransactionHistoryFile('2021-01-01', '2022-02-23')

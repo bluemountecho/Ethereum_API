@@ -543,7 +543,7 @@ module.exports.getPairInfo = async function getPairInfo(pairAddr) {
     }
 }
 
-async function getDailyPairData(pairAddr, page = -1) {
+async function getDailyPairData(pairAddr) {
     try {
         var pair = pairAddr.toLowerCase()
         var datas = []
@@ -556,25 +556,6 @@ async function getDailyPairData(pairAddr, page = -1) {
 
         for (var i = 0; i < datas.length; i ++) {
             datas[i].AVGPRICE = datas[i].TOTALVOLUME0 / datas[i].TOTALVOLUME1
-        }
-
-        datas.sort(function (a, b) {
-            var ad = (new Date(a.SWAPAT)).getTime()
-            var bd = (new Date(b.SWAPAT)).getTime()
-
-            if (ad > bd) return -1
-            if (ad < bd) return 1
-            return 0
-        })
-
-        if (page >= 0) {
-            var pageData = []
-    
-            for (var i = page * 100; i < page * 100 + 100 && i < datas.length; i ++) {
-                pageData.push(datas[i])
-            }
-    
-            return pageData
         }
 
         return datas
@@ -818,6 +799,25 @@ module.exports.getDailyPairPrice = async function getDailyPairPrice(pairAddr, pa
 
         for (var i = 0; i < livePairs.length; i ++) {
             datas.push(livePairs[i])
+        }
+        
+        datas.sort(function (a, b) {
+            var ad = (new Date(a.SWAPAT)).getTime()
+            var bd = (new Date(b.SWAPAT)).getTime()
+
+            if (ad > bd) return -1
+            if (ad < bd) return 1
+            return 0
+        })
+
+        if (page >= 0) {
+            var pageData = []
+    
+            for (var i = page * 100; i < page * 100 + 100 && i < datas.length; i ++) {
+                pageData.push(datas[i])
+            }
+    
+            return pageData
         }
 
         return {

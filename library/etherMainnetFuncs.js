@@ -280,7 +280,7 @@ async function getTokenTotalTrnasactions(tokenAddress) {
 }
 
 module.exports.getLast24HourInfos = async function getLast24HourInfos(tokenAddress) {
-    var res = (await this.getLiveTokenPrice(tokenAddress, true)).data
+    var res = (await this.getLiveTokenPrice(tokenAddress, true, -1)).data
     var ret = {}
     var date24ago = new Date().getTime() - 86400 * 1000
     var date12ago = new Date().getTime() - 12 * 3600 * 1000
@@ -294,7 +294,7 @@ module.exports.getLast24HourInfos = async function getLast24HourInfos(tokenAddre
     ret.totalVolume = 0
     ret.totalTransactions = 0
     ret.todayTransactions = 0
-    ret.price30 = ret.price1 = ret.price2 = ret.price6 = ret.price12 = ret.price24 = -1
+    ret.price30 = ret.price1 = ret.price2 = ret.price6 = ret.price12 = ret.price24 = 0
 
     for (var i = res.length - 1; i >= 0; i --) {
         var tmpTime = new Date(res[i].SWAPAT).getTime()
@@ -308,27 +308,27 @@ module.exports.getLast24HourInfos = async function getLast24HourInfos(tokenAddre
             ret.todayTransactions ++
         }
         
-        if (ret.price30 < 0 && new Date(res[i].SWAPAT).getTime() < date30ago) {
+        if (ret.price30 == 0 && new Date(res[i].SWAPAT).getTime() < date30ago) {
             ret.price30 = res[i].PRICE
         }
 
-        if (ret.price1 < 0 && new Date(res[i].SWAPAT).getTime() < date1ago) {
+        if (ret.price1 == 0 && new Date(res[i].SWAPAT).getTime() < date1ago) {
             ret.price1 = res[i].PRICE
         }
 
-        if (ret.price2 < 0 && new Date(res[i].SWAPAT).getTime() < date2ago) {
+        if (ret.price2 == 0 && new Date(res[i].SWAPAT).getTime() < date2ago) {
             ret.price2 = res[i].PRICE
         }
 
-        if (ret.price6 < 0 && new Date(res[i].SWAPAT).getTime() < date6ago) {
+        if (ret.price6 == 0 && new Date(res[i].SWAPAT).getTime() < date6ago) {
             ret.price6 = res[i].PRICE
         }
 
-        if (ret.price12 < 0 && new Date(res[i].SWAPAT).getTime() < date12ago) {
+        if (ret.price12 == 0 && new Date(res[i].SWAPAT).getTime() < date12ago) {
             ret.price12 = res[i].PRICE
         }
 
-        if (ret.price24 < 0 && new Date(res[i].SWAPAT).getTime() < date24ago) {
+        if (ret.price24 == 0 && new Date(res[i].SWAPAT).getTime() < date24ago) {
             ret.price24 = res[i].PRICE
         }
     }

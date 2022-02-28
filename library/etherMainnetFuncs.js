@@ -543,7 +543,7 @@ module.exports.getPairInfo = async function getPairInfo(pairAddr) {
     }
 }
 
-async function getDailyPairData(pairAddr) {
+async function getDailyPairData(pairAddr, page = -1) {
     try {
         var pair = pairAddr.toLowerCase()
         var datas = []
@@ -562,10 +562,20 @@ async function getDailyPairData(pairAddr) {
             var ad = (new Date(a.SWAPAT)).getTime()
             var bd = (new Date(b.SWAPAT)).getTime()
 
-            if (ad < bd) return -1
-            if (ad > bd) return 1
+            if (ad > bd) return -1
+            if (ad < bd) return 1
             return 0
         })
+
+        if (page >= 0) {
+            var pageData = []
+    
+            for (var i = page * 100; i < page * 100 + 100 && i < datas.length; i ++) {
+                pageData.push(datas[i])
+            }
+    
+            return pageData
+        }
 
         return datas
     } catch (err) {
@@ -574,7 +584,7 @@ async function getDailyPairData(pairAddr) {
     }
 }
 
-async function mergeDailyPairData(rows, token0Address, token1Address) {
+async function mergeDailyPairData(rows, token0Address, token1Address, page = -1) {
     var datas = []
     var res = []
     var funcs = []
@@ -662,15 +672,25 @@ async function mergeDailyPairData(rows, token0Address, token1Address) {
         var ad = (new Date(a.SWAPAT)).getTime()
         var bd = (new Date(b.SWAPAT)).getTime()
 
-        if (ad < bd) return -1
-        if (ad > bd) return 1
+        if (ad > bd) return -1
+        if (ad < bd) return 1
         return 0
     })
+
+    if (page >= 0) {
+        var pageData = []
+
+        for (var i = page * 100; i < page * 100 + 100 && i < res.length; i ++) {
+            pageData.push(res[i])
+        }
+
+        return pageData
+    }
 
     return res
 }
 
-module.exports.getDailyTokenPrice = async function getDailyTokenPrice(tokenAddr) {
+module.exports.getDailyTokenPrice = async function getDailyTokenPrice(tokenAddr, page = 0) {
     var tokenAddress = tokenAddr.toLowerCase()
     var tokenInfo = await knex('eth_tokens').where('tokenAddress', tokenAddress).select('*')
 
@@ -698,7 +718,7 @@ module.exports.getDailyTokenPrice = async function getDailyTokenPrice(tokenAddr)
         )
 
         var rows = await Promise.all(funcs)
-        var res1 = await mergeDailyPairData(rows[0], token0Address, token1Address)
+        var res1 = await mergeDailyPairData(rows[0], token0Address, token1Address, page)
         var res2 = await mergeDailyPairData(rows[1], token2Address, token3Address)
 
         if (rows[0].length) {
@@ -768,7 +788,7 @@ module.exports.getDailyTokenPrice = async function getDailyTokenPrice(tokenAddr)
     }
 }
 
-module.exports.getDailyPairPrice = async function getDailyPairPrice(pairAddr) {
+module.exports.getDailyPairPrice = async function getDailyPairPrice(pairAddr, page = 0) {
     try {
         pairAddr = pairAddr.toLowerCase()
         
@@ -880,7 +900,7 @@ module.exports.mergeLivePairData = async function mergeLivePairData(token0Addres
     return res
 }
 
-module.exports.getLiveTokenPrice = async function getLiveTokenPrice(tokenAddr, flag = false) {
+module.exports.getLiveTokenPrice = async function getLiveTokenPrice(tokenAddr, flag = false, page = 0) {
     var tokenAddress = tokenAddr.toLowerCase()
     var tokenInfo = await knex('eth_tokens').where('tokenAddress', tokenAddress).select('*')
 
@@ -953,7 +973,7 @@ module.exports.getLiveTokenPrice = async function getLiveTokenPrice(tokenAddr, f
     }
 }
 
-module.exports.getLivePairPrice = async function getLivePairPrice(pairAddr) {
+module.exports.getLivePairPrice = async function getLivePairPrice(pairAddr, page = 0) {
     try {
         var pair = pairAddr.toLowerCase()
         var rows = await knex('eth_live').where('pairAddress', pair).orderBy('swapAt', 'asc').select('*')
@@ -983,7 +1003,7 @@ module.exports.getLivePairPrice = async function getLivePairPrice(pairAddr) {
     }
 }
 
-module.exports.getDailyMarketCap = async function getDailyMarketCap(tokenAddr) {
+module.exports.getDailyMarketCap = async function getDailyMarketCap(tokenAddr, page = 0) {
     try {
         var tokenAddress = tokenAddr.toLowerCase()
         var data = (await this.getDailyTokenPrice(tokenAddress)).data

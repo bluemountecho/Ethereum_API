@@ -52,35 +52,35 @@ router.get('/pair_info/:pairAddr', function(req, res, next) {
 });
 
 router.get('/daily_pair_price/:pairAddr', function(req, res, next) {
-  etherMainnetFuncs.getDailyPairPrice(req.params.pairAddr)
+  etherMainnetFuncs.getDailyPairPrice(req.params.pairAddr, req.query.page ? req.query.page : 0)
   .then((data) => {
     res.send(JSON.stringify(data))
   })
 });
 
 router.get('/daily_token_price/:tokenAddr', function(req, res, next) {
-  etherMainnetFuncs.getDailyTokenPrice(req.params.tokenAddr)
+  etherMainnetFuncs.getDailyTokenPrice(req.params.tokenAddr, req.query.page ? req.query.page : 0)
   .then((data) => {
     res.send(JSON.stringify(data))
   })
 });
 
 router.get('/live_pair_price/:pairAddr', function(req, res, next) {
-  etherMainnetFuncs.getLivePairPrice(req.params.pairAddr)
+  etherMainnetFuncs.getLivePairPrice(req.params.pairAddr, req.query.page ? req.query.page : 0)
   .then((data) => {
     res.send(JSON.stringify(data))
   })
 });
 
 router.get('/live_token_price/:tokenAddr', function(req, res, next) {
-  etherMainnetFuncs.getLiveTokenPrice(req.params.tokenAddr)
+  etherMainnetFuncs.getLiveTokenPrice(req.params.tokenAddr, false, req.query.page ? req.query.page : 0)
   .then((data) => {
     res.send(JSON.stringify(data))
   })
 });
 
 router.get('/daily_market_cap/:tokenAddr', function(req, res, next) {
-  etherMainnetFuncs.getDailyMarketCap(req.params.tokenAddr)
+  etherMainnetFuncs.getDailyMarketCap(req.params.tokenAddr, req.query.page ? req.query.page : 0)
   .then((data) => {
     res.send(JSON.stringify(data))
   })

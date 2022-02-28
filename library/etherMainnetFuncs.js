@@ -296,7 +296,7 @@ module.exports.getLast24HourInfos = async function getLast24HourInfos(tokenAddre
     ret.todayTransactions = 0
     ret.price30 = ret.price1 = ret.price2 = ret.price6 = ret.price12 = ret.price24 = 0
 
-    for (var i = res.length - 1; i >= 0; i --) {
+    for (var i = 0; i < res.length; i ++) {
         var tmpTime = new Date(res[i].SWAPAT).getTime()
 
         if (tmpTime >= date24ago) {

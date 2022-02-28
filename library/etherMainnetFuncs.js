@@ -943,7 +943,7 @@ module.exports.getLiveTokenPrice = async function getLiveTokenPrice(tokenAddr, f
         if (res1.length > 0 && res2.length > 0) {
             var k = 0
 
-            for (var j = res1.length; j >= 0; j --) {
+            for (var j = res1.length - 1; j >= 0; j --) {
                 var jd = (new Date(res1[j].SWAPAT)).getTime()
                 
                 while (true) {

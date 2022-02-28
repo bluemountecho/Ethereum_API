@@ -791,7 +791,7 @@ module.exports.getDailyPairPrice = async function getDailyPairPrice(pairAddr, pa
             eth_live\
             LEFT JOIN eth_pairs ON eth_pairs.pairAddress = eth_live.pairAddress \
         WHERE\
-            eth_live.pairAddress="' + pairAddr + '"\
+            eth_live.pairAddress="' + pairAddr + '" and DATE( eth_live.swapAt )="' + convertTimestampToString(new Date().getTime(), true).split(' ')[0] + '"\
         GROUP BY\
             DATE( eth_live.swapAt ) \
         ORDER BY\

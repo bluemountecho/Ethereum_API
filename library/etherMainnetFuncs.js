@@ -943,7 +943,7 @@ module.exports.getLiveTokenPrice = async function getLiveTokenPrice(tokenAddr, f
         if (res1.length > 0 && res2.length > 0) {
             var k = 0
 
-            for (var j = 0; j < res1.length; j ++) {
+            for (var j = res1.length; j >= 0; j --) {
                 var jd = (new Date(res1[j].SWAPAT)).getTime()
                 
                 while (true) {
@@ -963,14 +963,12 @@ module.exports.getLiveTokenPrice = async function getLiveTokenPrice(tokenAddr, f
                 res1[j].PRICE = (res1[j].PRICE * res2[k].PRICE).toFixed(30)
                 res1[j].SWAPAMOUNTINUSD = ((token0Address == baseTokens[i] ? res1[j].SWAPAMOUNT0 : res1[j].SWAPAMOUNT1) * res2[k].PRICE).toFixed(30)
             }
-
-            if (j == res1.length) {
-                return {
-                    status: 'Success!',
-                    symbol: tokenInfo[0].tokenSymbol,
-                    name: tokenInfo[0].tokenName,
-                    data: res1
-                }
+            
+            return {
+                status: 'Success!',
+                symbol: tokenInfo[0].tokenSymbol,
+                name: tokenInfo[0].tokenName,
+                data: res1
             }
         }
     }

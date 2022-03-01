@@ -1328,7 +1328,7 @@ async function addMissedTokens() {
 }
 
 async function getContavoInfo() {
-    var rows = await getURL('http://user:pass@51.83.184.35:8888/eth/contavo_info', "")
+    var rows = await getURL('http://user:pass@167.86.120.197:8888/eth/contavo_info', "")
 
     console.log(rows[0])
     console.log("Getting contavo info is finished!")

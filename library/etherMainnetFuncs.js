@@ -349,14 +349,6 @@ module.exports.getTokenInfo = async function getTokenInfo(tokenAddr) {
 
         totalSupply = totalSupply / 10 ** rows[0].tokenDecimals
 
-        var funcs = []
-
-        funcs.push(this.getPriceOfToken(tokenAddress))
-        funcs.push(getTokenTotalTrnasactions(tokenAddress))
-        funcs.push(this.getLast24HourInfos(tokenAddress))
-
-        var res = await Promise.all(funcs)
-
         if (rows.length == 0) {
             return {
                 status: 'Fail',
@@ -392,6 +384,58 @@ module.exports.getTokenInfo = async function getTokenInfo(tokenAddr) {
                     totalSupply: (totalSupply).toFixed(30),
                     totalHolders: rows[0].totalHolders,
                     holders: JSON.parse(rows[0].holders),
+                    createdAt: rows[0].createdAt,
+                    sourceCode: rows[0].sourceCode,
+                    description: infos.description.en,
+                    links: {
+                        coingecko: infos.links,
+                        etherscan: JSON.parse(rows[0].links)
+                    },
+                    image: {
+                        coingecko: infos.image,
+                        github: 'https://github.com/thefortube/trust-assets/blob/master/blockchains/ethereum/assets/' + Web3.utils.toChecksumAddress(tokenAddr) + '/logo.png?raw=true'
+                    },
+                }]
+            }
+        }
+    } catch (err) {
+        console.log(err)
+
+        return {
+            status: 'Fail(Server error)',
+            message: err,
+            data: []
+        }
+    }
+}
+
+module.exports.getTokenStatistics = async function getTokenStatistics(tokenAddr) {
+    try {
+        var tokenAddress = tokenAddr.toLowerCase()
+        var rows = await knex('eth_tokens').where('tokenAddress', tokenAddress).select('*')
+
+        var funcs = []
+
+        funcs.push(this.getPriceOfToken(tokenAddress))
+        funcs.push(getTokenTotalTrnasactions(tokenAddress))
+        funcs.push(this.getLast24HourInfos(tokenAddress))
+
+        var res = await Promise.all(funcs)
+
+        if (rows.length == 0) {
+            return {
+                status: 'Fail',
+                message: 'Token does not exist!',
+                data: []
+            }
+        } else {
+            return {
+                status: 'Success',
+                message: 'Getting token statistics completed successfully!',
+                data: [{
+                    address: rows[0].tokenAddress,
+                    symbol: rows[0].tokenSymbol,
+                    name: rows[0].tokenName,
                     totalTransactions: res[1] + res[2].todayTransactions,
                     last24hTransactions: res[2].totalTransactions,
                     last24hVolume: res[2].totalVolume,
@@ -421,17 +465,6 @@ module.exports.getTokenInfo = async function getTokenInfo(tokenAddr) {
                             price: res[2].price24,
                             changePercent: res[2].price24 == 0 ? 0 : -(100 - (res[0].data.price / res[2].price24 * 100)).toFixed(2)
                         },
-                    },
-                    createdAt: rows[0].createdAt,
-                    sourceCode: rows[0].sourceCode,
-                    description: infos.description.en,
-                    links: {
-                        coingecko: infos.links,
-                        etherscan: JSON.parse(rows[0].links)
-                    },
-                    image: {
-                        coingecko: infos.image,
-                        github: 'https://github.com/thefortube/trust-assets/blob/master/blockchains/ethereum/assets/' + Web3.utils.toChecksumAddress(tokenAddr) + '/logo.png?raw=true'
                     },
                 }]
             }

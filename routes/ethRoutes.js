@@ -93,4 +93,11 @@ router.get('/contavo_info', function(req, res, next) {
   })
 });
 
+router.get('/token_statistics/:tokenAddr', function(req, res, next) {
+  etherMainnetFuncs.getTokenStatistics(req.params.tokenAddr)
+  .then((data) => {
+    res.send(JSON.stringify(data))
+  })
+});
+
 module.exports = router;

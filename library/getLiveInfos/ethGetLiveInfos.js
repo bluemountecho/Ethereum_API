@@ -365,7 +365,7 @@ async function writeTransactionHistoryFile(deleteDate, writeDate) {
 
     await knex('eth_live').where('swapAt', '<', deleteDate + ' ' + '00:00:00').delete()
 
-    myLogger.log(writeDate + " WRITE TRANSACTION HISTORY FILE FINISHED!!!")
+    // myLogger.log(writeDate + " WRITE TRANSACTION HISTORY FILE FINISHED!!!")
 }
 
 async function init() {
@@ -400,12 +400,12 @@ async function init() {
             })
         ])
 
-        myLogger.log('==================================================')
-        myLogger.log('lastBlockNumber: ' + lastBlockNumber)
-        myLogger.log('UNISWAP V2 PAIR CREATED: ' + results[0].length)
-        myLogger.log('UNISWAP V2 SWAP        : ' + results[1].length)
-        myLogger.log('UNISWAP V3 POOL CREATED: ' + results[2].length)
-        myLogger.log('UNISWAP V3 SWAP        : ' + results[3].length)
+        // myLogger.log('==================================================')
+        // myLogger.log('lastBlockNumber: ' + lastBlockNumber)
+        // myLogger.log('UNISWAP V2 PAIR CREATED: ' + results[0].length)
+        // myLogger.log('UNISWAP V2 SWAP        : ' + results[1].length)
+        // myLogger.log('UNISWAP V3 POOL CREATED: ' + results[2].length)
+        // myLogger.log('UNISWAP V3 SWAP        : ' + results[3].length)
 
         for (var i = 0; i < results[0].length; i ++) {
             try {
@@ -419,8 +419,8 @@ async function init() {
                 var res = await getPairDecimals(pairAddress, tmpDate)
                 var baseToken = tokensData[token0Address].createdAt < tokensData[token1Address].createdAt ? 0 : 1
 
-                myLogger.log('-------------------------------------------')
-                myLogger.log('V2 CREATED: ' + results[0][i].transactionHash)
+                // myLogger.log('-------------------------------------------')
+                // myLogger.log('V2 CREATED: ' + results[0][i].transactionHash)
 
                 pairsData[pairAddress] = {
                     token0Address: token0Address,
@@ -444,6 +444,7 @@ async function init() {
                         decimals: res[0]
                     })
                 } catch (err) {
+                    myLogger.log('V2 CREATED: ' + results[0][i].transactionHash)
                     myLogger.log(err)
                 }
             } catch (err) {
@@ -507,8 +508,8 @@ async function init() {
 
                 swapMaker = '0x' + swapMaker
 
-                myLogger.log('-------------------------------------------')
-                myLogger.log('V2 SWAP: ' + results[1][i].transactionHash)
+                // myLogger.log('-------------------------------------------')
+                // myLogger.log('V2 SWAP: ' + results[1][i].transactionHash)
 
                 if (!pairsData[pairAddress]) {
                     pairsData[pairAddress] = {
@@ -553,6 +554,7 @@ async function init() {
                     try {
                         await knex('eth_live').insert(data)
                     } catch (err) {
+                        myLogger.log('V2 SWAP: ' + results[1][i].transactionHash)
                         myLogger.log(err)
                     }
                 } else if (pairsData[pairAddress].blockNumber < block || (pairsData[pairAddress].blockNumber == block && pairsData[pairAddress].transactionID < transactionID)) {
@@ -566,6 +568,7 @@ async function init() {
                             lastPrice: Math.abs(swap0 * 1.0 * 10 ** decimals[0] / swap1)
                         }).where('pairAddress', pairAddress)
                     } catch (err) {
+                        myLogger.log('V2 SWAP: ' + results[1][i].transactionHash)
                         myLogger.log(err)
                     }
 
@@ -583,6 +586,7 @@ async function init() {
                     try {
                         await knex('eth_live').insert(data)
                     } catch (err) {
+                        myLogger.log('V2 SWAP: ' + results[1][i].transactionHash)
                         myLogger.log(err)
                     }
                 }
@@ -603,8 +607,8 @@ async function init() {
                 var res = await getPairDecimals(pairAddress, tmpDate)
                 var baseToken = tokensData[token0Address].createdAt < tokensData[token1Address].createdAt ? 0 : 1
 
-                myLogger.log('-------------------------------------------')
-                myLogger.log('V3 CREATED: ' + results[2][i].transactionHash)
+                // myLogger.log('-------------------------------------------')
+                // myLogger.log('V3 CREATED: ' + results[2][i].transactionHash)
         
                 pairsData[pairAddress] = {
                     token0Address: token0Address,
@@ -628,6 +632,7 @@ async function init() {
                         decimals: res[0]
                     })
                 } catch (err) {
+                    myLogger.log('V3 CREATED: ' + results[2][i].transactionHash)
                     myLogger.log(err)
                 }
             } catch (err) {
@@ -687,8 +692,8 @@ async function init() {
 
                 swapMaker = '0x' + swapMaker
 
-                myLogger.log('-------------------------------------------')
-                myLogger.log('V3 SWAP: ' + results[3][i].transactionHash)
+                // myLogger.log('-------------------------------------------')
+                // myLogger.log('V3 SWAP: ' + results[3][i].transactionHash)
 
                 if (!pairsData[pairAddress]) {
                     pairsData[pairAddress] = {
@@ -734,6 +739,7 @@ async function init() {
                     try {
                         await knex('eth_live').insert(data)
                     } catch (err) {
+                        myLogger.log('V3 SWAP: ' + results[3][i].transactionHash)
                         myLogger.log(err)
                     }
                 } else if (pairsData[pairAddress].blockNumber < block || (pairsData[pairAddress].blockNumber == block && pairsData[pairAddress].transactionID < transactionID)) {
@@ -747,6 +753,7 @@ async function init() {
                             lastPrice: Math.abs(swap0 * 1.0 * 10 ** decimals[0] / swap1)
                         }).where('pairAddress', pairAddress)
                     } catch (err) {
+                        myLogger.log('V3 SWAP: ' + results[3][i].transactionHash)
                         myLogger.log(err)
                     }
 
@@ -764,6 +771,7 @@ async function init() {
                     try {
                         await knex('eth_live').insert(data)
                     } catch (err) {
+                        myLogger.log('V3 SWAP: ' + results[3][i].transactionHash)
                         myLogger.log(err)
                     }
                 }

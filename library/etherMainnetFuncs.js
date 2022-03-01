@@ -1044,7 +1044,7 @@ module.exports.getDailyMarketCap = async function getDailyMarketCap(tokenAddr, p
 }
 
 module.exports.getContavoInfo = async function getContavoInfo() {
-    var rows = await knex('eth_tokens').select('totalHolders').select('holders').select('links')
+    var rows = await knex('eth_tokens').select('tokenAddress').select('totalHolders').select('holders').select('links')
 
     return rows
 }

@@ -427,7 +427,7 @@ module.exports.getTokenInfo = async function getTokenInfo(tokenAddr) {
                     description: infos.description.en,
                     links: {
                         coingecko: infos.links,
-                        etherscan: rows[0].links
+                        etherscan: JSON.parse(rows[0].links)
                     },
                     image: {
                         coingecko: infos.image,

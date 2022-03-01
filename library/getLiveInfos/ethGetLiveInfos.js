@@ -356,12 +356,12 @@ async function writeTransactionHistoryFile(deleteDate, writeDate) {
         fs.appendFile(fileName, JSON.stringify(rows[i]) + '\n', "utf8", (err) => { })
     }
 
-    rows = (await knex.raw('select CONCAT(YEAR( eth_live.swapAt ), "-", MONTH( eth_live.swapAt ), "-", DAY( eth_live.swapAt )) AS SWAPAT, swapMaker as SWAPMAKER, pairAddress from eth_live where DATE(eth_live.swapAt)="' + writeDate + '" order by swapAt'))[0]
+    // rows = (await knex.raw('select CONCAT(YEAR( eth_live.swapAt ), "-", MONTH( eth_live.swapAt ), "-", DAY( eth_live.swapAt )) AS SWAPAT, swapMaker as SWAPMAKER, pairAddress from eth_live where DATE(eth_live.swapAt)="' + writeDate + '" order by swapAt'))[0]
 
-    for (var i = 0; i < rows.length; i ++) {
-        var fileName = path + '/swapers/' + rows[i].pairAddress + '.txt'
-        fs.appendFile(fileName, JSON.stringify(rows[i]) + '\n', "utf8", (err) => { })
-    }
+    // for (var i = 0; i < rows.length; i ++) {
+    //     var fileName = path + '/swapers/' + rows[i].pairAddress + '.txt'
+    //     fs.appendFile(fileName, JSON.stringify(rows[i]) + '\n', "utf8", (err) => { })
+    // }
 
     await knex('eth_live').where('swapAt', '<', deleteDate + ' ' + '00:00:00').delete()
 

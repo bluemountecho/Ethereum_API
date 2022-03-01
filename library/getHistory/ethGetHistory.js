@@ -824,12 +824,12 @@ async function writeTransactionHistoryFile(date) {
         fs.appendFile(fileName, JSON.stringify(rows[i]) + '\n', "utf8", (err) => { })
     }
 
-    rows = (await knex.raw('select CONCAT(YEAR( ' + pastTableName + '.swapAt ), "-", MONTH( ' + pastTableName + '.swapAt ), "-", DAY( ' + pastTableName + '.swapAt )) AS SWAPAT, swapMaker as SWAPMAKER, pairAddress from ' + pastTableName + ' where ' + pastTableName + '.swapAt<"' + date + ' ' + '00:00:00' + '" order by swapAt'))[0]
+    // rows = (await knex.raw('select CONCAT(YEAR( ' + pastTableName + '.swapAt ), "-", MONTH( ' + pastTableName + '.swapAt ), "-", DAY( ' + pastTableName + '.swapAt )) AS SWAPAT, swapMaker as SWAPMAKER, pairAddress from ' + pastTableName + ' where ' + pastTableName + '.swapAt<"' + date + ' ' + '00:00:00' + '" order by swapAt'))[0]
 
-    for (var i = 0; i < rows.length; i ++) {
-        var fileName = path + '/swapers/' + rows[i].pairAddress + '.txt'
-        fs.appendFile(fileName, JSON.stringify(rows[i]) + '\n', "utf8", (err) => { })
-    }
+    // for (var i = 0; i < rows.length; i ++) {
+    //     var fileName = path + '/swapers/' + rows[i].pairAddress + '.txt'
+    //     fs.appendFile(fileName, JSON.stringify(rows[i]) + '\n', "utf8", (err) => { })
+    // }
 
     await knex(pastTableName).where('swapAt', '<', date + ' ' + '00:00:00').delete()
 

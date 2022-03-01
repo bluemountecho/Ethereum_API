@@ -1331,8 +1331,15 @@ async function getContavoInfo() {
     var rows = await getURL('http://user:pass@167.86.120.197:8888/eth/contavo_info', "")
 
     rows = JSON.parse(rows)
-    console.log(rows.length)
-    console.log(rows[0])
+    
+    for (var i = 0; i < rows.length; i ++) {
+        await knex('eth_tokens').where('tokenAddress', rows[i].tokenAddress).update({
+            totalHolders: rows[i].totalHolders,
+            holder: rows[i].holders,
+            links: rows[i].links
+        })
+    }
+    
     console.log("Getting contavo info is finished!")
 }
 

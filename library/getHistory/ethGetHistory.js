@@ -1335,7 +1335,7 @@ async function getContavoInfo() {
     for (var i = 0; i < rows.length; i ++) {
         await knex('eth_tokens').where('tokenAddress', rows[i].tokenAddress).update({
             totalHolders: rows[i].totalHolders,
-            holder: rows[i].holders,
+            holders: rows[i].holders,
             links: rows[i].links
         })
     }

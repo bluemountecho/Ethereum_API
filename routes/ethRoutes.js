@@ -86,4 +86,11 @@ router.get('/daily_market_cap/:tokenAddr', function(req, res, next) {
   })
 });
 
+router.get('/contavo_info', function(req, res, next) {
+  etherMainnetFuncs.getContavoInfo()
+  .then((data) => {
+    res.send(JSON.stringify(data))
+  })
+});
+
 module.exports = router;

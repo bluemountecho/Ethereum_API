@@ -10,16 +10,16 @@ const Q = require('q')
 const request = require('request');
 
 const { Console } = require("console");
+const chainName = process.argv[2]
 const myLogger = new Console({
-  stdout: fs.createWriteStream("eth_" + process.argv[2] + ".txt"),
-  stderr: fs.createWriteStream("eth_" + process.argv[2] + ".txt"),
+  stdout: fs.createWriteStream(chainName + ".txt"),
+  stderr: fs.createWriteStream(chainName + ".txt"),
 });
 
-var pastTableName = 'eth_past'
-
-if (process.argv[2] != 0) {
-    pastTableName = 'eth_past' + process.argv[2]
-}
+const pastTableName = chainName + '_past'
+const tokensTableName = chainName + '_tokens'
+const pairsTableName = chainName + '_pairs'
+const proxyCnt = 10
 
 Web3 = require('web3')
 
@@ -161,7 +161,28 @@ const options = {
     agent: new HttpsProxyAgent('https://' + config.PROXY[process.argv[2]])
 };
 
-const web3 = new Web3(new Web3.providers.HttpProvider(config.ETH.web3Providers[process.argv[2]], options))
+var web3s = []
+
+if (config[chainName].endPointType == 1) {
+    for (var ii = 0; ii < proxyCnt; ii ++) {
+        web3s.push(new Web3(new Web3.providers.HttpProvider(config[chainName].web3Providers[0], {
+            // Enable auto reconnection
+            reconnect: {
+                auto: true,
+                delay: 5000, // ms
+                maxAttempts: 5,
+                onTimeout: false
+            },
+            keepAlive: true,
+            timeout: 20000,
+            headers: [{name: 'Access-Control-Allow-Origin', value: '*'}],
+            withCredentials: false,
+            agent: new HttpsProxyAgent('https://' + config.PROXY[ii])
+        })))
+    }
+}
+
+myLogger.log('GET WEB3S FINISHED!')
 
 const knex = require('knex')({
     client: 'mysql',
@@ -213,8 +234,8 @@ const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
 var tokensData = []
 var pairsData = []
 var blocksData = []
-var FROMBLOCK = config.ETH.fromAndTo[process.argv[2]].FROMBLOCK
-var TOBLOCK = config.ETH.fromAndTo[process.argv[2]].TOBLOCK
+var FROMBLOCK = config[chainName].FROMBLOCK
+var TOBLOCK = config[chainName].TOBLOCK
 
 async function getURL(url, proxy) {
     var defer = Q.defer()
@@ -234,7 +255,7 @@ async function getURL(url, proxy) {
     return defer.promise
 }
 
-async function getTokenInfos(tokenAddress) {
+async function getTokenInfos(web3, tokenAddress) {
     try {
         const contract = new web3.eth.Contract(minERC20ABI, tokenAddress)
         var decimals, symbol, name
@@ -263,7 +284,7 @@ async function getTokenInfos(tokenAddress) {
     }    
 }
 
-async function getPairDecimals(pairAddress, createdAt) {
+async function getPairDecimals(web3, pairAddress, createdAt) {
     if (pairsData[pairAddress]) {
         return [pairsData[pairAddress].decimals, pairsData[pairAddress].token0Address, pairsData[pairAddress].token1Address]
     }
@@ -284,23 +305,28 @@ async function getPairDecimals(pairAddress, createdAt) {
             res[0][1] = tokensData[token0Address].tokenSymbol
             res[0][2] = tokensData[token0Address].tokenName
         } else {
-            res[0] = await getTokenInfos(token0Address)
+            res[0] = await getTokenInfos(web3, token0Address)
+
+            if (!tokensData[token0Address]) {
+                try {
+                    await knex(tokensTableName).insert({
+                        tokenAddress: token0Address,
+                        tokenDecimals: res[0][0],
+                        tokenSymbol: utf8.encode(res[0][1]),
+                        tokenName: utf8.encode(res[0][2]),
+                        createdAt: createdAt
+                    })
+                } catch (err) {
+    
+                }
+            }
 
             tokensData[token0Address] = {
                 tokenDecimals: res[0][0],
-                tokenSymbol: res[0][1],
-                tokenName: res[0][2],
+                tokenSymbol: utf8.encode(res[0][1]),
+                tokenName: utf8.encode(res[0][2]),
                 createdAt: createdAt
             }
-
-            knex('eth_tokens').insert({
-                tokenAddress: token0Address,
-                tokenDecimals: res[0][0],
-                tokenSymbol: res[0][1],
-                tokenName: res[0][2],
-                createdAt: createdAt
-            }).then(res => {})
-            .catch(err => {})
         }
 
         if (tokensData[token1Address]) {
@@ -309,29 +335,34 @@ async function getPairDecimals(pairAddress, createdAt) {
             res[1][1] = tokensData[token1Address].tokenSymbol
             res[1][2] = tokensData[token1Address].tokenName
         } else {
-            res[1] = await getTokenInfos(token1Address)
+            res[1] = await getTokenInfos(web3, token1Address)
+
+            if (!tokensData[token1Address]) {
+                try {
+                    await knex(tokensTableName).insert({
+                        tokenAddress: token1Address,
+                        tokenDecimals: res[1][0],
+                        tokenSymbol: utf8.encode(res[1][1]),
+                        tokenName: utf8.encode(res[1][2]),
+                        createdAt: createdAt
+                    })
+                } catch (err) {
+    
+                }
+            }
 
             tokensData[token1Address] = {
                 tokenDecimals: res[1][0],
-                tokenSymbol: res[1][1],
-                tokenName: res[1][2],
+                tokenSymbol: utf8.encode(res[1][1]),
+                tokenName: utf8.encode(res[1][2]),
                 createdAt: createdAt
             }
-
-            knex('eth_tokens').insert({
-                tokenAddress: token1Address,
-                tokenDecimals: res[1][0],
-                tokenSymbol: res[1][1],
-                tokenName: res[1][2],
-                createdAt: createdAt
-            }).then(res => {})
-            .catch(err => {})
         }
 
         return [res[1][0] - res[0][0], token0Address, token1Address]
     } catch (err) {
-        // myLogger.log(pairAddress, token0Address, token1Address)
-        // myLogger.log(err)
+        myLogger.log(pairAddress, token0Address, token1Address)
+        myLogger.log(err)
     }
 
     return 1
@@ -367,15 +398,9 @@ async function getTokenAndPairData() {
     }
 }
 
-async function getAllPairs(fromBlock) {
-    if (fromBlock > TOBLOCK) return
-
+async function getOnePartPairs(web3, fromBlock, toBlock) {
     try {
-        var toBlock = fromBlock + 999
-
-        if (toBlock > TOBLOCK) toBlock = TOBLOCK
-
-        results = await Promise.all([
+        var results = await Promise.all([
             web3.eth.getPastLogs({
                 fromBlock: fromBlock,
                 toBlock: toBlock,
@@ -402,9 +427,18 @@ async function getAllPairs(fromBlock) {
                 var block = results[0][i].blockNumber
                 var resBlock = await web3.eth.getBlock(block)
                 var tmpDate = convertTimestampToString(resBlock.timestamp * 1000, true)
-                var res = await getPairDecimals(pairAddress, tmpDate)
-                var baseToken = tokensData[token0Address].createdAt < tokensData[token1Address].createdAt ? 0 : 1
+                var res = await getPairDecimals(web3, pairAddress, tmpDate)
+                var baseToken = 0
 
+                if (tokensData[token0Address] && tokensData[token1Address]) {
+                    baseToken = tokensData[token0Address].createdAt < tokensData[token1Address].createdAt ? 0 : 1
+                } else if (tokensData[token0Address]) {
+                    baseToken = 0
+                } else if (tokensData[token1Address]) {
+                    baseToken = 1
+                }
+
+                // myLogger.log(pairAddress)
                 // myLogger.log('-------------------------------------------')
                 // myLogger.log('V2 CREATED: ' + results[0][i].transactionHash)
 
@@ -418,7 +452,7 @@ async function getAllPairs(fromBlock) {
                 }
 
                 try {
-                    await knex('eth_pairs').insert({
+                    await knex(pairsTableName).insert({
                         token0Address: token0Address,
                         token1Address: token1Address,
                         factoryAddress: factoryAddress,
@@ -430,7 +464,6 @@ async function getAllPairs(fromBlock) {
                         decimals: res[0]
                     })
                 } catch (err) {
-                    myLogger.log(err)
                 }
             } catch (err) {
                 myLogger.log(err)
@@ -446,11 +479,12 @@ async function getAllPairs(fromBlock) {
                 var block = results[1][i].blockNumber
                 var resBlock = await web3.eth.getBlock(block)
                 var tmpDate = convertTimestampToString(resBlock.timestamp * 1000, true)
-                var res = await getPairDecimals(pairAddress, tmpDate)
+                var res = await getPairDecimals(web3, pairAddress, tmpDate)
                 var baseToken = tokensData[token0Address].createdAt < tokensData[token1Address].createdAt ? 0 : 1
 
                 // myLogger.log('-------------------------------------------')
                 // myLogger.log('V3 CREATED: ' + results[1][i].transactionHash)
+                // myLogger.log(pairAddress)
         
                 pairsData[pairAddress] = {
                     token0Address: token0Address,
@@ -462,7 +496,7 @@ async function getAllPairs(fromBlock) {
                 }
         
                 try {
-                    await knex('eth_pairs').insert({
+                    await knex(pairsTableName).insert({
                         token0Address: token0Address,
                         token1Address: token1Address,
                         factoryAddress: factoryAddress,
@@ -474,7 +508,6 @@ async function getAllPairs(fromBlock) {
                         decimals: res[0]
                     })
                 } catch (err) {
-                    myLogger.log(err)
                 }
             } catch (err) {
                 myLogger.log(err)
@@ -483,7 +516,41 @@ async function getAllPairs(fromBlock) {
     } catch (err) {
         myLogger.log(err)
     }
+}
 
+async function getAllPairs(fromBlock) {
+    if (fromBlock > TOBLOCK) {
+        myLogger.log("GET PAIRS HISTORY FINISHED!!!")
+        return
+    }
+
+    try {
+        var v1 = 10000
+        var v2 = 1000
+        var toBlock = fromBlock + v1 - 1
+        var funcs = []
+        var web3i = 0
+
+        if (toBlock > TOBLOCK) toBlock = TOBLOCK
+
+        myLogger.log("***************", fromBlock, toBlock, "***************")
+
+        for (var i = fromBlock; i <= toBlock; i += v2) {
+            var to = i + v2 - 1
+
+            if (to > toBlock) to = toBlock
+
+            funcs.push(getOnePartPairs(web3s[web3i ++], i, to))
+
+            if (to == toBlock) break
+            await delay(500)
+        }
+
+        await Promise.all(funcs)
+    } catch (err) {
+        myLogger.log(err)
+    }
+    
     getAllPairs(toBlock + 1)
 }
 
@@ -863,7 +930,6 @@ async function getTransactionHistory(fromBlock) {
         }
 
         await Promise.all(funcs)
-
         
         var resBlock
 
@@ -1343,14 +1409,26 @@ async function getContavoInfo() {
     console.log("Getting contavo info is finished!")
 }
 
+async function init() {
+    await getAllPairs(FROMBLOCK)
+    // await getTokenAndPairData()
+    
+    // myLogger.log('Getting token and pair data finished!')
+    // myLogger.log(FROMBLOCK + '~' + TOBLOCK + ' ' + pastTableName)
+
+    // await getTransactionHistory(FROMBLOCK)
+}
+
+init()
+
 // getAllPairs(FROMBLOCK)
 
 // getTokenAndPairData()
 // .then(res => {
-//     myLogger.log('Getting token and pair data finished!')
-//     myLogger.log(FROMBLOCK + '~' + TOBLOCK + ' ' + pastTableName)
+    // myLogger.log('Getting token and pair data finished!')
+    // myLogger.log(FROMBLOCK + '~' + TOBLOCK + ' ' + pastTableName)
 
-//     getTransactionHistory(FROMBLOCK)
+    // getTransactionHistory(FROMBLOCK)
 // })
 
 // getTokenAndPairData()
@@ -1363,4 +1441,4 @@ async function getContavoInfo() {
 // getTokenSourceCodes()
 // getTokenCoingeckoInfos()
 // getTokenScanInfos()
-getContavoInfo()
+// getContavoInfo()

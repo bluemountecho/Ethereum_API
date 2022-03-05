@@ -19,7 +19,7 @@ const myLogger = new Console({
 const pastTableName = chainName + '_past'
 const tokensTableName = chainName + '_tokens'
 const pairsTableName = chainName + '_pairs'
-const proxyCnt = 10
+const proxyCnt = 100
 
 Web3 = require('web3')
 
@@ -361,8 +361,8 @@ async function getPairDecimals(web3, pairAddress, createdAt) {
 
         return [res[1][0] - res[0][0], token0Address, token1Address]
     } catch (err) {
-        myLogger.log(pairAddress, token0Address, token1Address)
-        myLogger.log(err)
+        // myLogger.log(pairAddress, token0Address, token1Address)
+        // myLogger.log(err)
     }
 
     return 1
@@ -413,10 +413,10 @@ async function getOnePartPairs(web3, fromBlock, toBlock) {
             })
         ])
 
-        myLogger.log('==================================================')
-        myLogger.log('Block Range: ' + fromBlock + ' ~ ' + toBlock)
-        myLogger.log('UNISWAP V2 PAIR CREATED: ' + results[0].length)
-        myLogger.log('UNISWAP V3 POOL CREATED: ' + results[1].length)
+        // myLogger.log('==================================================')
+        // myLogger.log('Block Range: ' + fromBlock + ' ~ ' + toBlock)
+        // myLogger.log('UNISWAP V2 PAIR CREATED: ' + results[0].length)
+        // myLogger.log('UNISWAP V3 POOL CREATED: ' + results[1].length)
 
         for (var i = 0; i < results[0].length; i ++) {
             try {
@@ -525,7 +525,7 @@ async function getAllPairs(fromBlock) {
     }
 
     try {
-        var v1 = 10000
+        var v1 = 100000
         var v2 = 1000
         var toBlock = fromBlock + v1 - 1
         var funcs = []

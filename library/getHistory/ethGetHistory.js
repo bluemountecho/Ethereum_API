@@ -178,12 +178,12 @@ if (config[chainName].endPointType == 1) {
             timeout: 20000,
             headers: [{name: 'Access-Control-Allow-Origin', value: '*'}],
             withCredentials: false,
-            // agent: new HttpsProxyAgent('http://' + config.PROXY[ii]),
-            agent: {
-                // http: new HttpsProxyAgent('http://' + config.PROXY[ii]),
-                http: http.Agent('http://' + config.PROXY[ii]),
-                baseUrl: 'http://' + config.PROXY[ii]
-            }
+            agent: new HttpsProxyAgent('https://' + config.PROXY[ii]),
+            // agent: {
+            //     // http: new HttpsProxyAgent('http://' + config.PROXY[ii]),
+            //     http: http.Agent('http://' + config.PROXY[ii]),
+            //     baseUrl: 'http://' + config.PROXY[ii]
+            // }
         })))
     }
 }

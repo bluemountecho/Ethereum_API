@@ -6,6 +6,7 @@ const axios = require('axios')
 const utf8 = require('utf8')
 const { JSDOM } = require('jsdom')
 const https = require('https')
+const http = require('http')
 const Q = require('q')
 const request = require('request');
 
@@ -19,7 +20,7 @@ const myLogger = new Console({
 const pastTableName = chainName + '_past'
 const tokensTableName = chainName + '_tokens'
 const pairsTableName = chainName + '_pairs'
-const proxyCnt = 29
+const proxyCnt = 30
 
 Web3 = require('web3')
 
@@ -177,7 +178,12 @@ if (config[chainName].endPointType == 1) {
             timeout: 20000,
             headers: [{name: 'Access-Control-Allow-Origin', value: '*'}],
             withCredentials: false,
-            agent: new HttpsProxyAgent('https://' + config.PROXY[ii])
+            // agent: new HttpsProxyAgent('http://' + config.PROXY[ii]),
+            agent: {
+                // http: new HttpsProxyAgent('http://' + config.PROXY[ii]),
+                http: http.Agent('http://' + config.PROXY[ii]),
+                baseUrl: 'http://' + config.PROXY[ii]
+            }
         })))
     }
 }
@@ -413,6 +419,8 @@ async function getOnePartPairs(web3, fromBlock, toBlock) {
             })
         ])
 
+        console.log(results[0].length, results[1].length)
+
         // myLogger.log('==================================================')
         // myLogger.log('Block Range: ' + fromBlock + ' ~ ' + toBlock)
         // myLogger.log('UNISWAP V2 PAIR CREATED: ' + results[0].length)
@@ -525,7 +533,7 @@ async function getAllPairs(fromBlock) {
     }
 
     try {
-        var v1 = 29000
+        var v1 = 300000
         var v2 = 1000
         var toBlock = fromBlock + v1 - 1
         var funcs = []

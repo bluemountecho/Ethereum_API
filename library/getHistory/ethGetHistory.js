@@ -419,8 +419,6 @@ async function getOnePartPairs(web3, fromBlock, toBlock) {
             })
         ])
 
-        console.log(results[0].length, results[1].length)
-
         // myLogger.log('==================================================')
         // myLogger.log('Block Range: ' + fromBlock + ' ~ ' + toBlock)
         // myLogger.log('UNISWAP V2 PAIR CREATED: ' + results[0].length)

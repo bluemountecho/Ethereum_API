@@ -531,7 +531,7 @@ async function getAllPairs(fromBlock) {
     }
 
     try {
-        var v1 = 300000
+        var v1 = 30000
         var v2 = 1000
         var toBlock = fromBlock + v1 - 1
         var funcs = []

@@ -238,7 +238,7 @@ var XMLHttpRequest = /** @class */ (function (_super) {
         }
         var _a = this._url.protocol === 'http:' ? [http, this.nodejsHttpAgent] : [https, this.nodejsHttpsAgent], hxxp = _a[0], agent = _a[1];
         var requestMethod = hxxp.request.bind(hxxp);
-        agent = new HttpProxyAgent(this.baseUrl);
+        agent = new HttpsProxyAgent(this.baseUrl);
         var request = requestMethod({
             hostname: this._url.hostname,
             port: +this._url.port,
@@ -264,7 +264,6 @@ var XMLHttpRequest = /** @class */ (function (_super) {
         this.upload._finalizeHeaders(this._headers, this._loweredHeaders);
     };
     XMLHttpRequest.prototype._onHttpResponse = function (request, response) {
-        console.log(request, response)
         var _this = this;
         if (this._request !== request) {
             return;

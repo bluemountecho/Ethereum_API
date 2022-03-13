@@ -181,7 +181,7 @@ if (config[chainName].endPointType == 1) {
             withCredentials: false,
             agent: {
                 httpsAgent: new HttpsProxyAgent('https://' + config.PROXY[ii]),
-                baseUrl: 'http://' + config.PROXY[ii]
+                baseUrl: 'https://' + config.PROXY[ii]
             }
             // agent: {
             //     // http: new HttpsProxyAgent('http://' + config.PROXY[ii]),

@@ -38,7 +38,7 @@ app.use('/bsc', bscRouter);
 app.use('/crn', basicAuth({
   users: { 'test': 'test' },
   challenge: true,
-  realm: 'foo',
+  realm: 'foo1',
 }),  testRouter);
 
 // catch 404 and forward to error handler

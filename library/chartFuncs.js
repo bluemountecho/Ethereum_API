@@ -333,8 +333,8 @@ async function mergeDailyPairData(rows, token0Address, token1Address, startTime,
         var ad = (new Date(a.SWAPAT)).getTime()
         var bd = (new Date(b.SWAPAT)).getTime()
 
-        if (ad > bd) return -1
-        if (ad < bd) return 1
+        if (ad < bd) return -1
+        if (ad > bd) return 1
         return 0
     })
 

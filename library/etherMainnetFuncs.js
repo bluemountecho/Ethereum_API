@@ -232,7 +232,7 @@ module.exports.getAllTokens1 = async function getAllTokens(page = 0) {
         for (var i = 0; i < rows.length; i ++) {
             datas.push({
                 address: rows[i].tokenAddress,
-                symbol: rows[i].tokenSymbol,
+                symbol: rows[i].tokenSymbol.toUpperCase(),
                 // name: rows[i].tokenName
             })
         }

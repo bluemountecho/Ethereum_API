@@ -220,7 +220,7 @@ module.exports.getTokenInfo = async function getTokenInfo(tokenAddr) {
     }
 }
 
-async function getDailyPairData(pairAddr) {
+async function getDailyPairData(pairAddr, startTime, endTime, limit) {
     try {
         var pair = pairAddr.toLowerCase()
         var datas = []
@@ -228,7 +228,8 @@ async function getDailyPairData(pairAddr) {
         var rows = content.split('\n')
 
         for (var i = 0; i < rows.length - 1; i ++) {
-            datas.push(JSON.parse(rows[i]))
+            if (new Date(rows[i].SWAPAT).getTime() <= endTime)
+                datas.push(JSON.parse(rows[i]))
         }
 
         for (var i = 0; i < datas.length; i ++) {
@@ -242,7 +243,7 @@ async function getDailyPairData(pairAddr) {
     }
 }
 
-async function mergeDailyPairData(rows, token0Address, token1Address, page = -1) {
+async function mergeDailyPairData(rows, token0Address, token1Address, startTime, endTime, limit) {
     var datas = []
     var res = []
     var funcs = []
@@ -267,7 +268,7 @@ async function mergeDailyPairData(rows, token0Address, token1Address, page = -1)
         eth_live\
         LEFT JOIN eth_pairs ON eth_pairs.pairAddress = eth_live.pairAddress \
     WHERE\
-        eth_pairs.token0Address="' + token0Address + '" and eth_pairs.token1Address="' + token1Address + '" and DATE( eth_live.swapAt )="' + convertTimestampToString(new Date().getTime(), true).split(' ')[0] + '"\
+        eth_pairs.token0Address="' + token0Address + '" and eth_pairs.token1Address="' + token1Address + '" and DATE( eth_live.swapAt )="' + convertTimestampToString(endTime, true).split(' ')[0] + '"\
     GROUP BY\
         DATE( eth_live.swapAt ) \
     ORDER BY\
@@ -318,10 +319,10 @@ async function mergeDailyPairData(rows, token0Address, token1Address, page = -1)
             SWAPAT: swapAt,
             TOTALVOLUME0: totalVolume0.toFixed(30),
             TOTALVOLUME1: totalVolume1.toFixed(30),
-            VOLUME0: volume0.toFixed(30),
-            VOLUME1: volume1.toFixed(30),
-            LOWPRICE: minPrice.toFixed(30),
-            HIGHPRICE: maxPrice.toFixed(30),
+            // VOLUME0: volume0.toFixed(30),
+            // VOLUME1: volume1.toFixed(30),
+            // LOWPRICE: minPrice.toFixed(30),
+            // HIGHPRICE: maxPrice.toFixed(30),
             AVGPRICE: (totalVolume0 / totalVolume1).toFixed(30)
         })
     }
@@ -335,22 +336,11 @@ async function mergeDailyPairData(rows, token0Address, token1Address, page = -1)
         return 0
     })
 
-    if (page >= 0) {
-        var pageData = []
-
-        for (var i = page * 100; i < page * 100 + 100 && i < res.length; i ++) {
-            pageData.push(res[i])
-        }
-
-        return pageData
-    }
-
     return res
 }
 
-module.exports.getDailyTokenPrice = async function getDailyTokenPrice(tokenAddr, page = 0) {
+module.exports.getDailyTokenPrice = async function getDailyTokenPrice(tokenAddr, startTime, endTime, limit) {
     var tokenAddress = tokenAddr.toLowerCase()
-    var tokenInfo = await knex('eth_tokens').where('tokenAddress', tokenAddress).select('*')
 
     for (var i = 0; i < baseTokens.length; i ++) {
         var funcs = []
@@ -376,16 +366,16 @@ module.exports.getDailyTokenPrice = async function getDailyTokenPrice(tokenAddr,
         )
 
         var rows = await Promise.all(funcs)
-        var res1 = await mergeDailyPairData(rows[0], token0Address, token1Address, page)
-        var res2 = await mergeDailyPairData(rows[1], token2Address, token3Address)
+        var res1 = await mergeDailyPairData(rows[0], token0Address, token1Address, startTime, endTime, limit)
+        var res2 = await mergeDailyPairData(rows[1], token2Address, token3Address, startTime, endTime, limit)
 
         if (rows[0].length) {
             if (rows[0][0].token1Address != tokenAddress) {
                 for (var j = 0; j < res1.length; j ++) {
-                    var tmp = 1.0 / res1[j].LOWPRICE
+                    // var tmp = 1.0 / res1[j].LOWPRICE
     
-                    res1[j].LOWPRICE = 1.0 / res1[j].HIGHPRICE
-                    res1[j].HIGHPRICE = tmp
+                    // res1[j].LOWPRICE = 1.0 / res1[j].HIGHPRICE
+                    // res1[j].HIGHPRICE = tmp
                     res1[j].AVGPRICE = 1.0 / res1[j].AVGPRICE
                 }
             }
@@ -394,10 +384,10 @@ module.exports.getDailyTokenPrice = async function getDailyTokenPrice(tokenAddr,
         if (rows[1].length) {
             if (rows[1][0].token0Address != USDC_ADDRESS) {
                 for (var j = 0; j < res2.length; j ++) {
-                    var tmp = 1.0 / res2[j].LOWPRICE
+                    // var tmp = 1.0 / res2[j].LOWPRICE
     
-                    res2[j].LOWPRICE = 1.0 / res2[j].HIGHPRICE
-                    res2[j].HIGHPRICE = tmp
+                    // res2[j].LOWPRICE = 1.0 / res2[j].HIGHPRICE
+                    // res2[j].HIGHPRICE = tmp
                     res2[j].AVGPRICE = 1.0 / res2[j].AVGPRICE
                 }
             }
@@ -423,25 +413,17 @@ module.exports.getDailyTokenPrice = async function getDailyTokenPrice(tokenAddr,
 
                 if (k < 0) k = 0
 
-                res1[j].AVGPRICE = res1[j].AVGPRICE * res2[k].AVGPRICE
-                res1[j].HIGHPRICE = res1[j].HIGHPRICE * res2[k].HIGHPRICE
-                res1[j].LOWPRICE = res1[j].LOWPRICE * res2[k].LOWPRICE
+                res1[j].PRICE = res1[j].AVGPRICE * res2[k].AVGPRICE
+                // res1[j].HIGHPRICE = res1[j].HIGHPRICE * res2[k].HIGHPRICE
+                // res1[j].LOWPRICE = res1[j].LOWPRICE * res2[k].LOWPRICE
+                res1[j].SWAPAMOUNTINUSD = ((token0Address == baseTokens[i] ? res1[j].TOTALVOLUME0 : res1[j].TOTALVOLUME1) * res2[k].AVGPRICE).toFixed(30)
             }
             
-            return {
-                status: 'Success!',
-                symbol: tokenInfo[0].tokenSymbol,
-                name: tokenInfo[0].tokenName,
-                data: res1
-            }
+            return res1
         }
     }
     
-    return {
-        status: 'Fail',
-        message: "Can't find swap route!",
-        data: []
-    }
+    return []
 }
 
 module.exports.getDailyPairPrice = async function getDailyPairPrice(pairAddr, page = 0) {
@@ -632,5 +614,7 @@ module.exports.getLiveTokenPrice = async function getLiveTokenPrice(tokenAddr, s
 module.exports.getChartPriceData = async function getChartPriceData(tokenAddr, interval, startTime, endTime, limit) {
     if (interval == '1m') {
         return await this.getLiveTokenPrice(tokenAddr, startTime, endTime, limit)
+    } else {
+        return await this.getDailyTokenPrice(tokenAddr, startTime, endTime, limit)
     }
 }

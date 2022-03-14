@@ -631,3 +631,9 @@ module.exports.getLiveTokenPrice = async function getLiveTokenPrice(tokenAddr, s
         data: []
     }
 }
+
+module.exports.getChartPriceData = async function getChartPriceData(tokenAddr, interval, startTime, endTime, limit) {
+    if (interval == '1m') {
+        return await getLiveTokenPrice(tokenAddr, startTime, endTime, limit)
+    }
+}

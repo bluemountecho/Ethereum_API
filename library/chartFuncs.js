@@ -510,8 +510,10 @@ module.exports.getDailyPairPrice = async function getDailyPairPrice(pairAddr, pa
 
 async function getLivePairData(token0Address, token1Address, startTime, endTime, limit) {
     var rows 
-    var startDate = convertTimestampToString(startTime / 1, true)
-    var endDate = convertTimestampToString(endTime / 1, true)
+    var startDate = convertTimestampToString(parseInt(startTime), true)
+    var endDate = convertTimestampToString(parseInt(endTime), true)
+
+    console.log(startDate, endDate)
 
     rows = await knex('eth_live')
         .join('eth_pairs', 'eth_pairs.pairAddress', '=', 'eth_live.pairAddress')

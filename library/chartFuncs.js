@@ -634,8 +634,8 @@ module.exports.getLiveTokenPrice = async function getLiveTokenPrice(tokenAddr, s
 
 module.exports.getChartPriceData = async function getChartPriceData(tokenAddr, interval, startTime, endTime, limit) {
     console.log(tokenAddr, interval, startTime, endTime, limit)
-    
+
     if (interval == '1m') {
-        return await getLiveTokenPrice(tokenAddr, startTime, endTime, limit)
+        return await this.getLiveTokenPrice(tokenAddr, startTime, endTime, limit)
     }
 }

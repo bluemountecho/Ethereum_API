@@ -35,7 +35,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/eth', ethRouter);
 app.use('/bsc', bscRouter);
-app.use('/crn', testRouter)
+app.use('/crn', basicAuth({
+  users: { 'test': 'test' },
+  challenge: true,
+  realm: 'foo',
+}),  testRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

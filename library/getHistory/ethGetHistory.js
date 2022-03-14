@@ -21,7 +21,7 @@ const myLogger = new Console({
 const pastTableName = chainName + '_past'
 const tokensTableName = chainName + '_tokens'
 const pairsTableName = chainName + '_pairs'
-const proxyCnt = 50
+const proxyCnt = 1
 
 Web3 = require('web3')
 
@@ -181,7 +181,7 @@ if (config[chainName].endPointType == 1) {
             withCredentials: false,
             agent: {
                 httpsAgent: new HttpsProxyAgent('https://' + config.PROXY[ii]),
-                baseUrl: 'https://' + config.PROXY[ii]
+                baseUrl: 'http://' + config.PROXY[ii]
             }
             // agent: {
             //     // http: new HttpsProxyAgent('http://' + config.PROXY[ii]),
@@ -536,8 +536,8 @@ async function getAllPairs(fromBlock) {
     }
 
     try {
-        var v1 = 50000
-        var v2 = 1000
+        var v1 = 10
+        var v2 = 10
         var toBlock = fromBlock + v1 - 1
         var funcs = []
         var web3i = 0

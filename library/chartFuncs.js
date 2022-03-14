@@ -228,8 +228,10 @@ async function getDailyPairData(pairAddr, startTime, endTime, limit) {
         var rows = content.split('\n')
 
         for (var i = 0; i < rows.length - 1; i ++) {
-            if (new Date(rows[i].SWAPAT).getTime() <= endTime)
-                datas.push(JSON.parse(rows[i]))
+            var tmp = JSON.parse(rows[i])
+
+            if (new Date(tmp.SWAPAT).getTime() <= endTime)
+                datas.push(tmp)
         }
 
         for (var i = 0; i < datas.length; i ++) {

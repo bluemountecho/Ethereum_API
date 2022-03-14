@@ -224,30 +224,6 @@ module.exports.getAllTokens = async function getAllTokens(page = 0) {
     }
 }
 
-module.exports.getAllTokens1 = async function getAllTokens(page = 0) {
-    try {
-        var rows = await knex('eth_tokens').orderBy('createdAt', 'desc').select('*')
-        var datas = []
-
-        for (var i = 0; i < rows.length; i ++) {
-            datas.push({
-                address: rows[i].tokenAddress,
-                symbol: rows[i].tokenSymbol,
-                // name: rows[i].tokenName
-            })
-        }
-
-        return datas
-    } catch (err) {
-        console.log(err)
-        return {
-            status: 'Fail(Server)',
-            message: err,
-            data: []
-        }
-    }
-}
-
 module.exports.getTokensFromName = async function getTokensFromName(tokenName) {
     try {
         var rows = await knex('eth_tokens')

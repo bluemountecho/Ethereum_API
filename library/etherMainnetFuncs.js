@@ -226,7 +226,7 @@ module.exports.getAllTokens = async function getAllTokens(page = 0) {
 
 module.exports.getAllTokens1 = async function getAllTokens(page = 0) {
     try {
-        var rows = await knex('eth_tokens').orderBy('createdAt', 'desc').limit(100).offset(page * 100).select('*')
+        var rows = await knex('eth_tokens').orderBy('createdAt', 'desc').select('*')
         var datas = []
 
         for (var i = 0; i < rows.length; i ++) {

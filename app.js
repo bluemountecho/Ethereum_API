@@ -12,12 +12,6 @@ var testRouter = require('./routes/crnRoutes')
 
 var app = express();
 
-app.use(basicAuth({
-  users: { 'user': 'pass' },
-  challenge: true,
-  realm: 'foo',
-}))
-
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
@@ -33,13 +27,14 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use('/crn', testRouter);
+app.use(basicAuth({
+  users: { 'user': 'pass' },
+  challenge: true,
+  realm: 'foo',
+}))
 app.use('/eth', ethRouter);
 app.use('/bsc', bscRouter);
-app.use('/crn', basicAuth({
-  users: { 'test': 'test' },
-  challenge: true,
-  realm: 'foo1',
-}),  testRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

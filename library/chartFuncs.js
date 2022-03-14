@@ -249,7 +249,7 @@ async function mergeDailyPairData(rows, token0Address, token1Address, startTime,
     var funcs = []
 
     for (var i = 0; i < rows.length; i ++) {
-        funcs.push(getDailyPairData(rows[i].pairAddress))
+        funcs.push(getDailyPairData(rows[i].pairAddress, startTime, endTime, limit))
     }
 
     funcs.push(knex.raw('\

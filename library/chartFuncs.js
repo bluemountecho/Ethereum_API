@@ -517,10 +517,10 @@ async function getLivePairData(token0Address, token1Address, startTime, endTime)
         .join('eth_pairs', 'eth_pairs.pairAddress', '=', 'eth_live.pairAddress')
         .where('eth_pairs.token0Address', token0Address)
         .where('eth_pairs.token1Address', token1Address)
-        .where('eth_live.swapAt', '>=', startDate)
-        .where('eth_live.swapAt', '<=', endDate)
-        .orderBy('eth_live.swapAt', 'asc')
-        .select('eth_live.*', knex.raw('CONCAT(YEAR( eth_live.swapAt ), "-", MONTH( eth_live.swapAt ), "-", DAY( eth_live.swapAt ), " ", HOUR(eth_live.swapAt), ":", MINUTE(eth_live.swapAt), ":", SECOND(eth_live.swapAt)) as SWAPAT'))
+        // .where('eth_live.swapAt', '>=', startDate)
+        // .where('eth_live.swapAt', '<=', endDate)
+        // .orderBy('eth_live.swapAt', 'asc')
+        .select('eth_live.*', knex.raw('CONCAT(YEAR( eth_live.swapAt ), "-", MONTH( eth_live.swapAt ), "-", DAY( eth_live.swapAt ), " ", HOUR(eth_live.swapAt), ":", MINUTE(eth_live.swapAt)) as SWAPAT'))
 
     return rows
 }

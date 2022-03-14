@@ -509,6 +509,7 @@ module.exports.getDailyPairPrice = async function getDailyPairPrice(pairAddr, pa
 }
 
 async function getLivePairData(token0Address, token1Address, startTime, endTime, limit) {
+    console.log(startTime, endTime, limit)
     var rows 
     var startDate = convertTimestampToString(startTime, true)
     var endDate = convertTimestampToString(endTime, true)
@@ -578,7 +579,7 @@ module.exports.getLiveTokenPrice = async function getLiveTokenPrice(tokenAddr, s
         var token2Address = USDC_ADDRESS > baseTokens[i] ? baseTokens[i] : USDC_ADDRESS
         var token3Address = USDC_ADDRESS < baseTokens[i] ? baseTokens[i] : USDC_ADDRESS
 
-        var res = await Promise.all([this.mergeLivePairData(token0Address, token1Address, startTime, endTime, limit), this.mergeLivePairData(token2Address, token3Address, startTime, endTime, limit)])
+        var res = await Promise.all([this.mergeLivePairData(token0Address, token1Address, startTime, endTime, limit), this.mergeLivePairData(token2Address, token3Address, startTime, endTime, 100000)])
         var res1 = res[0]
         var res2 = res[1]
 
@@ -626,10 +627,7 @@ module.exports.getLiveTokenPrice = async function getLiveTokenPrice(tokenAddr, s
         }
     }
     
-    return {
-        message: "Can't find swap route!",
-        data: []
-    }
+    return []
 }
 
 module.exports.getChartPriceData = async function getChartPriceData(tokenAddr, interval, startTime, endTime, limit) {

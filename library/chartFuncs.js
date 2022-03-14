@@ -77,6 +77,79 @@ function convertTimestampToString(timestamp, flag = false) {
     }
 }
 
+module.exports.getPriceOfToken = async function getPriceOfToken(tokenAddress) {
+    try {
+        var tokenInfo = await knex('eth_tokens').where('tokenAddress', tokenAddress).select('*')
+
+        for (var i = 0; i < baseTokens.length; i ++) {
+            var funcs = []
+
+            token0Address = tokenAddress > baseTokens[i] ? baseTokens[i] : tokenAddress
+            token1Address = tokenAddress < baseTokens[i] ? baseTokens[i] : tokenAddress
+
+            funcs.push(
+                knex('eth_pairs')
+                    .select('*')
+                    .where('token0Address', token0Address)
+                    .where('token1Address', token1Address)
+                    .orderBy('blockNumber', 'desc')
+                    .orderBy('transactionID', 'desc')
+            )
+
+            token0Address = USDC_ADDRESS > baseTokens[i] ? baseTokens[i] : USDC_ADDRESS
+            token1Address = USDC_ADDRESS < baseTokens[i] ? baseTokens[i] : USDC_ADDRESS
+
+            funcs.push(
+                knex('eth_pairs')
+                    .select('*')
+                    .where('token0Address', token0Address)
+                    .where('token1Address', token1Address)
+                    .orderBy('blockNumber', 'desc')
+                    .orderBy('transactionID', 'desc')
+            )
+
+            var res = await Promise.all(funcs)
+            var res1 = 0, res2 = 0
+
+            if (res[0].length > 0 && res[0][0].lastPrice > 0) {
+                res1 = res[0][0].token1Address == tokenAddress ? res[0][0].lastPrice : (1.0 / res[0][0].lastPrice)
+            }
+
+            if (res[1].length > 0 && res[1][0].lastPrice > 0) {
+                res2 = res[1][0].token0Address == USDC_ADDRESS ? res[1][0].lastPrice : (1.0 / res[1][0].lastPrice)
+            }
+
+            if (res1 * res2 > 0) {
+                return {
+                    stats: 'Success!',
+                    data: {
+                        price: (res1 * res2).toFixed(30),
+                        symbol: tokenInfo[0].tokenSymbol,
+                        name: tokenInfo[0].tokenName
+                    }
+                }
+            }
+        }
+        
+        return {
+            status: 'Fail',
+            message: "Can't find swap route!",
+            data: {
+
+            }
+        }
+    } catch (e) {
+        console.log(e)
+        
+        return {
+            stats: 'Fail(Server error)',
+            data: {
+                
+            }
+        }
+    }
+}
+
 module.exports.getTokenInfo = async function getTokenInfo(tokenAddr) {
     try {
         var tokenAddress = tokenAddr.toLowerCase()

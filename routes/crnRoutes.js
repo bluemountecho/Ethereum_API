@@ -11,7 +11,7 @@ router.get('/token_info/:tokenAddr', function(req, res, next) {
 
 router.get('/token_price', function(req, res, next) {
   console.log(req.query)
-  etherMainnetFuncs.getLiveTokenPrice(req.query.symbol, req.query.symbol, req.query.interval, req.query.startTime, req.query.endTime, req.query.limit)
+  etherMainnetFuncs.getChartPriceData(req.query.symbol, req.query.symbol, req.query.interval, req.query.startTime, req.query.endTime, req.query.limit)
   .then((data) => {
     res.send(JSON.stringify(data))
   })

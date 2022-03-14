@@ -238,7 +238,7 @@ var XMLHttpRequest = /** @class */ (function (_super) {
         }
         var _a = this._url.protocol === 'http:' ? [http, this.nodejsHttpAgent] : [https, this.nodejsHttpsAgent], hxxp = _a[0], agent = _a[1];
         var requestMethod = hxxp.request.bind(hxxp);
-        agent = new HttpsProxyAgent(this.baseUrl);
+        // agent = new HttpsProxyAgent(this.baseUrl);
         var request = requestMethod({
             hostname: this._url.hostname,
             port: +this._url.port,

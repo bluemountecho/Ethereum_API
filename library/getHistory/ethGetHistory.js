@@ -21,7 +21,7 @@ const myLogger = new Console({
 const pastTableName = chainName + '_past'
 const tokensTableName = chainName + '_tokens'
 const pairsTableName = chainName + '_pairs'
-const proxyCnt = 50
+const proxyCnt = 100
 
 Web3 = require('web3')
 
@@ -536,7 +536,7 @@ async function getAllPairs(fromBlock) {
     }
 
     try {
-        var v1 = 50000
+        var v1 = 100000
         var v2 = 1000
         var toBlock = fromBlock + v1 - 1
         var funcs = []

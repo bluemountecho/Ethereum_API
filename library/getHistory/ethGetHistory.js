@@ -923,8 +923,8 @@ async function getTransactionHistory(fromBlock) {
     }
 
     try {
-        var v1 = 100
-        var v2 = 50
+        var v1 = 20000
+        var v2 = 200
         var toBlock = fromBlock + v1 - 1
         var funcs = []
         var web3i = 0

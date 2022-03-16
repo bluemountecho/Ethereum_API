@@ -886,7 +886,7 @@ async function writeTransactionHistoryFile(date) {
             sum( ' + pastTableName + '.swapAmount1 * ( ' + pairsTableName + '.baseToken * - 2 + 1 ) * ( ' + pastTableName + '.isBuy * - 2 + 1 ) ) AS VOLUME1,\
             sum( ' + pastTableName + '.swapAmount0 ) AS TOTALVOLUME0,\
             sum( ' + pastTableName + '.swapAmount1 ) AS TOTALVOLUME1,\
-            count( ' + pastTableName + '.swapMaker ) AS SWAPCOUNT \
+            count( ' + pastTableName + '.swapAmount0 ) AS SWAPCOUNT \
         FROM\
             ' + pastTableName + '\
             LEFT JOIN ' + pairsTableName + ' ON ' + pairsTableName + '.pairAddress = ' + pastTableName + '.pairAddress \

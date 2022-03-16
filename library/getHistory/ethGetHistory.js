@@ -1430,7 +1430,7 @@ async function init() {
     // myLogger.log('Getting token and pair data finished!')
     // myLogger.log(FROMBLOCK + '~' + TOBLOCK + ' ' + pastTableName)
 
-    await getTransactionHistory(FROMBLOCK)
+    // await getTransactionHistory(FROMBLOCK)
 }
 
 init()

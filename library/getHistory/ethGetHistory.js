@@ -21,6 +21,7 @@ const myLogger = new Console({
 const pastTableName = chainName + '_past'
 const tokensTableName = chainName + '_tokens'
 const pairsTableName = chainName + '_pairs'
+const dailyPastTableName = chainName + '_daily'
 const proxyCnt = 100
 
 Web3 = require('web3')
@@ -200,12 +201,12 @@ const knex = require('knex')({
     connection: {
         host : '127.0.0.1',
         port : 3306,
-        user : 'admin_root',
-        password : 'bOPTDZXP8Xvdf9I1',
-        database : 'admin_ethereum_api'
-        // user : 'root',
-        // password : '',
-        // database : 'ethereum_api'
+        // user : 'admin_root',
+        // password : 'bOPTDZXP8Xvdf9I1',
+        // database : 'admin_ethereum_api'
+        user : 'root',
+        password : '',
+        database : 'ethereum_api'
     }
 })
 
@@ -380,7 +381,7 @@ async function getPairDecimals(web3, pairAddress, createdAt) {
 }
 
 async function getTokenAndPairData() {
-    var res = await knex('eth_tokens').select('*')
+    var res = await knex(tokensTableName).select('*')
 
     myLogger.log(res.length)
 
@@ -393,7 +394,7 @@ async function getTokenAndPairData() {
         }
     }
 
-    res = await knex('eth_pairs').select('*')
+    res = await knex(pairsTableName).select('*')
 
     myLogger.log(res.length)
 
@@ -565,7 +566,7 @@ async function getAllPairs(fromBlock) {
     getAllPairs(toBlock + 1)
 }
 
-async function getOnePartTransactionHistory(fromBlock, toBlock) {
+async function getOnePartTransactionHistory(web3, fromBlock, toBlock) {
     try {
         var insertDatas = []
 
@@ -612,8 +613,8 @@ async function getOnePartTransactionHistory(fromBlock, toBlock) {
                 var decimals = await getPairDecimals(pairAddress, tmpDate)
                 var baseToken = tokensData[decimals[1]].createdAt < tokensData[decimals[2]].createdAt ? 0 : 1
                 var isBuy = 0
-                var transactionData = await web3.eth.getTransactionReceipt(transactionHash)
-                var swapMaker = ""
+                // var transactionData = await web3.eth.getTransactionReceipt(transactionHash)
+                // var swapMaker = ""
                 var baseAddress = baseToken == 0 ? decimals[2] : decimals[1]
 
                 if (baseToken == 0) {
@@ -630,18 +631,18 @@ async function getOnePartTransactionHistory(fromBlock, toBlock) {
                     }
                 }
 
-                for (var j = 0; j < transactionData.logs.length; j ++) {
-                    if (transactionData.logs[j].logIndex == transactionID) break;
-                    if (transactionData.logs[j].topics[0] == '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef' && transactionData.logs[j].address.toLowerCase() == baseAddress) {
-                        if (isBuy) {
-                            swapMaker = transactionData.logs[j].topics[2].substr(26, 40)
-                        } else {
-                            swapMaker = transactionData.logs[j].topics[1].substr(26, 40)
-                        }
-                    }
-                }
+                // for (var j = 0; j < transactionData.logs.length; j ++) {
+                //     if (transactionData.logs[j].logIndex == transactionID) break;
+                //     if (transactionData.logs[j].topics[0] == '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef' && transactionData.logs[j].address.toLowerCase() == baseAddress) {
+                //         if (isBuy) {
+                //             swapMaker = transactionData.logs[j].topics[2].substr(26, 40)
+                //         } else {
+                //             swapMaker = transactionData.logs[j].topics[1].substr(26, 40)
+                //         }
+                //     }
+                // }
 
-                swapMaker = '0x' + swapMaker
+                // swapMaker = '0x' + swapMaker
 
                 if (!pairsData[pairAddress]) {
                     pairsData[pairAddress] = {
@@ -654,7 +655,7 @@ async function getOnePartTransactionHistory(fromBlock, toBlock) {
                     }
 
                     try {
-                        await knex('eth_pairs').insert({
+                        await knex(pairsTableName).insert({
                             token0Address: decimals[1],
                             token1Address: decimals[2],
                             pairAddress: pairAddress,
@@ -666,7 +667,7 @@ async function getOnePartTransactionHistory(fromBlock, toBlock) {
                             createdAt: tmpDate
                         })
                     } catch (err) {
-                        await knex('eth_pairs').update({
+                        await knex(pairsTableName).update({
                             blockNumber: block,
                             transactionID: transactionID,
                             lastPrice: Math.abs(swap0 * 1.0 * 10 ** decimals[0] / swap1)
@@ -681,7 +682,7 @@ async function getOnePartTransactionHistory(fromBlock, toBlock) {
                         swapAt: tmpDate,
                         swapTransactionHash: transactionHash,
                         isBuy: isBuy,
-                        swapMaker: swapMaker
+                        // swapMaker: swapMaker
                     }
 
                     try {
@@ -695,7 +696,7 @@ async function getOnePartTransactionHistory(fromBlock, toBlock) {
                     pairsData[pairAddress].transactionID = transactionID
 
                     try {
-                        await knex('eth_pairs').update({
+                        await knex(pairsTableName).update({
                             blockNumber: block,
                             transactionID: transactionID,
                             lastPrice: Math.abs(swap0 * 1.0 * 10 ** decimals[0] / swap1)
@@ -712,7 +713,7 @@ async function getOnePartTransactionHistory(fromBlock, toBlock) {
                         swapAt: tmpDate,
                         swapTransactionHash: transactionHash,
                         isBuy: isBuy,
-                        swapMaker: swapMaker
+                        // swapMaker: swapMaker
                     }
 
                     try {
@@ -748,8 +749,8 @@ async function getOnePartTransactionHistory(fromBlock, toBlock) {
                 var decimals = await getPairDecimals(pairAddress, tmpDate)
                 var baseToken = tokensData[decimals[1]].createdAt < tokensData[decimals[2]].createdAt ? 0 : 1
                 var isBuy = 0
-                var transactionData = await web3.eth.getTransactionReceipt(transactionHash)
-                var swapMaker = ""
+                // var transactionData = await web3.eth.getTransactionReceipt(transactionHash)
+                // var swapMaker = ""
                 var baseAddress = baseToken == 0 ? decimals[2] : decimals[1]
 
                 if (baseToken == 0) {
@@ -766,18 +767,18 @@ async function getOnePartTransactionHistory(fromBlock, toBlock) {
                     }
                 }
 
-                for (var j = 0; j < transactionData.logs.length; j ++) {
-                    if (transactionData.logs[j].logIndex == transactionID) break;
-                    if (transactionData.logs[j].topics[0] == '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef' && transactionData.logs[j].address.toLowerCase() == baseAddress) {
-                        if (isBuy) {
-                            swapMaker = transactionData.logs[j].topics[2].substr(26, 40)
-                        } else {
-                            swapMaker = transactionData.logs[j].topics[1].substr(26, 40)
-                        }
-                    }
-                }
+                // for (var j = 0; j < transactionData.logs.length; j ++) {
+                //     if (transactionData.logs[j].logIndex == transactionID) break;
+                //     if (transactionData.logs[j].topics[0] == '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef' && transactionData.logs[j].address.toLowerCase() == baseAddress) {
+                //         if (isBuy) {
+                //             swapMaker = transactionData.logs[j].topics[2].substr(26, 40)
+                //         } else {
+                //             swapMaker = transactionData.logs[j].topics[1].substr(26, 40)
+                //         }
+                //     }
+                // }
 
-                swapMaker = '0x' + swapMaker
+                // swapMaker = '0x' + swapMaker
 
                 if (!pairsData[pairAddress]) {
                     pairsData[pairAddress] = {
@@ -790,7 +791,7 @@ async function getOnePartTransactionHistory(fromBlock, toBlock) {
                     }
 
                     try {
-                        await knex('eth_pairs').insert({
+                        await knex(pairsTableName).insert({
                             token0Address: decimals[1],
                             token1Address: decimals[2],
                             pairAddress: pairAddress,
@@ -802,7 +803,7 @@ async function getOnePartTransactionHistory(fromBlock, toBlock) {
                             createdAt: tmpDate
                         })
                     } catch (err) {
-                        await knex('eth_pairs').update({
+                        await knex(pairsTableName).update({
                             blockNumber: block,
                             transactionID: transactionID,
                             lastPrice: Math.abs(swap0 * 1.0 * 10 ** decimals[0] / swap1)
@@ -817,7 +818,7 @@ async function getOnePartTransactionHistory(fromBlock, toBlock) {
                         swapAt: tmpDate,
                         swapTransactionHash: transactionHash,
                         isBuy: isBuy,
-                        swapMaker: swapMaker
+                        // swapMaker: swapMaker
                     }
 
                     try {
@@ -831,7 +832,7 @@ async function getOnePartTransactionHistory(fromBlock, toBlock) {
                     pairsData[pairAddress].transactionID = transactionID
 
                     try {
-                        await knex('eth_pairs').update({
+                        await knex(pairsTableName).update({
                             blockNumber: block,
                             transactionID: transactionID,
                             lastPrice: Math.abs(swap0 * 1.0 * 10 ** decimals[0] / swap1)
@@ -848,7 +849,7 @@ async function getOnePartTransactionHistory(fromBlock, toBlock) {
                         swapAt: tmpDate,
                         swapTransactionHash: transactionHash,
                         isBuy: isBuy,
-                        swapMaker: swapMaker
+                        // swapMaker: swapMaker
                     }
 
                     try {
@@ -872,7 +873,7 @@ async function getOnePartTransactionHistory(fromBlock, toBlock) {
 }
 
 async function writeTransactionHistoryFile(date) {
-    var path = "../../database/ethereum"
+    var path = "../../database/" + chainName
 
     var rows = (await knex.raw('\
         SELECT\
@@ -881,14 +882,14 @@ async function writeTransactionHistoryFile(date) {
             avg( ' + pastTableName + '.swapPrice ) AS AVGPRICE,\
             max( ' + pastTableName + '.swapPrice ) AS MAXPRICE,\
             min( ' + pastTableName + '.swapPrice ) AS MINPRICE,\
-            sum( ' + pastTableName + '.swapAmount0 * ( eth_pairs.baseToken * 2 - 1 ) * ( ' + pastTableName + '.isBuy * - 2 + 1 ) ) AS VOLUME0,\
-            sum( ' + pastTableName + '.swapAmount1 * ( eth_pairs.baseToken * - 2 + 1 ) * ( ' + pastTableName + '.isBuy * - 2 + 1 ) ) AS VOLUME1,\
+            sum( ' + pastTableName + '.swapAmount0 * ( ' + pairsTableName + '.baseToken * 2 - 1 ) * ( ' + pastTableName + '.isBuy * - 2 + 1 ) ) AS VOLUME0,\
+            sum( ' + pastTableName + '.swapAmount1 * ( ' + pairsTableName + '.baseToken * - 2 + 1 ) * ( ' + pastTableName + '.isBuy * - 2 + 1 ) ) AS VOLUME1,\
             sum( ' + pastTableName + '.swapAmount0 ) AS TOTALVOLUME0,\
             sum( ' + pastTableName + '.swapAmount1 ) AS TOTALVOLUME1,\
             count( ' + pastTableName + '.swapMaker ) AS SWAPCOUNT \
         FROM\
             ' + pastTableName + '\
-            LEFT JOIN eth_pairs ON eth_pairs.pairAddress = ' + pastTableName + '.pairAddress \
+            LEFT JOIN ' + pairsTableName + ' ON ' + pairsTableName + '.pairAddress = ' + pastTableName + '.pairAddress \
         WHERE\
             ' + pastTableName + '.swapAt<"' + date + ' ' + '00:00:00' + '"\
         GROUP BY\
@@ -898,8 +899,9 @@ async function writeTransactionHistoryFile(date) {
             DATE( ' + pastTableName + '.swapAt)'))[0]
 
     for (var i = 0; i < rows.length; i ++) {
-        var fileName = path + '/transactions/' + rows[i].PAIRADDRESS + '.txt'
-        fs.appendFile(fileName, JSON.stringify(rows[i]) + '\n', "utf8", (err) => { })
+        // var fileName = path + '/transactions/' + rows[i].PAIRADDRESS + '.txt'
+        // fs.appendFile(fileName, JSON.stringify(rows[i]) + '\n', "utf8", (err) => { })
+        knex(dailyPastTableName).insert(rows[i])
     }
 
     // rows = (await knex.raw('select CONCAT(YEAR( ' + pastTableName + '.swapAt ), "-", MONTH( ' + pastTableName + '.swapAt ), "-", DAY( ' + pastTableName + '.swapAt )) AS SWAPAT, swapMaker as SWAPMAKER, pairAddress from ' + pastTableName + ' where ' + pastTableName + '.swapAt<"' + date + ' ' + '00:00:00' + '" order by swapAt'))[0]
@@ -925,6 +927,7 @@ async function getTransactionHistory(fromBlock) {
         var v2 = 50
         var toBlock = fromBlock + v1 - 1
         var funcs = []
+        var web3i = 0
 
         if (toBlock > TOBLOCK) toBlock = TOBLOCK
 
@@ -935,7 +938,7 @@ async function getTransactionHistory(fromBlock) {
 
             if (to > toBlock) to = toBlock
 
-            funcs.push(getOnePartTransactionHistory(i, to))
+            funcs.push(getOnePartTransactionHistory(web3s[web3i ++], i, to))
 
             if (to == toBlock) break
         }
@@ -977,7 +980,7 @@ async function getUniswapV2PairPriceHistory() {
     var sum = 0
     var isVisit = []
 
-    var rows = await knex('eth_pairs').select('*').where('lastPrice', '!=', 0)
+    var rows = await knex(pairsTableName).select('*').where('lastPrice', '!=', 0)
 
     for (var i = 0; i < rows.length; i ++) {
         isVisit[rows[i].pairAddress] = true
@@ -1011,7 +1014,7 @@ async function getUniswapV2PairPriceHistory() {
                 var block = results[j].blockNumber
                 var transactionID = results[j].logIndex
                 
-                await knex('eth_pairs').update({
+                await knex(pairsTableName).update({
                     lastPrice: Math.abs(swap0 * 1.0 * 10 ** decimals[0] / swap1),
                     blockNumber: block,
                     transactionID: transactionID
@@ -1037,7 +1040,7 @@ async function getUniswapV3PairPriceHistory() {
     var sum = 0
     var isVisit = []
 
-    var rows = await knex('eth_pairs').select('*').where('lastPrice', '!=', 0)
+    var rows = await knex(pairsTableName).select('*').where('lastPrice', '!=', 0)
 
     for (var i = 0; i < rows.length; i ++) {
         isVisit[rows[i].pairAddress] = true
@@ -1067,7 +1070,7 @@ async function getUniswapV3PairPriceHistory() {
                 var block = results[j].blockNumber
                 var transactionID = results[j].logIndex
                 
-                await knex('eth_pairs').update({
+                await knex(pairsTableName).update({
                     lastPrice: Math.abs(swap0 * 1.0 * 10 ** decimals[0] / swap1),
                     blockNumber: block,
                     transactionID: transactionID
@@ -1089,7 +1092,7 @@ async function getUniswapV3PairPriceHistory() {
 }
 
 async function getTokenSourceCodes() {
-    var tokens = await knex('eth_tokens').orderBy('createdAt', 'desc').where('sourceCode', '').select('*')
+    var tokens = await knex(tokensTableName).orderBy('createdAt', 'desc').where('sourceCode', '').select('*')
 
     myLogger.log('Tokens Length: ' + tokens.length)
 
@@ -1107,7 +1110,7 @@ async function getTokenSourceCodes() {
 
             }
 
-            await knex('eth_tokens')
+            await knex(tokensTableName)
                 .where('tokenAddress', tokens[i].tokenAddress)
                 .update({
                     sourceCode: utf8.encode(sourceCode),
@@ -1125,7 +1128,7 @@ async function getTokenSourceCodes() {
 }
 
 async function getTokenCoingeckoInfos() {
-    var tokens = await knex('eth_tokens').orderBy('createdAt', 'desc').where('coingeckoInfos', '').select('*')
+    var tokens = await knex(tokensTableName).orderBy('createdAt', 'desc').where('coingeckoInfos', '').select('*')
 
     myLogger.log('Tokens Length: ' + tokens.length)
 
@@ -1143,7 +1146,7 @@ async function getTokenCoingeckoInfos() {
 
             }
 
-            await knex('eth_tokens')
+            await knex(tokensTableName)
                 .where('tokenAddress', tokens[i].tokenAddress)
                 .update({
                     coingeckoInfos: utf8.encode(otherInfos)
@@ -1277,14 +1280,14 @@ async function getOneTokenScanInfos(tokenAddress, proxy) {
         }
     }
 
-    await knex('eth_tokens').where('tokenAddress', tokenAddress).update({
+    await knex(tokensTableName).where('tokenAddress', tokenAddress).update({
         totalSupply: totalSupply,
         totalHolders: totalHolders,
         links: JSON.stringify(links),
         holders: JSON.stringify(holders)
     })
 
-    // await knex('eth_tokens').insert({
+    // await knex(tokensTableName).insert({
     //     tokenAddress: tokenAddress,
     //     totalSupply: totalSupply,
     //     totalHolders: totalHolders,
@@ -1294,7 +1297,7 @@ async function getOneTokenScanInfos(tokenAddress, proxy) {
 }
 
 async function getTokenScanInfos() {
-    // var tokens = await knex('eth_tokens')
+    // var tokens = await knex(tokensTableName)
     //     .orderBy('createdAt', 'asc')
     //     .select('*')
     // var vis = []
@@ -1308,13 +1311,13 @@ async function getTokenScanInfos() {
 
     // for (var i = 0; i < res.data.data.length; i ++) {
     //     if (!vis[res.data.data[i].address]) {
-    //         await knex('eth_tokens').insert({
+    //         await knex(tokensTableName).insert({
     //             tokenAddress: res.data.data[i].address
     //         })
     //     }
     // }
 
-    tokens = await knex('eth_tokens')
+    tokens = await knex(tokensTableName)
         // .orderBy('createdAt', 'asc')
         .whereRaw('totalSupply is NULL')
         .select('*')
@@ -1324,7 +1327,7 @@ async function getTokenScanInfos() {
     myLogger.log(tokens.length)
 
     // for (var i = 0; i < tokens.length; i ++) {
-    //     await knex('eth_tokens').insert({
+    //     await knex(tokensTableName).insert({
     //         tokenAddress: tokens[i].address
     //     })
     //     myLogger.log(i)
@@ -1352,8 +1355,8 @@ async function getTokenScanInfos() {
 }
 
 async function addMissedTokens() {
-    var pairs = await knex('eth_pairs').orderBy('createdAt', 'asc').select('*')
-    var tokens = await knex('eth_tokens').select('*')
+    var pairs = await knex(pairsTableName).orderBy('createdAt', 'asc').select('*')
+    var tokens = await knex(tokensTableName).select('*')
     var tokenData = []
 
     for (var i = 0; i < tokens.length; i ++) {
@@ -1367,7 +1370,7 @@ async function addMissedTokens() {
             if (!tokenData[pairs[i].token0Address]) {
                 var res = await getTokenInfos(pairs[i].token0Address)
 
-                await knex('eth_tokens').insert({
+                await knex(tokensTableName).insert({
                     tokenAddress: pairs[i].token0Address,
                     tokenDecimals: res[0],
                     tokenSymbol: utf8.encode(res[1]),
@@ -1382,7 +1385,7 @@ async function addMissedTokens() {
             if (!tokenData[pairs[i].token1Address]) {
                 var res = await getTokenInfos(pairs[i].token1Address)
 
-                await knex('eth_tokens').insert({
+                await knex(tokensTableName).insert({
                     tokenAddress: pairs[i].token1Address,
                     tokenDecimals: res[0],
                     tokenSymbol: utf8.encode(res[1]),
@@ -1410,7 +1413,7 @@ async function getContavoInfo() {
     rows = JSON.parse(rows)
     
     for (var i = 0; i < rows.length; i ++) {
-        await knex('eth_tokens').where('tokenAddress', rows[i].tokenAddress).update({
+        await knex(tokensTableName).where('tokenAddress', rows[i].tokenAddress).update({
             totalHolders: rows[i].totalHolders,
             holders: rows[i].holders,
             links: rows[i].links
@@ -1421,13 +1424,13 @@ async function getContavoInfo() {
 }
 
 async function init() {
-    await getAllPairs(FROMBLOCK)
-    // await getTokenAndPairData()
+    // await getAllPairs(FROMBLOCK)
+    await getTokenAndPairData()
     
     // myLogger.log('Getting token and pair data finished!')
     // myLogger.log(FROMBLOCK + '~' + TOBLOCK + ' ' + pastTableName)
 
-    // await getTransactionHistory(FROMBLOCK)
+    await getTransactionHistory(FROMBLOCK)
 }
 
 init()

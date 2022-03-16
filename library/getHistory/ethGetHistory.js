@@ -948,7 +948,7 @@ async function getTransactionHistory(fromBlock) {
         var resBlock
 
         if (!blocksData[fromBlock]) {
-            resBlock = await web3.eth.getBlock(fromBlock)
+            resBlock = await web3s[0].eth.getBlock(fromBlock)
             blocksData[fromBlock] = {timestamp: resBlock.timestamp}
         } else {
             resBlock = blocksData[fromBlock]
@@ -957,7 +957,7 @@ async function getTransactionHistory(fromBlock) {
         var tmpDate1 = convertTimestampToString(resBlock.timestamp * 1000, true)
 
         if (!blocksData[toBlock]) {
-            resBlock = await web3.eth.getBlock(toBlock)
+            resBlock = await web3s[1].eth.getBlock(toBlock)
             blocksData[toBlock] = {timestamp: resBlock.timestamp}
         } else {
             resBlock = blocksData[toBlock]

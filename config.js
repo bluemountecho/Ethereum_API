@@ -3,8 +3,8 @@ module.exports.bsc = {
         'https://bsc-dataseed.binance.org/',
     ],
     'endPointType': 1,
-    'FROMBLOCK': 11806552,
-    'TOBLOCK': 15795552,
+    'FROMBLOCK': 0,
+    'TOBLOCK': 16104144,
 }
 
 module.exports.PROXY = [

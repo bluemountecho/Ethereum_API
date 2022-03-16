@@ -555,7 +555,7 @@ async function getAllPairs(fromBlock) {
             funcs.push(getOnePartPairs(web3s[web3i ++], i, to))
 
             if (to == toBlock) break
-            await delay(500)
+            // await delay(500)
         }
 
         await Promise.all(funcs)
@@ -1424,8 +1424,8 @@ async function getContavoInfo() {
 }
 
 async function init() {
-    // await getAllPairs(FROMBLOCK)
-    await getTokenAndPairData()
+    await getAllPairs(FROMBLOCK)
+    // await getTokenAndPairData()
     
     // myLogger.log('Getting token and pair data finished!')
     // myLogger.log(FROMBLOCK + '~' + TOBLOCK + ' ' + pastTableName)

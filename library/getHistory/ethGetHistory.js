@@ -901,7 +901,7 @@ async function writeTransactionHistoryFile(date) {
     for (var i = 0; i < rows.length; i ++) {
         // var fileName = path + '/transactions/' + rows[i].PAIRADDRESS + '.txt'
         // fs.appendFile(fileName, JSON.stringify(rows[i]) + '\n', "utf8", (err) => { })
-        knex(dailyPastTableName).insert(rows[i])
+        await knex(dailyPastTableName).insert(rows[i])
     }
 
     // rows = (await knex.raw('select CONCAT(YEAR( ' + pastTableName + '.swapAt ), "-", MONTH( ' + pastTableName + '.swapAt ), "-", DAY( ' + pastTableName + '.swapAt )) AS SWAPAT, swapMaker as SWAPMAKER, pairAddress from ' + pastTableName + ' where ' + pastTableName + '.swapAt<"' + date + ' ' + '00:00:00' + '" order by swapAt'))[0]
@@ -923,8 +923,8 @@ async function getTransactionHistory(fromBlock) {
     }
 
     try {
-        var v1 = 20000
-        var v2 = 200
+        var v1 = 2000
+        var v2 = 20
         var toBlock = fromBlock + v1 - 1
         var funcs = []
         var web3i = 0

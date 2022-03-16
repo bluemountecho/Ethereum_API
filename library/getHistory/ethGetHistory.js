@@ -610,7 +610,7 @@ async function getOnePartTransactionHistory(web3, fromBlock, toBlock) {
                 var tmpDate = convertTimestampToString(resBlock.timestamp * 1000, true)
                 var transactionID = results[0][i].logIndex
                 var transactionHash = results[0][i].transactionHash
-                var decimals = await getPairDecimals(pairAddress, tmpDate)
+                var decimals = await getPairDecimals(web3, pairAddress, tmpDate)
                 var baseToken = tokensData[decimals[1]].createdAt < tokensData[decimals[2]].createdAt ? 0 : 1
                 var isBuy = 0
                 // var transactionData = await web3.eth.getTransactionReceipt(transactionHash)
@@ -746,7 +746,7 @@ async function getOnePartTransactionHistory(web3, fromBlock, toBlock) {
                 var tmpDate = convertTimestampToString(resBlock.timestamp * 1000, true)
                 var transactionID = results[1][i].logIndex
                 var transactionHash = results[1][i].transactionHash
-                var decimals = await getPairDecimals(pairAddress, tmpDate)
+                var decimals = await getPairDecimals(web3, pairAddress, tmpDate)
                 var baseToken = tokensData[decimals[1]].createdAt < tokensData[decimals[2]].createdAt ? 0 : 1
                 var isBuy = 0
                 // var transactionData = await web3.eth.getTransactionReceipt(transactionHash)

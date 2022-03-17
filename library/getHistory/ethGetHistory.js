@@ -717,17 +717,19 @@ async function getOnePartTransactionHistory(web3, fromBlock, toBlock) {
                         myLogger.log(err)
                     }
                 } else {
-                    pairsData[pairAddress].blockNumber = block
-                    pairsData[pairAddress].transactionID = transactionID
-
-                    try {
-                        await knex(pairsTableName).update({
-                            blockNumber: block,
-                            transactionID: transactionID,
-                            lastPrice: Math.abs(swap0 * 1.0 * 10 ** decimals[0] / swap1)
-                        }).where('pairAddress', pairAddress)
-                    } catch (err) {
-                        myLogger.log(err)
+                    if (pairsData[pairAddress].blockNumber <= block && pairsData[pairAddress].transactionID <= transactionID) {
+                        pairsData[pairAddress].blockNumber = block
+                        pairsData[pairAddress].transactionID = transactionID
+                        
+                        try {
+                            await knex(pairsTableName).update({
+                                blockNumber: block,
+                                transactionID: transactionID,
+                                lastPrice: Math.abs(swap0 * 1.0 * 10 ** decimals[0] / swap1)
+                            }).where('pairAddress', pairAddress)
+                        } catch (err) {
+                            myLogger.log(err)
+                        }
                     }
 
                     var data = {
@@ -853,17 +855,19 @@ async function getOnePartTransactionHistory(web3, fromBlock, toBlock) {
                         myLogger.log(err)
                     }
                 } else {
-                    pairsData[pairAddress].blockNumber = block
-                    pairsData[pairAddress].transactionID = transactionID
+                    if (pairsData[pairAddress].blockNumber <= block && pairsData[pairAddress].transactionID <= transactionID) {
+                        pairsData[pairAddress].blockNumber = block
+                        pairsData[pairAddress].transactionID = transactionID
 
-                    try {
-                        await knex(pairsTableName).update({
-                            blockNumber: block,
-                            transactionID: transactionID,
-                            lastPrice: Math.abs(swap0 * 1.0 * 10 ** decimals[0] / swap1)
-                        }).where('pairAddress', pairAddress)
-                    } catch (err) {
-                        myLogger.log(err)
+                        try {
+                            await knex(pairsTableName).update({
+                                blockNumber: block,
+                                transactionID: transactionID,
+                                lastPrice: Math.abs(swap0 * 1.0 * 10 ** decimals[0] / swap1)
+                            }).where('pairAddress', pairAddress)
+                        } catch (err) {
+                            myLogger.log(err)
+                        }
                     }
 
                     var data = {
@@ -893,6 +897,7 @@ async function getOnePartTransactionHistory(web3, fromBlock, toBlock) {
             // await knex(pastTableName).insert(insertDatas)
         }
     } catch (err) {
+        console.log(fromBlock, toBlock, web3._provider)
         myLogger.log(err)
     }
 }

@@ -897,7 +897,7 @@ async function getOnePartTransactionHistory(web3, fromBlock, toBlock) {
             // await knex(pastTableName).insert(insertDatas)
         }
     } catch (err) {
-        console.log(fromBlock, toBlock, web3._provider)
+        myLogger.log(fromBlock, toBlock, web3._provider)
         myLogger.log(err)
     }
 }

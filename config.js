@@ -235,3 +235,17 @@ module.exports.optimism = {
     'PAIRV2': 1000,
     'PROXYCOUNT': 10,
 }
+
+module.exports.avalanche = {
+    'web3Providers': [
+        'https://api.avax.network/ext/bc/C/rpc',
+    ],
+    'endPointType': 1,
+    'FROMBLOCK': 0,
+    'TOBLOCK': 12212568,
+    'TRANSACTIONV1': 20000,
+    'TRANSACTIONV2': 200,
+    'PAIRV1': 100000,
+    'PAIRV2': 1000,
+    'PROXYCOUNT': 100,
+}

@@ -189,3 +189,26 @@ module.exports.polygon = {
     'PAIRV2': 1000,
     'PROXYCOUNT': 10,
 }
+
+module.exports.arbitrum = {
+    'web3Providers': [
+        "https://arb-mainnet.g.alchemy.com/v2/B-hSa-xUe7POBE4FphFTXZoY5Yg1Gp6A",
+        "https://arb-mainnet.g.alchemy.com/v2/CMyoMie29nBElpSvrBvQAi7z91eZhhQm",
+        "https://arb-mainnet.g.alchemy.com/v2/RfiObJCAeHwMraPJhkBVEogphZWC7TwU",
+        "https://arb-mainnet.g.alchemy.com/v2/Jj8Ex6xsFKfVdMZNsuwCAZ_xFq3yYMuD",
+        "https://arb-mainnet.g.alchemy.com/v2/XjaGi3LC5vKEnfWHiLWvC6SeW1_7v7SB",
+        "https://arb-mainnet.g.alchemy.com/v2/iCo869T-Woed7WvIKQ7k6K5ysy9vdqIR",
+        "https://arb-mainnet.g.alchemy.com/v2/Mu6ONfoSgJv_Fc05UI6vFpYb7-XiSH3_",
+        "https://arb-mainnet.g.alchemy.com/v2/VWPIPsUe8hWljWz46u4Ee0Z5yxJW36j9",
+        "https://arb-mainnet.g.alchemy.com/v2/dJYwbK8taJ8wVidFnkNkKFOjXPka8p37",
+        "https://arb-mainnet.g.alchemy.com/v2/5R8yB7E9R7__ftPYyMJBs0c9aQtavggF",
+    ],
+    'endPointType': 0,
+    'FROMBLOCK': 0,
+    'TOBLOCK': 8035177,
+    'TRANSACTIONV1': 2000,
+    'TRANSACTIONV2': 200,
+    'PAIRV1': 10000,
+    'PAIRV2': 1000,
+    'PROXYCOUNT': 10,
+}

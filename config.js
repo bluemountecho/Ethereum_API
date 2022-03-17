@@ -3,7 +3,7 @@ module.exports.bsc = {
         'https://bsc-dataseed.binance.org/',
     ],
     'endPointType': 1,
-    'FROMBLOCK': 11967361,
+    'FROMBLOCK': 320000,
     'TOBLOCK': 16104144,
     'TRANSACTIONV1': 20000,
     'TRANSACTIONV2': 200,

@@ -608,10 +608,10 @@ async function getOnePartTransactionHistory(web3, fromBlock, toBlock) {
             })
         ])
 
-        myLogger.log('==================================================')
-        myLogger.log('Block Range: ' + fromBlock + ' ~ ' + toBlock)
-        myLogger.log('UNISWAP V2 SWAP: ' + results[0].length)
-        myLogger.log('UNISWAP V3 SWAP: ' + results[1].length)
+        // myLogger.log('==================================================')
+        // myLogger.log('Block Range: ' + fromBlock + ' ~ ' + toBlock)
+        // myLogger.log('UNISWAP V2 SWAP: ' + results[0].length)
+        // myLogger.log('UNISWAP V3 SWAP: ' + results[1].length)
 
         for (var i = 0; i < results[0].length; i ++) {
             try {

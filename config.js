@@ -228,7 +228,7 @@ module.exports.optimism = {
     ],
     'endPointType': 0,
     'FROMBLOCK': 0,
-    'TOBLOCK': 36866,
+    'TOBLOCK': 4533196,
     'TRANSACTIONV1': 2000,
     'TRANSACTIONV2': 200,
     'PAIRV1': 10000,

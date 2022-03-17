@@ -212,3 +212,26 @@ module.exports.arbitrum = {
     'PAIRV2': 1000,
     'PROXYCOUNT': 10,
 }
+
+module.exports.optimism = {
+    'web3Providers': [
+        'https://opt-mainnet.g.alchemy.com/v2/OSIPOf0AZokqB8Hye9rGWEZnVBl1c6re',
+        'https://opt-mainnet.g.alchemy.com/v2/xhW5IVm05L5EOn78XXuyPTqAgdve-5Fz',
+        'https://opt-mainnet.g.alchemy.com/v2/Hm9LqAmvLAHShA1IJrIiKxy4MqIEqK3B',
+        'https://opt-mainnet.g.alchemy.com/v2/yEa7Zmm1MvXyWi7C0SXZm_lkVduz-nE-',
+        'https://opt-mainnet.g.alchemy.com/v2/LItBBHAHW-v9edqMQqOZbd0P4ykcEY47',
+        'https://opt-mainnet.g.alchemy.com/v2/r1mcAJC2-HXOGv9oRcRqMyuAEMyWYnu9',
+        'https://opt-mainnet.g.alchemy.com/v2/aPcJi4BQZWto9BJvsKU67nSsTVh63gT7',
+        'https://opt-mainnet.g.alchemy.com/v2/oWkWY5hXjKy250YHuI8Kj-4kvSfIlAPn',
+        'https://opt-mainnet.g.alchemy.com/v2/jy9FYFkC3v-Cvzw3nasrfBY_UYyqfrx7',
+        'https://opt-mainnet.g.alchemy.com/v2/TP1t1XaKC_li-Czjpqrzf7E6t1Ol6U4Q',
+    ],
+    'endPointType': 0,
+    'FROMBLOCK': 0,
+    'TOBLOCK': 36866,
+    'TRANSACTIONV1': 2000,
+    'TRANSACTIONV2': 200,
+    'PAIRV1': 10000,
+    'PAIRV2': 1000,
+    'PROXYCOUNT': 10,
+}

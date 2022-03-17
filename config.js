@@ -243,9 +243,9 @@ module.exports.avalanche = {
     'endPointType': 1,
     'FROMBLOCK': 0,
     'TOBLOCK': 12212568,
-    'TRANSACTIONV1': 20000,
+    'TRANSACTIONV1': 10000,
     'TRANSACTIONV2': 200,
-    'PAIRV1': 100000,
-    'PAIRV2': 1000,
-    'PROXYCOUNT': 100,
+    'PAIRV1': 10000,
+    'PAIRV2': 200,
+    'PROXYCOUNT': 50,
 }

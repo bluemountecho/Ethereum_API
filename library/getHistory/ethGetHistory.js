@@ -22,7 +22,7 @@ const pastTableName = chainName + '_past'
 const tokensTableName = chainName + '_tokens'
 const pairsTableName = chainName + '_pairs'
 const dailyPastTableName = chainName + '_daily'
-const proxyCnt = 100
+const proxyCnt = config[chainName].PROXYCOUNT
 
 Web3 = require('web3')
 
@@ -169,6 +169,31 @@ var web3s = []
 if (config[chainName].endPointType == 1) {
     for (var ii = 0; ii < proxyCnt; ii ++) {
         web3s.push(new Web3(new Web3.providers.HttpProvider(config[chainName].web3Providers[0], {
+            // Enable auto reconnection
+            reconnect: {
+                auto: true,
+                delay: 5000, // ms
+                maxAttempts: 5,
+                onTimeout: false
+            },
+            keepAlive: true,
+            timeout: 20000,
+            headers: [{name: 'Access-Control-Allow-Origin', value: '*'}],
+            withCredentials: false,
+            agent: {
+                // httpsAgent: new HttpsProxyAgent('https://' + config.PROXY[ii]),
+                baseUrl: 'http://' + config.PROXY[ii]
+            }
+            // agent: {
+            //     // http: new HttpsProxyAgent('http://' + config.PROXY[ii]),
+            //     http: http.Agent('http://' + config.PROXY[ii]),
+            //     baseUrl: 'http://' + config.PROXY[ii]
+            // }
+        })))
+    }
+} else {
+    for (var ii = 0; ii < proxyCnt; ii ++) {
+        web3s.push(new Web3(new Web3.providers.HttpProvider(config[chainName].web3Providers[ii], {
             // Enable auto reconnection
             reconnect: {
                 auto: true,
@@ -537,8 +562,8 @@ async function getAllPairs(fromBlock) {
     }
 
     try {
-        var v1 = 100000
-        var v2 = 1000
+        var v1 = config[chainName].PAIRV1
+        var v2 = config[chainName].PAIRV2
         var toBlock = fromBlock + v1 - 1
         var funcs = []
         var web3i = 0
@@ -923,8 +948,8 @@ async function getTransactionHistory(fromBlock) {
     }
 
     try {
-        var v1 = 2000
-        var v2 = 20
+        var v1 = config[chainName].TRANSACTIONV1
+        var v2 = config[chainName].TRANSACTIONV2
         var toBlock = fromBlock + v1 - 1
         var funcs = []
         var web3i = 0

@@ -5,6 +5,11 @@ module.exports.bsc = {
     'endPointType': 1,
     'FROMBLOCK': 11967361,
     'TOBLOCK': 16104144,
+    'TRANSACTIONV1': 20000,
+    'TRANSACTIONV2': 200,
+    'PAIRV1': 100000,
+    'PAIRV2': 1000,
+    'PROXYCOUNT': 100,
 }
 
 module.exports.PROXY = [
@@ -160,4 +165,27 @@ module.exports.ETH = {
         scanSite: 'https://api.etherscan.io',
         coinID: 'ethereum'
     }
+}
+
+module.exports.polygon = {
+    'web3Providers': [
+        'https://polygon-mainnet.g.alchemy.com/v2/9G7mimbs8eAYU7gh_eEWSGSM8moRb-tY',
+        'https://polygon-mainnet.g.alchemy.com/v2/WD0dXQdA20h7zrm4V_ljS-Qg0R0Xd0n2',
+        'https://polygon-mainnet.g.alchemy.com/v2/2FuYtYGGC2Asqnle9rFyePFrct0BhiRa',
+        'https://polygon-mainnet.g.alchemy.com/v2/Fv0qpWHoMf1hsYR2LrTKkw9MNSoXAMKS',
+        'https://polygon-mainnet.g.alchemy.com/v2/bZm2hhXpkGuyAsd-eDZpYyNSLGJ-hqtB',
+        'https://polygon-mainnet.g.alchemy.com/v2/FLsiHZ27feMEMRnqAttnnacoJl88AnDd',
+        'https://polygon-mainnet.g.alchemy.com/v2/fVJGPg9s3a3WDzZv0jJQUV-VDYuH88Ci',
+        'https://polygon-mainnet.g.alchemy.com/v2/0p_PtOFF6lNPiEZ6WDnjK1kBTLAOSkWG',
+        'https://polygon-mainnet.g.alchemy.com/v2/WbwgeLY2XkJabYJ-4mXeNhVYbEe4j-TB',
+        'https://polygon-mainnet.g.alchemy.com/v2/T56O8pkKhrwe9BUizzaxuxOGL_103bhE',
+    ],
+    'endPointType': 0,
+    'FROMBLOCK': 0,
+    'TOBLOCK': 26028293,
+    'TRANSACTIONV1': 2000,
+    'TRANSACTIONV2': 200,
+    'PAIRV1': 10000,
+    'PAIRV2': 1000,
+    'PROXYCOUNT': 10,
 }

@@ -551,6 +551,7 @@ async function getOnePartPairs(web3, fromBlock, toBlock) {
             }
         }
     } catch (err) {
+        myLogger.log(fromBlock, toBlock, web3._provider)
         myLogger.log(err)
     }
 }

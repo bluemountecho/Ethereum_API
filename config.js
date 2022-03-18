@@ -250,7 +250,7 @@ module.exports.avalanche = {
     'PROXYCOUNT': 68,
 }
 
-module.exports.avalanche = {
+module.exports.fantom = {
     'web3Providers': [
         'https://rpc.ftm.tools',
     ],

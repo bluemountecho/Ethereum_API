@@ -402,7 +402,7 @@ async function getPairDecimals(web3, pairAddress, createdAt) {
         // myLogger.log(err)
     }
 
-    return 1
+    return [0, 0, 0]
 }
 
 async function getTokenAndPairData() {
@@ -638,6 +638,9 @@ async function getOnePartTransactionHistory(web3, fromBlock, toBlock) {
                 var transactionID = results[0][i].logIndex
                 var transactionHash = results[0][i].transactionHash
                 var decimals = await getPairDecimals(web3, pairAddress, tmpDate)
+
+                if (decimals[1] == 0) continue;
+                
                 var baseToken = 0
                 try {
                     baseToken = tokensData[decimals[1]].createdAt < tokensData[decimals[2]].createdAt ? 0 : 1
@@ -780,6 +783,9 @@ async function getOnePartTransactionHistory(web3, fromBlock, toBlock) {
                 var transactionID = results[1][i].logIndex
                 var transactionHash = results[1][i].transactionHash
                 var decimals = await getPairDecimals(web3, pairAddress, tmpDate)
+
+                if (decimals[1] == 0) continue;
+
                 var baseToken = 0
                 try {
                     baseToken = tokensData[decimals[1]].createdAt < tokensData[decimals[2]].createdAt ? 0 : 1

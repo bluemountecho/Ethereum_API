@@ -638,7 +638,11 @@ async function getOnePartTransactionHistory(web3, fromBlock, toBlock) {
                 var transactionID = results[0][i].logIndex
                 var transactionHash = results[0][i].transactionHash
                 var decimals = await getPairDecimals(web3, pairAddress, tmpDate)
-                var baseToken = tokensData[decimals[1]].createdAt < tokensData[decimals[2]].createdAt ? 0 : 1
+                var baseToken = 0
+                try {
+                    baseToken = tokensData[decimals[1]].createdAt < tokensData[decimals[2]].createdAt ? 0 : 1
+                } catch (err) {
+                }
                 var isBuy = 0
                 // var transactionData = await web3.eth.getTransactionReceipt(transactionHash)
                 // var swapMaker = ""
@@ -776,7 +780,11 @@ async function getOnePartTransactionHistory(web3, fromBlock, toBlock) {
                 var transactionID = results[1][i].logIndex
                 var transactionHash = results[1][i].transactionHash
                 var decimals = await getPairDecimals(web3, pairAddress, tmpDate)
-                var baseToken = tokensData[decimals[1]].createdAt < tokensData[decimals[2]].createdAt ? 0 : 1
+                var baseToken = 0
+                try {
+                    baseToken = tokensData[decimals[1]].createdAt < tokensData[decimals[2]].createdAt ? 0 : 1
+                } catch (err) {
+                }
                 var isBuy = 0
                 // var transactionData = await web3.eth.getTransactionReceipt(transactionHash)
                 // var swapMaker = ""

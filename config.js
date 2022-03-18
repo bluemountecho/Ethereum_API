@@ -181,7 +181,7 @@ module.exports.polygon = {
         'https://polygon-mainnet.g.alchemy.com/v2/T56O8pkKhrwe9BUizzaxuxOGL_103bhE',
     ],
     'endPointType': 0,
-    'FROMBLOCK': 0,
+    'FROMBLOCK': 3559367,
     'TOBLOCK': 26028293,
     'TRANSACTIONV1': 2000,
     'TRANSACTIONV2': 200,

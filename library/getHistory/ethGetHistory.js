@@ -1457,7 +1457,7 @@ async function getContavoInfo() {
 }
 
 async function init() {
-    // await getAllPairs(FROMBLOCK)
+    await getAllPairs(FROMBLOCK)
     await getTokenAndPairData()
     
     myLogger.log('Getting token and pair data finished!')

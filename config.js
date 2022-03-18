@@ -266,7 +266,7 @@ module.exports.fantom = {
 
 module.exports.harmony = {
     'web3Providers': [
-        'https://api.harmony.one',
+        'https://api.s0.t.hmny.io',
     ],
     'endPointType': 1,
     'FROMBLOCK': 0,

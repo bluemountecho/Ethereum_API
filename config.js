@@ -169,7 +169,7 @@ module.exports.ETH = {
 
 module.exports.polygon = {
     'web3Providers': [
-        'https://rpc-mainnet.matic.network',
+        'https://polygon-rpc.com',
         // 'https://polygon-mainnet.g.alchemy.com/v2/9G7mimbs8eAYU7gh_eEWSGSM8moRb-tY',
         // 'https://polygon-mainnet.g.alchemy.com/v2/WD0dXQdA20h7zrm4V_ljS-Qg0R0Xd0n2',
         // 'https://polygon-mainnet.g.alchemy.com/v2/2FuYtYGGC2Asqnle9rFyePFrct0BhiRa',

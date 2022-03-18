@@ -578,6 +578,7 @@ async function getAllPairs(fromBlock) {
             if (to > toBlock) to = toBlock
 
             funcs.push(getOnePartPairs(web3s[web3i ++], i, to))
+            await delay(100)
 
             if (to == toBlock) break
             // await delay(500)
@@ -969,6 +970,7 @@ async function getTransactionHistory(fromBlock) {
             if (to > toBlock) to = toBlock
 
             funcs.push(getOnePartTransactionHistory(web3s[web3i ++], i, to))
+            await delay(100)
 
             if (to == toBlock) break
         }
@@ -1454,13 +1456,13 @@ async function getContavoInfo() {
 }
 
 async function init() {
-    // await getAllPairs(FROMBLOCK)
-    await getTokenAndPairData()
+    await getAllPairs(FROMBLOCK)
+    // await getTokenAndPairData()
     
-    myLogger.log('Getting token and pair data finished!')
-    myLogger.log(FROMBLOCK + '~' + TOBLOCK + ' ' + pastTableName)
+    // myLogger.log('Getting token and pair data finished!')
+    // myLogger.log(FROMBLOCK + '~' + TOBLOCK + ' ' + pastTableName)
 
-    await getTransactionHistory(FROMBLOCK)
+    // await getTransactionHistory(FROMBLOCK)
 }
 
 init()

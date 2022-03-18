@@ -277,3 +277,17 @@ module.exports.harmony = {
     'PAIRV2': 1000,
     'PROXYCOUNT': 68,
 }
+
+module.exports.cronos = {
+    'web3Providers': [
+        'https://evm.cronos.org',
+    ],
+    'endPointType': 1,
+    'FROMBLOCK': 0,
+    'TOBLOCK': 1950475,
+    'TRANSACTIONV1': 13600,
+    'TRANSACTIONV2': 200,
+    'PAIRV1': 68000,
+    'PAIRV2': 1000,
+    'PROXYCOUNT': 68,
+}

@@ -263,3 +263,17 @@ module.exports.fantom = {
     'PAIRV2': 1000,
     'PROXYCOUNT': 68,
 }
+
+module.exports.harmony = {
+    'web3Providers': [
+        'https://api.harmony.one',
+    ],
+    'endPointType': 1,
+    'FROMBLOCK': 0,
+    'TOBLOCK': 24195953,
+    'TRANSACTIONV1': 13600,
+    'TRANSACTIONV2': 200,
+    'PAIRV1': 68000,
+    'PAIRV2': 1000,
+    'PROXYCOUNT': 68,
+}

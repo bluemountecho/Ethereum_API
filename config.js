@@ -334,3 +334,17 @@ module.exports.moonriver = {
     'PAIRV2': 1000,
     'PROXYCOUNT': 68,
 }
+
+module.exports.metis = {
+    'web3Providers': [
+        'https://andromeda.metis.io/?owner=1088',
+    ],
+    'endPointType': 1,
+    'FROMBLOCK': 0,
+    'TOBLOCK': 1704002,
+    'TRANSACTIONV1': 13600,
+    'TRANSACTIONV2': 200,
+    'PAIRV1': 68000,
+    'PAIRV2': 1000,
+    'PROXYCOUNT': 68,
+}

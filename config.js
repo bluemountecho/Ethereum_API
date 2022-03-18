@@ -270,7 +270,7 @@ module.exports.harmony = {
         'https://api.s0.t.hmny.io',
     ],
     'endPointType': 1,
-    'FROMBLOCK': 0,
+    'FROMBLOCK': 5519385,
     'TOBLOCK': 24195953,
     'TRANSACTIONV1': 13600,
     'TRANSACTIONV2': 200,

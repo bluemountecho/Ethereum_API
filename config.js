@@ -348,3 +348,17 @@ module.exports.metis = {
     'PAIRV2': 1000,
     'PROXYCOUNT': 68,
 }
+
+module.exports.heco = {
+    'web3Providers': [
+        'https://http-mainnet-node.huobichain.com',
+    ],
+    'endPointType': 1,
+    'FROMBLOCK': 0,
+    'TOBLOCK': 13570714,
+    'TRANSACTIONV1': 13600,
+    'TRANSACTIONV2': 200,
+    'PAIRV1': 68000,
+    'PAIRV2': 1000,
+    'PROXYCOUNT': 68,
+}

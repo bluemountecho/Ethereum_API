@@ -298,7 +298,7 @@ module.exports.aurora = {
         'https://mainnet.aurora.dev',
     ],
     'endPointType': 1,
-    'FROMBLOCK': 0,
+    'FROMBLOCK': 50398142,
     'TOBLOCK': 61649006,
     'TRANSACTIONV1': 13600,
     'TRANSACTIONV2': 200,

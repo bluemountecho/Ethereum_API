@@ -947,7 +947,8 @@ async function writeTransactionHistoryFile(date) {
     for (var i = 0; i < rows.length; i ++) {
         // var fileName = path + '/transactions/' + rows[i].PAIRADDRESS + '.txt'
         // fs.appendFile(fileName, JSON.stringify(rows[i]) + '\n', "utf8", (err) => { })
-        await knex(dailyPastTableName).insert(rows[i])
+        // await knex(dailyPastTableName).insert(rows[i])
+        await knex(dailyPastTableName).insert(rows)
     }
 
     // rows = (await knex.raw('select CONCAT(YEAR( ' + pastTableName + '.swapAt ), "-", MONTH( ' + pastTableName + '.swapAt ), "-", DAY( ' + pastTableName + '.swapAt )) AS SWAPAT, swapMaker as SWAPMAKER, pairAddress from ' + pastTableName + ' where ' + pastTableName + '.swapAt<"' + date + ' ' + '00:00:00' + '" order by swapAt'))[0]
@@ -957,7 +958,7 @@ async function writeTransactionHistoryFile(date) {
     //     fs.appendFile(fileName, JSON.stringify(rows[i]) + '\n', "utf8", (err) => { })
     // }
 
-    await knex(pastTableName).where('swapAt', '<', date + ' ' + '00:00:00').delete()
+    // await knex(pastTableName).where('swapAt', '<', date + ' ' + '00:00:00').delete()
 
     myLogger.log("WRITE TRANSACTION HISTORY FILE FINISHED!!!")
 }
@@ -1472,12 +1473,13 @@ async function getContavoInfo() {
 
 async function init() {
     // await getAllPairs(FROMBLOCK)
-    await getTokenAndPairData()
+    // await getTokenAndPairData()
     
-    myLogger.log('Getting token and pair data finished!')
-    myLogger.log(FROMBLOCK + '~' + TOBLOCK + ' ' + pastTableName)
+    // myLogger.log('Getting token and pair data finished!')
+    // myLogger.log(FROMBLOCK + '~' + TOBLOCK + ' ' + pastTableName)
 
-    await getTransactionHistory(FROMBLOCK)
+    // await getTransactionHistory(FROMBLOCK)
+    await writeTransactionHistoryFile('2021-04-19')
 }
 
 init()

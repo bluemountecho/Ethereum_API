@@ -944,12 +944,12 @@ async function writeTransactionHistoryFile(date) {
         ORDER BY\
             DATE( ' + pastTableName + '.swapAt)'))[0]
 
-    for (var i = 0; i < rows.length; i ++) {
-        // var fileName = path + '/transactions/' + rows[i].PAIRADDRESS + '.txt'
-        // fs.appendFile(fileName, JSON.stringify(rows[i]) + '\n', "utf8", (err) => { })
-        // await knex(dailyPastTableName).insert(rows[i])
-        await knex(dailyPastTableName).insert(rows)
-    }
+    // for (var i = 0; i < rows.length; i ++) {
+    //     // var fileName = path + '/transactions/' + rows[i].PAIRADDRESS + '.txt'
+    //     // fs.appendFile(fileName, JSON.stringify(rows[i]) + '\n', "utf8", (err) => { })
+    //     // await knex(dailyPastTableName).insert(rows[i])
+    await knex(dailyPastTableName).insert(rows)
+    // }
 
     // rows = (await knex.raw('select CONCAT(YEAR( ' + pastTableName + '.swapAt ), "-", MONTH( ' + pastTableName + '.swapAt ), "-", DAY( ' + pastTableName + '.swapAt )) AS SWAPAT, swapMaker as SWAPMAKER, pairAddress from ' + pastTableName + ' where ' + pastTableName + '.swapAt<"' + date + ' ' + '00:00:00' + '" order by swapAt'))[0]
 

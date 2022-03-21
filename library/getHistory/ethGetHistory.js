@@ -1019,7 +1019,7 @@ async function getTransactionHistory(fromBlock) {
         var tmpDate2 = convertTimestampToString(resBlock.timestamp * 1000, true)
 
         if (tmpDate1.split(' ')[0] != tmpDate2.split(' ')[0]) {
-            writeTransactionHistoryFile(tmpDate2.split(' ')[0])
+            await writeTransactionHistoryFile(tmpDate2.split(' ')[0])
         }
     } catch (err) {
         myLogger.log(err)

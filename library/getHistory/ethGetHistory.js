@@ -958,7 +958,7 @@ async function writeTransactionHistoryFile(date) {
     //     fs.appendFile(fileName, JSON.stringify(rows[i]) + '\n', "utf8", (err) => { })
     // }
 
-    // await knex(pastTableName).where('swapAt', '<', date + ' ' + '00:00:00').delete()
+    await knex(pastTableName).where('swapAt', '<', date + ' ' + '00:00:00').delete()
 
     myLogger.log("WRITE TRANSACTION HISTORY FILE FINISHED!!!")
 }

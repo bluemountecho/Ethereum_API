@@ -919,48 +919,53 @@ async function getOnePartTransactionHistory(web3, fromBlock, toBlock) {
 }
 
 async function writeTransactionHistoryFile(date) {
-    var path = "../../database/" + chainName
+    try {
+        var path = "../../database/" + chainName
 
-    var rows = (await knex.raw('\
-        SELECT\
-            ' + pastTableName + '.pairAddress AS PAIRADDRESS,\
-            CONCAT(YEAR( ' + pastTableName + '.swapAt ), "-", MONTH( ' + pastTableName + '.swapAt ), "-", DAY( ' + pastTableName + '.swapAt )) AS SWAPAT,\
-            avg( ' + pastTableName + '.swapPrice ) AS AVGPRICE,\
-            max( ' + pastTableName + '.swapPrice ) AS MAXPRICE,\
-            min( ' + pastTableName + '.swapPrice ) AS MINPRICE,\
-            sum( ' + pastTableName + '.swapAmount0 * ( ' + pairsTableName + '.baseToken * 2 - 1 ) * ( ' + pastTableName + '.isBuy * - 2 + 1 ) ) AS VOLUME0,\
-            sum( ' + pastTableName + '.swapAmount1 * ( ' + pairsTableName + '.baseToken * - 2 + 1 ) * ( ' + pastTableName + '.isBuy * - 2 + 1 ) ) AS VOLUME1,\
-            sum( ' + pastTableName + '.swapAmount0 ) AS TOTALVOLUME0,\
-            sum( ' + pastTableName + '.swapAmount1 ) AS TOTALVOLUME1,\
-            count( ' + pastTableName + '.swapAmount0 ) AS SWAPCOUNT \
-        FROM\
-            ' + pastTableName + '\
-            LEFT JOIN ' + pairsTableName + ' ON ' + pairsTableName + '.pairAddress = ' + pastTableName + '.pairAddress \
-        WHERE\
-            ' + pastTableName + '.swapAt<"' + date + ' ' + '00:00:00' + '"\
-        GROUP BY\
-            ' + pastTableName + '.pairAddress,\
-            DATE( ' + pastTableName + '.swapAt ) \
-        ORDER BY\
-            DATE( ' + pastTableName + '.swapAt)'))[0]
+        var rows = (await knex.raw('\
+            SELECT\
+                ' + pastTableName + '.pairAddress AS PAIRADDRESS,\
+                CONCAT(YEAR( ' + pastTableName + '.swapAt ), "-", MONTH( ' + pastTableName + '.swapAt ), "-", DAY( ' + pastTableName + '.swapAt )) AS SWAPAT,\
+                avg( ' + pastTableName + '.swapPrice ) AS AVGPRICE,\
+                max( ' + pastTableName + '.swapPrice ) AS MAXPRICE,\
+                min( ' + pastTableName + '.swapPrice ) AS MINPRICE,\
+                sum( ' + pastTableName + '.swapAmount0 * ( ' + pairsTableName + '.baseToken * 2 - 1 ) * ( ' + pastTableName + '.isBuy * - 2 + 1 ) ) AS VOLUME0,\
+                sum( ' + pastTableName + '.swapAmount1 * ( ' + pairsTableName + '.baseToken * - 2 + 1 ) * ( ' + pastTableName + '.isBuy * - 2 + 1 ) ) AS VOLUME1,\
+                sum( ' + pastTableName + '.swapAmount0 ) AS TOTALVOLUME0,\
+                sum( ' + pastTableName + '.swapAmount1 ) AS TOTALVOLUME1,\
+                count( ' + pastTableName + '.swapAmount0 ) AS SWAPCOUNT \
+            FROM\
+                ' + pastTableName + '\
+                LEFT JOIN ' + pairsTableName + ' ON ' + pairsTableName + '.pairAddress = ' + pastTableName + '.pairAddress \
+            WHERE\
+                ' + pastTableName + '.swapAt<"' + date + ' ' + '00:00:00' + '"\
+            GROUP BY\
+                ' + pastTableName + '.pairAddress,\
+                DATE( ' + pastTableName + '.swapAt ) \
+            ORDER BY\
+                DATE( ' + pastTableName + '.swapAt)'))[0]
 
-    // for (var i = 0; i < rows.length; i ++) {
-    //     // var fileName = path + '/transactions/' + rows[i].PAIRADDRESS + '.txt'
-    //     // fs.appendFile(fileName, JSON.stringify(rows[i]) + '\n', "utf8", (err) => { })
-    //     // await knex(dailyPastTableName).insert(rows[i])
-    await knex(dailyPastTableName).insert(rows)
-    // }
+        // for (var i = 0; i < rows.length; i ++) {
+        //     // var fileName = path + '/transactions/' + rows[i].PAIRADDRESS + '.txt'
+        //     // fs.appendFile(fileName, JSON.stringify(rows[i]) + '\n', "utf8", (err) => { })
+        //     // await knex(dailyPastTableName).insert(rows[i])
+        await knex(dailyPastTableName).insert(rows)
+        // }
 
-    // rows = (await knex.raw('select CONCAT(YEAR( ' + pastTableName + '.swapAt ), "-", MONTH( ' + pastTableName + '.swapAt ), "-", DAY( ' + pastTableName + '.swapAt )) AS SWAPAT, swapMaker as SWAPMAKER, pairAddress from ' + pastTableName + ' where ' + pastTableName + '.swapAt<"' + date + ' ' + '00:00:00' + '" order by swapAt'))[0]
+        // rows = (await knex.raw('select CONCAT(YEAR( ' + pastTableName + '.swapAt ), "-", MONTH( ' + pastTableName + '.swapAt ), "-", DAY( ' + pastTableName + '.swapAt )) AS SWAPAT, swapMaker as SWAPMAKER, pairAddress from ' + pastTableName + ' where ' + pastTableName + '.swapAt<"' + date + ' ' + '00:00:00' + '" order by swapAt'))[0]
 
-    // for (var i = 0; i < rows.length; i ++) {
-    //     var fileName = path + '/swapers/' + rows[i].pairAddress + '.txt'
-    //     fs.appendFile(fileName, JSON.stringify(rows[i]) + '\n', "utf8", (err) => { })
-    // }
+        // for (var i = 0; i < rows.length; i ++) {
+        //     var fileName = path + '/swapers/' + rows[i].pairAddress + '.txt'
+        //     fs.appendFile(fileName, JSON.stringify(rows[i]) + '\n', "utf8", (err) => { })
+        // }
 
-    await knex(pastTableName).where('swapAt', '<', date + ' ' + '00:00:00').delete()
+        await knex(pastTableName).where('swapAt', '<', date + ' ' + '00:00:00').delete()
 
-    myLogger.log("WRITE TRANSACTION HISTORY FILE FINISHED!!!")
+        myLogger.log("WRITE TRANSACTION HISTORY FILE FINISHED!!!")
+    } catch (err) {
+        myLogger.log(date)
+        myLogger.log(err)
+    }    
 }
 
 async function getTransactionHistory(fromBlock) {
@@ -1473,13 +1478,12 @@ async function getContavoInfo() {
 
 async function init() {
     // await getAllPairs(FROMBLOCK)
-    // await getTokenAndPairData()
+    await getTokenAndPairData()
     
-    // myLogger.log('Getting token and pair data finished!')
-    // myLogger.log(FROMBLOCK + '~' + TOBLOCK + ' ' + pastTableName)
+    myLogger.log('Getting token and pair data finished!')
+    myLogger.log(FROMBLOCK + '~' + TOBLOCK + ' ' + pastTableName)
 
-    // await getTransactionHistory(FROMBLOCK)
-    await writeTransactionHistoryFile('2021-04-19')
+    await getTransactionHistory(FROMBLOCK)
 }
 
 init()

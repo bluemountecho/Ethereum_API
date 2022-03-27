@@ -1479,7 +1479,10 @@ async function getContavoInfo() {
 async function getDailyFromFile() {
     var rows = await knex(pairsTableName).select('*')
 
+    console.log(rows.length)
+
     for (var i = 0; i < rows.length; i ++) {
+        console.log(i)
         try {
             var content = fs.readFileSync('./database/ethereum/transactions/' + rows[i].pairAddress + '.txt', {encoding:'utf8', flag:'r'})
             var datas = content.split('\n')

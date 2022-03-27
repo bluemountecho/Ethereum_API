@@ -115,7 +115,7 @@ module.exports.PROXY = [
     "51.79.7.182:3128"
 ]
 
-module.exports.ETH = {
+module.exports.ETH = {    
     'web3Providers': [
         'https://eth-mainnet.alchemyapi.io/v2/SszaZPuxxxVhD6TKaCScBk7SQN4EEO8t',
         'https://eth-mainnet.alchemyapi.io/v2/UhrdEQkkqcqwwlm9wOXnYx71ut5BNDTd',
@@ -137,29 +137,14 @@ module.exports.ETH = {
         'https://eth-mainnet.alchemyapi.io/v2/0_DTvXZh-Y7iIZppUg_yPfpDcdOG6M3t',
         'https://eth-mainnet.alchemyapi.io/v2/gSyeUk2nIKtZMC_7xU1DnrB3DWeaXiRm'
     ],
-
-    'fromAndTo': [
-        { 'FROMBLOCK': 10000000, 'TOBLOCK': 10505861},
-        { 'FROMBLOCK': 10505861, 'TOBLOCK': 10700231},
-        { 'FROMBLOCK': 10700231, 'TOBLOCK': 10902387},
-        { 'FROMBLOCK': 10902387, 'TOBLOCK': 11102639},
-        { 'FROMBLOCK': 11102639, 'TOBLOCK': 11304643},
-        { 'FROMBLOCK': 11304643, 'TOBLOCK': 11506373},
-        { 'FROMBLOCK': 11506373, 'TOBLOCK': 11701952},
-        { 'FROMBLOCK': 11701952, 'TOBLOCK': 11903480},
-        { 'FROMBLOCK': 11903480, 'TOBLOCK': 12104733},
-        { 'FROMBLOCK': 12104733, 'TOBLOCK': 12306079},
-        { 'FROMBLOCK': 12306079, 'TOBLOCK': 12500189},
-        { 'FROMBLOCK': 12500189, 'TOBLOCK': 12699965},
-        { 'FROMBLOCK': 12699965, 'TOBLOCK': 12898513},
-        { 'FROMBLOCK': 12898513, 'TOBLOCK': 13104132},
-        { 'FROMBLOCK': 13104132, 'TOBLOCK': 13304528},
-        { 'FROMBLOCK': 13304528, 'TOBLOCK': 13502421},
-        { 'FROMBLOCK': 13502421, 'TOBLOCK': 13699125},
-        { 'FROMBLOCK': 13699125, 'TOBLOCK': 13903355},
-        { 'FROMBLOCK': 13903355, 'TOBLOCK': 14026168}
-    ],
-
+    'endPointType': 1,
+    'FROMBLOCK': 0,
+    'TOBLOCK': 26028293,
+    'TRANSACTIONV1': 2000,
+    'TRANSACTIONV2': 200,
+    'PAIRV1': 10000,
+    'PAIRV2': 1000,
+    'PROXYCOUNT': 19,
     'scanData': {
         apiKey: 'P5QXWEDN6PEQE4KB61J5GISXXNEKEYAGFM',
         scanSite: 'https://api.etherscan.io',
@@ -181,7 +166,7 @@ module.exports.polygon = {
         'https://polygon-mainnet.g.alchemy.com/v2/WbwgeLY2XkJabYJ-4mXeNhVYbEe4j-TB',
         'https://polygon-mainnet.g.alchemy.com/v2/T56O8pkKhrwe9BUizzaxuxOGL_103bhE',
     ],
-    'endPointType': 1,
+    'endPointType': 0,
     'FROMBLOCK': 3000000,
     'TOBLOCK': 26028293,
     'TRANSACTIONV1': 2000,

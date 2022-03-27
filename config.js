@@ -115,7 +115,7 @@ module.exports.PROXY = [
     "51.79.7.182:3128"
 ]
 
-module.exports.ETH = {    
+module.exports.eth = {    
     'web3Providers': [
         'https://eth-mainnet.alchemyapi.io/v2/SszaZPuxxxVhD6TKaCScBk7SQN4EEO8t',
         'https://eth-mainnet.alchemyapi.io/v2/UhrdEQkkqcqwwlm9wOXnYx71ut5BNDTd',

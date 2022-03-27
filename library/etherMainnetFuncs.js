@@ -646,8 +646,6 @@ async function mergeDailyPairData(rows, token0Address, token1Address, page = -1)
     
     var livePairs = oneDatas[rows.length][0]
 
-    console.log(livePairs.length)
-
     for (var i = 0; i < livePairs.length; i ++) {
         if (!datas[livePairs[i].SWAPAT]) {
             datas[livePairs[i].SWAPAT] = []

@@ -1476,14 +1476,40 @@ async function getContavoInfo() {
     console.log("Getting contavo info is finished!")
 }
 
+async function getDailyFromFile() {
+    var rows = await knex(pairsTableName).select('*')
+
+    for (var i = 0; i < rows.length; i ++) {
+        try {
+            var content = fs.readFileSync('./database/ethereum/transactions/' + rows[i].pairAddress + '.txt', {encoding:'utf8', flag:'r'})
+            var datas = content.split('\n')
+            var vis = []
+            
+            for (var j = 0; j < datas.length - 1; j ++) {
+                datas[j] = JSON.parse(datas[j])
+
+                if (vis[datas[j].SWAPAT]) continue
+
+                vis[datas[j].SWAPAT] = true
+                await knex(dailyPastTableName).insert(datas[j])
+            }
+        } catch (err) {
+
+        }
+    }
+}
+
 async function init() {
     // await getAllPairs(FROMBLOCK)
-    await getTokenAndPairData()
-    
-    myLogger.log('Getting token and pair data finished!')
-    myLogger.log(FROMBLOCK + '~' + TOBLOCK + ' ' + pastTableName)
 
-    await getTransactionHistory(FROMBLOCK)
+    // await getTokenAndPairData()
+    
+    // myLogger.log('Getting token and pair data finished!')
+    // myLogger.log(FROMBLOCK + '~' + TOBLOCK + ' ' + pastTableName)
+
+    // await getTransactionHistory(FROMBLOCK)
+
+    await getDailyFromFile()
 }
 
 init()

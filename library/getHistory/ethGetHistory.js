@@ -1481,7 +1481,7 @@ async function getDailyFromFile() {
 
     myLogger.log(rows.length)
 
-    for (var i = 0; i < 1; i ++) {
+    for (var i = 0; i < rows.length; i ++) {
         myLogger.log(i)
         try {
             var content = fs.readFileSync('../../database/ethereum/transactions/' + rows[i].pairAddress + '.txt', {encoding:'utf8', flag:'r'})

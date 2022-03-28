@@ -1502,6 +1502,26 @@ async function getDailyFromFile() {
     }
 }
 
+async function getUSDPrice() {
+    var rows = await knex(pairsTableName).select('*')
+    var vis = []
+    var baseTokens = []
+
+    for (var i = 0; i < rows.length; i ++) {
+        if (!vis[rows[i].token0Address] && rows[i].baseToken == 0) {
+            vis[rows[i].token0Address] = true
+            baseTokens.push(rows[i].token0Address)
+        }
+        
+        if (!vis[rows[i].token1Address] && rows[i].baseToken == 1) {
+            vis[rows[i].token1Address] = true
+            baseTokens.push(rows[i].token1Address)
+        }
+    }
+
+    console.log(baseTokens)
+}
+
 async function init() {
     // await getAllPairs(FROMBLOCK)
 
@@ -1512,7 +1532,9 @@ async function init() {
 
     // await getTransactionHistory(FROMBLOCK)
 
-    await getDailyFromFile()
+    // await getDailyFromFile()
+
+    await getUSDPrice()
 }
 
 init()

@@ -1569,7 +1569,7 @@ async function getUSDPrice() {
                     SWAPAT: key,
                     AVGPRICE: avg != 0 ? 1 / avg * basePrice : 0,
                     MAXPRICE: data[key].MAXPRICE != 0 ? 1 / data[key].MAXPRICE * basePrice : 0,
-                    MINPRICE: data[key].MAXPRICE != 0 ? 1 / data[key].MINPRICE * basePrice : 0,
+                    MINPRICE: data[key].MINPRICE != 0 ? 1 / data[key].MINPRICE * basePrice : 0,
                     VOLUME: data[key].TOTALVOLUME1 * basePrice,
                     SWAPCOUNT: data[key].SWAPCOUNT,
                 })

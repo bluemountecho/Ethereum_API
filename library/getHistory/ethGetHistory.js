@@ -1572,7 +1572,8 @@ async function getUSDPrice() {
         }
     }
 
-    calcDailyPrice("0xf0f9D895aCa5c8678f706FB8216fa22957685A13", ETH_ADDRESS)
+    await calcDailyPrice(ETH_ADDRESS, USD_ADDRESS)
+    // await calcDailyPrice("0xf0f9D895aCa5c8678f706FB8216fa22957685A13", ETH_ADDRESS)
 
     console.log('Finished')
 }

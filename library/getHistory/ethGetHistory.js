@@ -1507,8 +1507,17 @@ async function getDailyFromFile() {
 }
 
 async function getUSDPrice() {
+    function getMax(a, b) {
+        return a > b ? a : b
+    }
+
+    function getMin(a, b) {
+        return a < b ? a : b
+    }
+
     async function calcETHDailyPrice() {
         var start = new Date().getTime()
+        var data = []
         var token0Address = USD_ADDRESS
         var token1Address = ETH_ADDRESS
 
@@ -1517,18 +1526,52 @@ async function getUSDPrice() {
             token1Address = USD_ADDRESS
         }
 
-        // var pairs = await knex(pairsTableName).where('token0Address', token0Address).where('token1Address', token1Address).select('*')
-        // var dailyPast = knex(dailyPastTableName)
-
-        // for (var i = 0; i < pairs.length; i ++) {
-        //     dailyPast = dailyPast.orWhere('pairAddress', pairs[i].pairAddress)
-        // }
-
-        // dailyPast = await dailyPast.select('*')
-
         var dailyPast = await knex(dailyPastTableName).join(pairsTableName, pairsTableName + '.pairAddress', '=', dailyPastTableName + '.PAIRADDRESS').where(pairsTableName + '.token0Address', token0Address).where(pairsTableName + '.token1Address', token1Address).select(dailyPastTableName + '.*')
 
-        console.log(dailyPast.length)
+        console.log(dailyPast[0])
+        
+        for (var i = 0; i < dailyPast.length; i ++) {
+            if (!data[dailyPast[i].SWAPAT]) {
+                data[dailyPast[i].SWAPAT] = {
+                    MAXPRICE: dailyPast[i].MAXPRICE,
+                    MINPRICE: dailyPast[i].MINPRICE,
+                    TOTALVOLUME0: dailyPast[i].TOTALVOLUME0,
+                    TOTALVOLUME1: dailyPast[i].TOTALVOLUME1,
+                    SWAPCOUNT: dailyPast[i].SWAPCOUNT,
+                }
+            } else {
+                data[dailyPast[i].SWAPAT].MAXPRICE = getMax(data[dailyPast[i].SWAPAT].MAXPRICE, dailyPast[i].MAXPRICE)
+                data[dailyPast[i].SWAPAT].MINPRICE = getMin(data[dailyPast[i].SWAPAT].MINPRICE, dailyPast[i].MINPRICE)
+                data[dailyPast[i].SWAPAT].TOTALVOLUME0 += dailyPast[i].TOTALVOLUME0
+                data[dailyPast[i].SWAPAT].TOTALVOLUME1 += dailyPast[i].TOTALVOLUME1
+                data[dailyPast[i].SWAPAT].SWAPCOUNT += dailyPast[i].SWAPCOUNT
+            }
+        }
+
+        for (var key in data) {
+            var avg = data[key].TOTALVOLUME0 / data[key].TOTALVOLUME1
+
+            if (token0Address == USD_ADDRESS) {
+                await knex(tokenDailyTableName).insert({
+                    SWAPAT: key,
+                    AVGPRICE: avg,
+                    MAXPRICE: data[key].MAXPRICE,
+                    MINPRICE: data[key].MINPRICE,
+                    VOLUME: data[key].TOTALVOLUME0,
+                    SWAPCOUNT: data[key].SWAPCOUNT,
+                })
+            } else {
+                await knex(tokenDailyTableName).insert({
+                    SWAPAT: key,
+                    AVGPRICE: 1 / avg,
+                    MAXPRICE: 1 / data[key].MAXPRICE,
+                    MINPRICE: 1 / data[key].MINPRICE,
+                    VOLUME: data[key].TOTALVOLUME1,
+                    SWAPCOUNT: data[key].SWAPCOUNT,
+                })
+            }
+        }
+
         console.log((new Date().getTime() - start) + ' ms')
     }
     

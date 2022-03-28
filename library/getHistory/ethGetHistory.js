@@ -1507,6 +1507,8 @@ async function getDailyFromFile() {
 }
 
 async function getUSDPrice() {
+    var ethData = []
+
     function getMax(a, b) {
         return a > b ? a : b
     }
@@ -1552,20 +1554,20 @@ async function getUSDPrice() {
                 await knex(tokenDailyTableName).insert({
                     TOKENADDRESS: outToken,
                     SWAPAT: key,
-                    AVGPRICE: avg,
-                    MAXPRICE: data[key].MAXPRICE,
-                    MINPRICE: data[key].MINPRICE,
-                    VOLUME: data[key].TOTALVOLUME0,
+                    AVGPRICE: avg * ethData[key].AVGPRICE,
+                    MAXPRICE: data[key].MAXPRICE * ethData[key].AVGPRICE,
+                    MINPRICE: data[key].MINPRICE * ethData[key].AVGPRICE,
+                    VOLUME: data[key].TOTALVOLUME0 * ethData[key].AVGPRICE,
                     SWAPCOUNT: data[key].SWAPCOUNT,
                 })
             } else {
                 await knex(tokenDailyTableName).insert({
                     TOKENADDRESS: outToken,
                     SWAPAT: key,
-                    AVGPRICE: 1 / avg,
-                    MAXPRICE: 1 / data[key].MAXPRICE,
-                    MINPRICE: 1 / data[key].MINPRICE,
-                    VOLUME: data[key].TOTALVOLUME1,
+                    AVGPRICE: 1 / avg * ethData[key].AVGPRICE,
+                    MAXPRICE: 1 / data[key].MAXPRICE * ethData[key].AVGPRICE,
+                    MINPRICE: 1 / data[key].MINPRICE * ethData[key].AVGPRICE,
+                    VOLUME: data[key].TOTALVOLUME1 * ethData[key].AVGPRICE,
                     SWAPCOUNT: data[key].SWAPCOUNT,
                 })
             }
@@ -1573,7 +1575,14 @@ async function getUSDPrice() {
     }
 
     await calcDailyPrice(ETH_ADDRESS, USD_ADDRESS)
-    // await calcDailyPrice("0xf0f9D895aCa5c8678f706FB8216fa22957685A13", ETH_ADDRESS)
+
+    var rows = await knex(tokenDailyTableName).where('TOKENADDRESS', ETH_ADDRESS).select('*')
+
+    for (var i = 0; i < rows[i].length; i ++) {
+        ethData[convertTimestampToString(new Date(rows[i].SWAPAT).getTime(), true)] = rows[i]
+    }
+
+    await calcDailyPrice("0xf0f9D895aCa5c8678f706FB8216fa22957685A13", ETH_ADDRESS)
 
     console.log('Finished')
 }

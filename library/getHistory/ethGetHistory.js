@@ -1531,6 +1531,8 @@ async function getUSDPrice() {
         console.log(dailyPast[0])
         
         for (var i = 0; i < dailyPast.length; i ++) {
+            dailyPast[i].SWAPAT = convertTimestampToString(new Date(dailyPast[i].SWAPAT).getTime(), true)
+
             if (!data[dailyPast[i].SWAPAT]) {
                 data[dailyPast[i].SWAPAT] = {
                     MAXPRICE: dailyPast[i].MAXPRICE,

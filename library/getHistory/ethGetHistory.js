@@ -1508,6 +1508,7 @@ async function getDailyFromFile() {
 
 async function getUSDPrice() {
     async function calcETHDailyPrice() {
+        var start = new Date().getTime()
         var token0Address = USD_ADDRESS
         var token1Address = ETH_ADDRESS
 
@@ -1526,6 +1527,7 @@ async function getUSDPrice() {
         dailyPast = await dailyPast.select('*')
 
         console.log(dailyPast.length)
+        console.log((new Date().getTime() - start) + ' ms')
     }
     
     async function calcTokenDailyPrice(token) {

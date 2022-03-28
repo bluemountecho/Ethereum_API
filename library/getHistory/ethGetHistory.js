@@ -1526,7 +1526,7 @@ async function getUSDPrice() {
             token1Address = USD_ADDRESS
         }
 
-        var dailyPast = await knex(dailyPastTableName).join(pairsTableName, pairsTableName + '.pairAddress', '=', dailyPastTableName + '.PAIRADDRESS').where(pairsTableName + '.token0Address', token0Address).where(pairsTableName + '.token1Address', token1Address).select(dailyPastTableName + '.*')
+        var dailyPast = await knex(dailyPastTableName).join(pairsTableName, pairsTableName + '.pairAddress', '=', dailyPastTableName + '.PAIRADDRESS').where(pairsTableName + '.token0Address', token0Address).where(pairsTableName + '.token1Address', token1Address).orderBy(pairsTableName + '.createdAt', 'asc').limit(1).select(dailyPastTableName + '.*')
 
         console.log(dailyPast[0])
         
@@ -1542,8 +1542,6 @@ async function getUSDPrice() {
                     SWAPCOUNT: dailyPast[i].SWAPCOUNT,
                 }
             } else {
-                data[dailyPast[i].SWAPAT].MAXPRICE = getMax(data[dailyPast[i].SWAPAT].MAXPRICE, dailyPast[i].MAXPRICE)
-                data[dailyPast[i].SWAPAT].MINPRICE = getMin(data[dailyPast[i].SWAPAT].MINPRICE, dailyPast[i].MINPRICE)
                 data[dailyPast[i].SWAPAT].TOTALVOLUME0 += dailyPast[i].TOTALVOLUME0
                 data[dailyPast[i].SWAPAT].TOTALVOLUME1 += dailyPast[i].TOTALVOLUME1
                 data[dailyPast[i].SWAPAT].SWAPCOUNT += dailyPast[i].SWAPCOUNT
@@ -1555,6 +1553,7 @@ async function getUSDPrice() {
 
             if (token0Address == USD_ADDRESS) {
                 await knex(tokenDailyTableName).insert({
+                    TOKENADDRESS: ETH_ADDRESS,
                     SWAPAT: key,
                     AVGPRICE: avg,
                     MAXPRICE: data[key].MAXPRICE,
@@ -1564,6 +1563,7 @@ async function getUSDPrice() {
                 })
             } else {
                 await knex(tokenDailyTableName).insert({
+                    TOKENADDRESS: ETH_ADDRESS,
                     SWAPAT: key,
                     AVGPRICE: 1 / avg,
                     MAXPRICE: 1 / data[key].MAXPRICE,

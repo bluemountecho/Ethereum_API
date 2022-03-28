@@ -1549,25 +1549,28 @@ async function getUSDPrice() {
 
         for (var key in data) {
             var avg = data[key].TOTALVOLUME0 / data[key].TOTALVOLUME1
+            var basePrice = 1
+            
+            if (baseToken != USD_ADDRESS) basePrice = ethData[key].AVGPRICE
 
             if (token0Address == baseToken) {
                 await knex(tokenDailyTableName).insert({
                     TOKENADDRESS: outToken,
                     SWAPAT: key,
-                    AVGPRICE: avg * ethData[key].AVGPRICE,
-                    MAXPRICE: data[key].MAXPRICE * ethData[key].AVGPRICE,
-                    MINPRICE: data[key].MINPRICE * ethData[key].AVGPRICE,
-                    VOLUME: data[key].TOTALVOLUME0 * ethData[key].AVGPRICE,
+                    AVGPRICE: avg * basePrice,
+                    MAXPRICE: data[key].MAXPRICE * basePrice,
+                    MINPRICE: data[key].MINPRICE * basePrice,
+                    VOLUME: data[key].TOTALVOLUME0 * basePrice,
                     SWAPCOUNT: data[key].SWAPCOUNT,
                 })
             } else {
                 await knex(tokenDailyTableName).insert({
                     TOKENADDRESS: outToken,
                     SWAPAT: key,
-                    AVGPRICE: 1 / avg * ethData[key].AVGPRICE,
-                    MAXPRICE: 1 / data[key].MAXPRICE * ethData[key].AVGPRICE,
-                    MINPRICE: 1 / data[key].MINPRICE * ethData[key].AVGPRICE,
-                    VOLUME: data[key].TOTALVOLUME1 * ethData[key].AVGPRICE,
+                    AVGPRICE: 1 / avg * basePrice,
+                    MAXPRICE: 1 / data[key].MAXPRICE * basePrice,
+                    MINPRICE: 1 / data[key].MINPRICE * basePrice,
+                    VOLUME: data[key].TOTALVOLUME1 * basePrice,
                     SWAPCOUNT: data[key].SWAPCOUNT,
                 })
             }

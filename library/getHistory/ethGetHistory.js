@@ -1517,14 +1517,16 @@ async function getUSDPrice() {
             token1Address = USD_ADDRESS
         }
 
-        var pairs = await knex(pairsTableName).where('token0Address', token0Address).where('token1Address', token1Address).select('*')
-        var dailyPast = knex(dailyPastTableName)
+        // var pairs = await knex(pairsTableName).where('token0Address', token0Address).where('token1Address', token1Address).select('*')
+        // var dailyPast = knex(dailyPastTableName)
 
-        for (var i = 0; i < pairs.length; i ++) {
-            dailyPast = dailyPast.orWhere('pairAddress', pairs[i].pairAddress)
-        }
+        // for (var i = 0; i < pairs.length; i ++) {
+        //     dailyPast = dailyPast.orWhere('pairAddress', pairs[i].pairAddress)
+        // }
 
-        dailyPast = await dailyPast.select('*')
+        // dailyPast = await dailyPast.select('*')
+
+        var dailyPast = await knex(dailyPastTableName).join(pairsTableName, pairsTableName + '.pairAddress', '=', dailyPastTableName + '.PAIRADDRESS').where(pairsTableName + '.token0Address', token0Address).where(pairsTableName + '.token1Address', token1Address).select(dailyPastTableName + '.*')
 
         console.log(dailyPast.length)
         console.log((new Date().getTime() - start) + ' ms')

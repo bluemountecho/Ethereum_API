@@ -1515,10 +1515,11 @@ async function getUSDPrice() {
             ')).select('*')
 
             vis[rows[i].token0Address] = 1
+            myLogger.log(rows[i].token0Address)
 
             if (rows1.length > 0) continue
 
-            vis[rows[i].token0Address] = 2
+            myLogger.log('yes')
             baseTokens.push(rows[i].token0Address)
         }
         
@@ -1529,10 +1530,11 @@ async function getUSDPrice() {
             ')).select('*')
 
             vis[rows[i].token1Address] = 1
+            myLogger.log(rows[i].token1Address)
 
             if (rows1.length > 0) continue
 
-            vis[rows[i].token1Address] = 2
+            myLogger.log('yes')
             baseTokens.push(rows[i].token1Address)
         }
     }

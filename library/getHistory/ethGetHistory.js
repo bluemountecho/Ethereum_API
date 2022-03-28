@@ -1514,9 +1514,9 @@ async function getUSDPrice() {
                 or (token1Address = "' + rows[i].token0Address + '" and token0Address="0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2")\
             ')).select('*')
 
-            if (rows1.length > 0) continue
-
             vis[rows[i].token0Address] = true
+
+            if (rows1.length > 0) continue
             baseTokens.push(rows[i].token0Address)
         }
         
@@ -1526,12 +1526,15 @@ async function getUSDPrice() {
                 or (token1Address = "' + rows[i].token1Address + '" and token0Address="0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2")\
             ')).select('*')
 
-            if (rows1.length > 0) continue
-
             vis[rows[i].token1Address] = true
+
+            if (rows1.length > 0) continue
+            
             baseTokens.push(rows[i].token1Address)
         }
     }
+
+    console.log('Finished')
 
     myLogger.log(baseTokens)
 }

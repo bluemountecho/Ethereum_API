@@ -1585,12 +1585,14 @@ async function getUSDPrice() {
         ethData[convertTimestampToString(new Date(rows[i].SWAPAT).getTime(), true)] = rows[i]
     }
 
-    var tokens = await knex(tokensTableName).select('*')
+    var tokens = await knex(tokensTableName).where('tokenAddress', '>', '0x21c75f7173b2f2765b5239fa3643077de5627019').select('*')
 
-    for (var i = 0; i < tokens.length; i += 10) {
+    for (var i = 0; i < tokens.length; i += 30) {
         var funcs = []
 
-        for (var j = 0; j < 10 && i + j < tokens.length; j ++) {
+        if (tokens[i].tokenAddress == ETH_ADDRESS) continue
+
+        for (var j = 0; j < 30 && i + j < tokens.length; j ++) {
             funcs.push(calcDailyPrice(tokens[i + j].tokenAddress, ETH_ADDRESS))
         }
         

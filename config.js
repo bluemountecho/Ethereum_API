@@ -149,7 +149,9 @@ module.exports.eth = {
         apiKey: 'P5QXWEDN6PEQE4KB61J5GISXXNEKEYAGFM',
         scanSite: 'https://api.etherscan.io',
         coinID: 'ethereum'
-    }
+    },
+    'USD_ADDRESS': "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    'ETH_ADDRESS': "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
 }
 
 module.exports.polygon = {

@@ -22,6 +22,8 @@ const pastTableName = chainName + '_past'
 const tokensTableName = chainName + '_tokens'
 const pairsTableName = chainName + '_pairs'
 const dailyPastTableName = chainName + '_daily'
+const tokenDailyTableName = chainName + '_token_daily'
+const tokenLiveTableName = chainName + '_token_live'
 const proxyCnt = config[chainName].PROXYCOUNT
 
 Web3 = require('web3')
@@ -273,6 +275,8 @@ var pairsData = []
 var blocksData = []
 var FROMBLOCK = config[chainName].FROMBLOCK
 var TOBLOCK = config[chainName].TOBLOCK
+const USD_ADDRESS = config[chainName].USD_ADDRESS
+const ETH_ADDRESS = config[chainName].ETH_ADDRESS
 
 async function getURL(url, proxy) {
     var defer = Q.defer()
@@ -1503,45 +1507,33 @@ async function getDailyFromFile() {
 }
 
 async function getUSDPrice() {
-    var rows = await knex(pairsTableName).select('*')
-    var vis = []
-    var baseTokens = []
+    async function calcETHDailyPrice() {
+        var token0Address = USD_ADDRESS
+        var token1Address = ETH_ADDRESS
 
-    for (var i = 0; i < rows.length; i ++) {
-        if (!vis[rows[i].token0Address] && rows[i].baseToken == 0) {
-            var rows1 = await knex(pairsTableName).where(knex.raw('\
-                (token0Address = "' + rows[i].token0Address + '" and token1Address="0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2")\
-                or (token1Address = "' + rows[i].token0Address + '" and token0Address="0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2")\
-            ')).select('*')
-
-            vis[rows[i].token0Address] = 1
-            myLogger.log(rows[i].token0Address)
-
-            if (rows1.length > 0) continue
-
-            myLogger.log('yes')
-            baseTokens.push(rows[i].token0Address)
+        if (token0Address > token1Address) {
+            token0Address = ETH_ADDRESS
+            token1Address = USD_ADDRESS
         }
-        
-        if (!vis[rows[i].token1Address] && rows[i].baseToken == 1) {
-            var rows1 = await knex(pairsTableName).where(knex.raw('\
-                (token0Address = "' + rows[i].token1Address + '" and token1Address="0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2")\
-                or (token1Address = "' + rows[i].token1Address + '" and token0Address="0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2")\
-            ')).select('*')
 
-            vis[rows[i].token1Address] = 1
-            myLogger.log(rows[i].token1Address)
+        var pairs = await knex(pairsTableName).where('token0Address', token0Address).where('token1Address', token1Address).select('*')
+        var dailyPast = knex(dailyPastTableName)
 
-            if (rows1.length > 0) continue
-
-            myLogger.log('yes')
-            baseTokens.push(rows[i].token1Address)
+        for (var i = 0; i < pairs.length; i ++) {
+            dailyPast = dailyPast.orWhere('pairAddress', pairs[i].pairAddress)
         }
+
+        dailyPast = await dailyPast.select('*')
+
+        console.log(dailyPast.length)
+    }
+    
+    async function calcTokenDailyPrice(token) {
     }
 
-    console.log('Finished')
+    await calcETHDailyPrice()
 
-    myLogger.log(vis)
+    console.log('Finished')
 }
 
 async function init() {

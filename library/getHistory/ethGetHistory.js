@@ -1515,20 +1515,17 @@ async function getUSDPrice() {
         return a < b ? a : b
     }
 
-    async function calcETHDailyPrice() {
-        var start = new Date().getTime()
+    async function calcDailyPrice(outToken, baseToken) {
         var data = []
-        var token0Address = USD_ADDRESS
-        var token1Address = ETH_ADDRESS
+        var token0Address = baseToken
+        var token1Address = outToken
 
         if (token0Address > token1Address) {
-            token0Address = ETH_ADDRESS
-            token1Address = USD_ADDRESS
+            token0Address = outToken
+            token1Address = baseToken
         }
 
         var dailyPast = await knex(dailyPastTableName).join(pairsTableName, pairsTableName + '.pairAddress', '=', dailyPastTableName + '.PAIRADDRESS').where(pairsTableName + '.token0Address', token0Address).where(pairsTableName + '.token1Address', token1Address).orderBy(pairsTableName + '.createdAt', 'asc').select(dailyPastTableName + '.*')
-
-        console.log(dailyPast[0])
         
         for (var i = 0; i < dailyPast.length; i ++) {
             dailyPast[i].SWAPAT = convertTimestampToString(new Date(dailyPast[i].SWAPAT).getTime(), true)
@@ -1551,9 +1548,9 @@ async function getUSDPrice() {
         for (var key in data) {
             var avg = data[key].TOTALVOLUME0 / data[key].TOTALVOLUME1
 
-            if (token0Address == USD_ADDRESS) {
+            if (token0Address == baseToken) {
                 await knex(tokenDailyTableName).insert({
-                    TOKENADDRESS: ETH_ADDRESS,
+                    TOKENADDRESS: outToken,
                     SWAPAT: key,
                     AVGPRICE: avg,
                     MAXPRICE: data[key].MAXPRICE,
@@ -1563,7 +1560,7 @@ async function getUSDPrice() {
                 })
             } else {
                 await knex(tokenDailyTableName).insert({
-                    TOKENADDRESS: ETH_ADDRESS,
+                    TOKENADDRESS: outToken,
                     SWAPAT: key,
                     AVGPRICE: 1 / avg,
                     MAXPRICE: 1 / data[key].MAXPRICE,
@@ -1573,14 +1570,9 @@ async function getUSDPrice() {
                 })
             }
         }
-
-        console.log((new Date().getTime() - start) + ' ms')
-    }
-    
-    async function calcTokenDailyPrice(token) {
     }
 
-    await calcETHDailyPrice()
+    calcDailyPrice("0xf0f9D895aCa5c8678f706FB8216fa22957685A13", ETH_ADDRESS)
 
     console.log('Finished')
 }

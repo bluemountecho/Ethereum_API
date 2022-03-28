@@ -1526,7 +1526,7 @@ async function getUSDPrice() {
             token1Address = USD_ADDRESS
         }
 
-        var dailyPast = await knex(dailyPastTableName).join(pairsTableName, pairsTableName + '.pairAddress', '=', dailyPastTableName + '.PAIRADDRESS').where(pairsTableName + '.token0Address', token0Address).where(pairsTableName + '.token1Address', token1Address).orderBy(pairsTableName + '.createdAt', 'asc').limit(1).select(dailyPastTableName + '.*')
+        var dailyPast = await knex(dailyPastTableName).join(pairsTableName, pairsTableName + '.pairAddress', '=', dailyPastTableName + '.PAIRADDRESS').where(pairsTableName + '.token0Address', token0Address).where(pairsTableName + '.token1Address', token1Address).orderBy(pairsTableName + '.createdAt', 'asc').select(dailyPastTableName + '.*')
 
         console.log(dailyPast[0])
         

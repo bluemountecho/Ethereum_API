@@ -1532,7 +1532,7 @@ async function getUSDPrice() {
 
             if (rows1.length > 0) continue
 
-            vis[rows[i].token0Address] = 2
+            vis[rows[i].token1Address] = 2
             baseTokens.push(rows[i].token1Address)
         }
     }

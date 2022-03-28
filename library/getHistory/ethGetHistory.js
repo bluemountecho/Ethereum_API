@@ -1581,7 +1581,10 @@ async function getUSDPrice() {
 
     var rows = await knex(tokenDailyTableName).where('TOKENADDRESS', ETH_ADDRESS).select('*')
 
+    console.log(rows.length)
+
     for (var i = 0; i < rows[i].length; i ++) {
+        console.log(i)
         ethData[convertTimestampToString(new Date(rows[i].SWAPAT).getTime(), true)] = rows[i]
     }
 

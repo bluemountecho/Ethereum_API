@@ -1621,7 +1621,7 @@ async function getUSDPrice() {
         for (var token in data) {
             for (var key in data[token]) {
                 try {
-                    var avg = data[key].TOTALVOLUME0 / data[key].TOTALVOLUME1
+                    var avg = data[token][key].TOTALVOLUME0 / data[token][key].TOTALVOLUME1
                     var basePrice = ethData[key].AVGPRICE
     
                     if (token0Address == ETH_ADDRESS) {
@@ -1629,20 +1629,20 @@ async function getUSDPrice() {
                             TOKENADDRESS: token,
                             SWAPAT: key,
                             AVGPRICE: avg * basePrice,
-                            MAXPRICE: data[key].MAXPRICE * basePrice,
-                            MINPRICE: data[key].MINPRICE * basePrice,
-                            VOLUME: data[key].TOTALVOLUME0 * basePrice,
-                            SWAPCOUNT: data[key].SWAPCOUNT,
+                            MAXPRICE: data[token][key].MAXPRICE * basePrice,
+                            MINPRICE: data[token][key].MINPRICE * basePrice,
+                            VOLUME: data[token][key].TOTALVOLUME0 * basePrice,
+                            SWAPCOUNT: data[token][key].SWAPCOUNT,
                         })
                     } else {
                         await knex(tokenDailyTableName).insert({
                             TOKENADDRESS: token,
                             SWAPAT: key,
                             AVGPRICE: avg != 0 ? 1 / avg * basePrice : 0,
-                            MAXPRICE: data[key].MAXPRICE != 0 ? 1 / data[key].MAXPRICE * basePrice : 0,
-                            MINPRICE: data[key].MINPRICE != 0 ? 1 / data[key].MINPRICE * basePrice : 0,
-                            VOLUME: data[key].TOTALVOLUME1 * basePrice,
-                            SWAPCOUNT: data[key].SWAPCOUNT,
+                            MAXPRICE: data[token][key].MAXPRICE != 0 ? 1 / data[token][key].MAXPRICE * basePrice : 0,
+                            MINPRICE: data[token][key].MINPRICE != 0 ? 1 / data[token][key].MINPRICE * basePrice : 0,
+                            VOLUME: data[token][key].TOTALVOLUME1 * basePrice,
+                            SWAPCOUNT: data[token][key].SWAPCOUNT,
                         })
                     }
                 } catch (err) {

@@ -1595,7 +1595,7 @@ async function getUSDPrice() {
         for (var i = 0; i < dailyPast.length; i ++) {
             var token = dailyPast[i].token0Address
 
-            if (token0Address == ETH_ADDRESS) token = dailyPast[i].token1Address
+            if (dailyPast[i].token0Address == ETH_ADDRESS) token = dailyPast[i].token1Address
             if (token <= '0x812485ac6eac722cb3c4e02d3a821a74f65cd0e2') continue
             if (!data[token]) data[token] = []
 

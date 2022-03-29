@@ -628,7 +628,7 @@ async function init() {
 
                     var data = {
                         pairAddress: pairAddress,
-                        tokenAddress: tmpToken,
+                        tokenAddress: pairsData[pairAddress].baseToken == 1 ? pairsData[pairAddress].token0Address : pairsData[pairAddress].token1Address,
                         swapPrice: swap1 == 0 ? 0 : Math.abs(swap0 * 1.0 * 10 ** decimals[0] / swap1),
                         priceUSD: tmpPrice,
                         swapAmount0: Math.abs(swap0 / 10 ** tokensData[decimals[1]].tokenDecimals),
@@ -802,7 +802,7 @@ async function init() {
                         }
                     }
 
-                    var tmpToken = pairsData[pairAddress].baseToken == 0 ? pairsData[pairAddress].token0Address : pairsData[pairAddress].token1Address
+                    var tmpToken = pairsData[pairAddress].baseToken == 0 ? pairsData[pairAddress].token1Address : pairsData[pairAddress].token0Address
                     var tmpPrice = 0
 
                     if (pairsData[pairAddress] && pairsData[pairAddress].lastPrice != 0) {
@@ -818,7 +818,7 @@ async function init() {
 
                     var data = {
                         pairAddress: pairAddress,
-                        tokenAddress: tmpToken,
+                        tokenAddress: pairsData[pairAddress].baseToken == 1 ? pairsData[pairAddress].token0Address : pairsData[pairAddress].token1Address,
                         swapPrice: Math.abs(swap0 * 1.0 * 10 ** decimals[0] / swap1),
                         priceUSD: tmpPrice,
                         swapAmount0: Math.abs(swap0 / 10 ** tokensData[decimals[1]].tokenDecimals),
@@ -839,6 +839,14 @@ async function init() {
                     
                 }
             }
+
+            var funcs = []
+
+            for (var k = 0; k < proxyCnt && i + k < results[3].length; k ++) {
+                funcs.push(getOneV3Swap(results[3][i + k], web3s[k]))
+            }
+
+            await Promise.all(funcs)
         }
 
         var resBlock

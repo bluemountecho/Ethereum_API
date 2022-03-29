@@ -620,7 +620,7 @@ async function init() {
                         tmpPrice = pairsData[pairAddress].baseToken == 0 ? tokensData[tmpBaseToken].lastPrice * pairsData[pairAddress].lastPrice : tokensData[tmpBaseToken].lastPrice / pairsData[pairAddress].lastPrice
                     }
 
-                    if (!tokensData[tmpToken]) {
+                    if (tokensData[tmpToken]) {
                         tokensData[tmpToken].lastPrice = tmpPrice
                         await knex(tokensTableName).where('tokenAddress', tmpToken).update({
                             lastPrice: tmpPrice
@@ -811,7 +811,7 @@ async function init() {
                         tmpPrice = pairsData[pairAddress].baseToken == 0 ? tokensData[tmpBaseToken].lastPrice * pairsData[pairAddress].lastPrice : tokensData[tmpBaseToken].lastPrice / pairsData[pairAddress].lastPrice
                     }
 
-                    if (!tokensData[tmpToken]) {
+                    if (tokensData[tmpToken]) {
                         tokensData[tmpToken].lastPrice = tmpPrice
                         await knex(tokensTableName).where('tokenAddress', tmpToken).update({
                             lastPrice: tmpPrice

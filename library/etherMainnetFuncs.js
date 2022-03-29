@@ -718,7 +718,7 @@ module.exports.getDailyTokenPrice = async function getDailyTokenPrice(tokenAddr,
 
         for (var i = 0; i < rows.length; i ++) {
             data.push({
-                SWAPAT: convertTimestampToString(new Date(rows[i].SWAPAT).getTime(), true),
+                SWAPAT: convertTimestampToString(new Date(rows[i].SWAPAT).getTime(), true).split(' ')[0],
                 AVGPRICE: rows[i].AVGPRICE.toFixed(30),
                 HIGHPRICE: rows[i].MAXPRICE.toFixed(30),
                 LOWPRICE: rows[i].MINPRICE.toFixed(30),

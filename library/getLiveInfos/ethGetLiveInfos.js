@@ -762,6 +762,8 @@ async function init() {
                         }
                     }
 
+                    tokensData[USD_ADDRESS].lastPrice = 1
+
                     var tmpToken = pairsData[pairAddress].baseToken == 1 ? pairsData[pairAddress].token0Address : pairsData[pairAddress].token1Address
                     var tmpBaseToken = pairsData[pairAddress].baseToken == 0 ? pairsData[pairAddress].token0Address : pairsData[pairAddress].token1Address
                     var tmpPrice = 0
@@ -952,6 +954,8 @@ async function init() {
                             myLogger.log(err)
                         }
                     }
+
+                    tokensData[USD_ADDRESS].lastPrice = 1
 
                     var tmpToken = pairsData[pairAddress].baseToken == 1 ? pairsData[pairAddress].token0Address : pairsData[pairAddress].token1Address
                     var tmpBaseToken = pairsData[pairAddress].baseToken == 0 ? pairsData[pairAddress].token0Address : pairsData[pairAddress].token1Address

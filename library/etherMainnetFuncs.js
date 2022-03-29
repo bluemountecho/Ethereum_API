@@ -68,6 +68,7 @@ const options = {
 const web3 = new Web3(new Web3.providers.HttpProvider('https://eth-mainnet.alchemyapi.io/v2/KDRotLOmW8M21flLsKNaLN4IO5lB_6PN', options))
 
 var fs = require('fs')
+const { raw } = require('express')
 function convertTimestampToString(timestamp, flag = false) {
     if (flag == false) {
         return new Date(timestamp).toISOString().replace(/T/, ' ').replace(/\..+/, '').replace(/ /g, '_').replace(/:/g, '_').replace(/-/g, '_')
@@ -711,7 +712,7 @@ module.exports.getDailyTokenPrice = async function getDailyTokenPrice(tokenAddr,
     try {
         var tokenAddress = tokenAddr.toLowerCase()
         var tokenInfo = await knex('eth_tokens').where('tokenAddress', tokenAddress).select('*')
-        var rows = await knex('eth_token_daily').where('TOKENADDRESS', tokenAddress).limit(0 * page, 100).selectRaw('DATE(SWAPAT) as swapAt, AVGPRICE, MAXPRICE as HIGHPRICE, MINPRICE as LOWPRICE, VOLUME, SWAPCOUNT')
+        var rows = await knex('eth_token_daily').where('TOKENADDRESS', tokenAddress).limit(0 * page, 100).select(knex.raw('DATE(SWAPAT) as swapAt, AVGPRICE, MAXPRICE as HIGHPRICE, MINPRICE as LOWPRICE, VOLUME, SWAPCOUNT'))
 
         return {
             status: 'Success!',

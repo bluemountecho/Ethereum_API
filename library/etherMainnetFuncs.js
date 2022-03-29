@@ -285,6 +285,7 @@ module.exports.getTokenInfo = async function getTokenInfo(tokenAddr) {
         var rows = await knex('eth_tokens').where('tokenAddress', tokenAddress).select('*')
         var totalSupply = await contract.methods.totalSupply().call()
         var tokenPrice = await this.getPriceOfToken(tokenAddress)
+        var info = (await this.getTokenStatistics(tokenAddress)).data[0]
 
         totalSupply = totalSupply / 10 ** rows[0].tokenDecimals
 
@@ -322,6 +323,11 @@ module.exports.getTokenInfo = async function getTokenInfo(tokenAddr) {
                     marketCap: (totalSupply * tokenPrice.data.price).toFixed(30),
                     totalSupply: (totalSupply).toFixed(30),
                     totalHolders: rows[0].totalHolders,
+                    totalTransactions: info.totalTransactions,
+                    last24hTransactions: info.last24hTransactions,
+                    last24hVolume: info.last24hVolume,
+                    currentPrice: info.currentPrice,
+                    priceChanges: info.priceChanges,
                     holders: JSON.parse(rows[0].holders),
                     createdAt: rows[0].createdAt,
                     sourceCode: rows[0].sourceCode,
@@ -372,13 +378,13 @@ module.exports.getTokenStatistics = async function getTokenStatistics(tokenAddr)
                 status: 'Success',
                 message: 'Getting token statistics completed successfully!',
                 data: [{
-                    address: rows[0].tokenAddress,
-                    symbol: rows[0].tokenSymbol,
-                    name: rows[0].tokenName,
+                    // address: rows[0].tokenAddress,
+                    // symbol: rows[0].tokenSymbol,
+                    // name: rows[0].tokenName,
                     totalTransactions: res[1] + res[2].todayTransactions,
                     last24hTransactions: res[2].totalTransactions,
                     last24hVolume: res[2].totalVolume,
-                    currentPrice: res[0].data.price,
+                    // currentPrice: res[0].data.price,
                     priceChanges: {
                         priceChange30Min: {
                             price: res[2].price30,

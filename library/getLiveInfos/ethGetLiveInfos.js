@@ -612,11 +612,12 @@ async function init() {
                         }
                     }
 
-                    var tmpToken = pairsData[pairAddress].baseToken == 0 ? pairsData[pairAddress].token0Address : pairsData[pairAddress].token1Address
+                    var tmpToken = pairsData[pairAddress].baseToken == 1 ? pairsData[pairAddress].token0Address : pairsData[pairAddress].token1Address
+                    var tmpBaseToken = pairsData[pairAddress].baseToken == 0 ? pairsData[pairAddress].token0Address : pairsData[pairAddress].token1Address
                     var tmpPrice = 0
 
                     if (pairsData[pairAddress] && pairsData[pairAddress].lastPrice != 0) {
-                        tmpPrice = pairsData[pairAddress].baseToken == 0 ? tokensData[tmpToken].lastPrice * pairsData[pairAddress].lastPrice : tokensData[tmpToken].lastPrice / pairsData[pairAddress].lastPrice
+                        tmpPrice = pairsData[pairAddress].baseToken == 0 ? tokensData[tmpBaseToken].lastPrice * pairsData[pairAddress].lastPrice : tokensData[tmpBaseToken].lastPrice / pairsData[pairAddress].lastPrice
                     }
 
                     if (!tokensData[tmpToken]) {
@@ -628,8 +629,8 @@ async function init() {
 
                     var data = {
                         pairAddress: pairAddress,
-                        tokenAddress: pairsData[pairAddress].baseToken == 1 ? pairsData[pairAddress].token0Address : pairsData[pairAddress].token1Address,
-                        swapPrice: swap1 == 0 ? 0 : Math.abs(swap0 * 1.0 * 10 ** decimals[0] / swap1),
+                        tokenAddress: tmpToken,
+                        swapPrice: Math.abs(swap0 * 1.0 * 10 ** decimals[0] / swap1),
                         priceUSD: tmpPrice,
                         swapAmount0: Math.abs(swap0 / 10 ** tokensData[decimals[1]].tokenDecimals),
                         swapAmount1: Math.abs(swap1 / 10 ** tokensData[decimals[2]].tokenDecimals),
@@ -802,11 +803,12 @@ async function init() {
                         }
                     }
 
-                    var tmpToken = pairsData[pairAddress].baseToken == 0 ? pairsData[pairAddress].token1Address : pairsData[pairAddress].token0Address
+                    var tmpToken = pairsData[pairAddress].baseToken == 1 ? pairsData[pairAddress].token0Address : pairsData[pairAddress].token1Address
+                    var tmpBaseToken = pairsData[pairAddress].baseToken == 0 ? pairsData[pairAddress].token0Address : pairsData[pairAddress].token1Address
                     var tmpPrice = 0
 
                     if (pairsData[pairAddress] && pairsData[pairAddress].lastPrice != 0) {
-                        tmpPrice = pairsData[pairAddress].baseToken == 0 ? tokensData[tmpToken].lastPrice * pairsData[pairAddress].lastPrice : tokensData[tmpToken].lastPrice / pairsData[pairAddress].lastPrice
+                        tmpPrice = pairsData[pairAddress].baseToken == 0 ? tokensData[tmpBaseToken].lastPrice * pairsData[pairAddress].lastPrice : tokensData[tmpBaseToken].lastPrice / pairsData[pairAddress].lastPrice
                     }
 
                     if (!tokensData[tmpToken]) {
@@ -818,7 +820,7 @@ async function init() {
 
                     var data = {
                         pairAddress: pairAddress,
-                        tokenAddress: pairsData[pairAddress].baseToken == 1 ? pairsData[pairAddress].token0Address : pairsData[pairAddress].token1Address,
+                        tokenAddress: tmpToken,
                         swapPrice: Math.abs(swap0 * 1.0 * 10 ** decimals[0] / swap1),
                         priceUSD: tmpPrice,
                         swapAmount0: Math.abs(swap0 / 10 ** tokensData[decimals[1]].tokenDecimals),

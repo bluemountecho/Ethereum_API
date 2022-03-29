@@ -708,98 +708,23 @@ async function mergeDailyPairData(rows, token0Address, token1Address, page = -1)
 }
 
 module.exports.getDailyTokenPrice = async function getDailyTokenPrice(tokenAddr, page = 0) {
-    var tokenAddress = tokenAddr.toLowerCase()
-    var tokenInfo = await knex('eth_tokens').where('tokenAddress', tokenAddress).select('*')
+    try {
+        var tokenAddress = tokenAddr.toLowerCase()
+        var tokenInfo = await knex('eth_tokens').where('tokenAddress', tokenAddress).select('*')
+        var rows = await knex('eth_token_daily').where('TOKENADDRESS', tokenAddress).limit(0 * page, 100).selectRaw('DATE(SWAPAT) as swapAt, AVGPRICE, MAXPRICE as HIGHPRICE, MINPRICE as LOWPRICE, VOLUME, SWAPCOUNT')
 
-    for (var i = 0; i < baseTokens.length; i ++) {
-        var funcs = []
-
-        var token0Address = tokenAddress > baseTokens[i] ? baseTokens[i] : tokenAddress
-        var token1Address = tokenAddress < baseTokens[i] ? baseTokens[i] : tokenAddress
-
-        funcs.push(
-            knex('eth_pairs')
-                .where('token0Address', token0Address)
-                .where('token1Address', token1Address)
-                .select('*')
-        )
-
-        var token2Address = USDC_ADDRESS > baseTokens[i] ? baseTokens[i] : USDC_ADDRESS
-        var token3Address = USDC_ADDRESS < baseTokens[i] ? baseTokens[i] : USDC_ADDRESS
-
-        funcs.push(
-            knex('eth_pairs')
-                .where('token0Address', token2Address)
-                .where('token1Address', token3Address)
-                .select('*')
-        )
-
-        var rows = await Promise.all(funcs)
-        var res1 = await mergeDailyPairData(rows[0], token0Address, token1Address, page)
-        var res2 = await mergeDailyPairData(rows[1], token2Address, token3Address)
-
-        if (rows[0].length) {
-            if (rows[0][0].token1Address != tokenAddress) {
-                for (var j = 0; j < res1.length; j ++) {
-                    var tmp = 1.0 / res1[j].LOWPRICE
-    
-                    res1[j].LOWPRICE = 1.0 / res1[j].HIGHPRICE
-                    res1[j].HIGHPRICE = tmp
-                    res1[j].AVGPRICE = 1.0 / res1[j].AVGPRICE
-                }
-            }
+        return {
+            status: 'Success!',
+            symbol: tokenInfo[0].tokenSymbol,
+            name: tokenInfo[0].tokenName,
+            data: rows
         }
-
-        if (rows[1].length) {
-            if (rows[1][0].token0Address != USDC_ADDRESS) {
-                for (var j = 0; j < res2.length; j ++) {
-                    var tmp = 1.0 / res2[j].LOWPRICE
-    
-                    res2[j].LOWPRICE = 1.0 / res2[j].HIGHPRICE
-                    res2[j].HIGHPRICE = tmp
-                    res2[j].AVGPRICE = 1.0 / res2[j].AVGPRICE
-                }
-            }
+    } catch (err) {
+        return {
+            status: 'Fail',
+            message: "Server Error!",
+            data: []
         }
-
-        if (rows[0].length > 0 && rows[1].length > 0) {
-            var k = 0
-
-            for (var j = res1.length - 1; j >= 0; j --) {
-                var jd = (new Date(res1[j].SWAPAT)).getTime()
-
-                while (true) {
-                    var kd = (new Date(res2[k].SWAPAT)).getTime()
-
-                    if (kd > jd) break
-
-                    k ++
-
-                    if (k >= res2.length) break
-                }
-
-                k --
-
-                if (k < 0) k = 0
-
-                res1[j].AVGPRICE = res1[j].AVGPRICE * res2[k].AVGPRICE
-                res1[j].HIGHPRICE = res1[j].HIGHPRICE * res2[k].HIGHPRICE
-                res1[j].LOWPRICE = res1[j].LOWPRICE * res2[k].LOWPRICE
-            }
-            
-            return {
-                status: 'Success!',
-                symbol: tokenInfo[0].tokenSymbol,
-                name: tokenInfo[0].tokenName,
-                data: res1
-            }
-        }
-    }
-    
-    return {
-        status: 'Fail',
-        message: "Can't find swap route!",
-        data: []
     }
 }
 

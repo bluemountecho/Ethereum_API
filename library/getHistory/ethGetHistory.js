@@ -1591,11 +1591,13 @@ async function getUSDPrice() {
         }
 
         var dailyPast = await knex(dailyPastTableName).join(pairsTableName, pairsTableName + '.pairAddress', '=', dailyPastTableName + '.PAIRADDRESS').where(pairsTableName + '.token0Address', ETH_ADDRESS).orWhere(pairsTableName + '.token1Address', ETH_ADDRESS).orderBy(pairsTableName + '.createdAt', 'asc').select(dailyPastTableName + '.*').select(pairsTableName + '.token0Address').select(pairsTableName + '.token1Address')
+
+        console.log(dailyPast.length)
         
         for (var i = 0; i < dailyPast.length; i ++) {
             var token = dailyPast[i].token0Address
 
-            if (dailyPast[i].token0Address == ETH_ADDRESS) token = dailyPast[i].token1Address
+            if (token == ETH_ADDRESS) token = dailyPast[i].token1Address
             if (token <= '0x812485ac6eac722cb3c4e02d3a821a74f65cd0e2') continue
             if (!data[token]) data[token] = []
 

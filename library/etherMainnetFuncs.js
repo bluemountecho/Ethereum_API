@@ -495,8 +495,7 @@ module.exports.getPairsFromName = async function getPairsFromName(tokenName) {
             var pairs = await knex('eth_pairs')
                 .where('token0Address', rows[i].tokenAddress)
                 .orWhere('token1Address', rows[i].tokenAddress)
-                .orderBy('blockNumber', 'desc')
-                .orderBy('transactionID', 'desc')
+                .orderBy('createdAt', "desc")
                 .select('*')
             
             for (var j = 0; j < pairs.length; j ++) {

@@ -152,12 +152,20 @@ module.exports.getAllTokens = async function getAllTokens(page = 0) {
     try {
         var rows = await knex('eth_tokens').orderBy('createdAt', 'desc').limit(100).offset(page * 100).select('*')
         var datas = []
+        var funcs = []
+
+        for (var i = 0; i < rows.length; i ++) {
+            funcs.push(this.getTokenStatistics(rows[i].tokenAddress))
+        }
+
+        var res = await Promise.all(funcs)
 
         for (var i = 0; i < rows.length; i ++) {
             datas.push({
                 address: rows[i].tokenAddress,
                 symbol: rows[i].tokenSymbol,
-                name: rows[i].tokenName
+                name: rows[i].tokenName,
+                info: res[i].data[0]
             })
         }
 

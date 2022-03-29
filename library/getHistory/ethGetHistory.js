@@ -1583,7 +1583,7 @@ async function getUSDPrice() {
     }
 
     async function calcAllDailyPrice() {
-        // await calcDailyPrice(ETH_ADDRESS, USD_ADDRESS)
+        await calcDailyPrice(ETH_ADDRESS, USD_ADDRESS)
 
         var data = []
         var rows = await knex(tokenDailyTableName).where('TOKENADDRESS', ETH_ADDRESS).select('*')
@@ -1598,7 +1598,7 @@ async function getUSDPrice() {
             var token = dailyPast[i].token0Address
 
             if (token == ETH_ADDRESS) token = dailyPast[i].token1Address
-            if (token <= '0x812485ac6eac722cb3c4e02d3a821a74f65cd0e2') continue
+            // if (token <= '0x812485ac6eac722cb3c4e02d3a821a74f65cd0e2') continue
             if (!data[token]) data[token] = []
 
             dailyPast[i].SWAPAT = convertTimestampToString(new Date(dailyPast[i].SWAPAT).getTime(), true)

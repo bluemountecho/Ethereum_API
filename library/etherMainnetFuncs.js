@@ -903,6 +903,7 @@ module.exports.getLiveTokenPrice = async function getLiveTokenPrice(tokenAddr, f
 
             data.push({
                 SWAPAT: convertTimestampToString(new Date(rows[i].swapAt).getTime(), true),
+                PAIRADDRESS: rows[i].pairAddress,
                 PRICE: rows[i].priceUSD.toFixed(30),
                 SWAPAMOUNTINUSD: (swapAmount * rows[i].priceUSD).toFixed(30),
                 SWAPAMOUNT0: rows[i].swapAmount0.toFixed(30),

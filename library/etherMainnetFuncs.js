@@ -713,7 +713,7 @@ module.exports.getDailyTokenPrice = async function getDailyTokenPrice(tokenAddr,
         var tokenAddress = tokenAddr.toLowerCase()
         var tokenInfo = await knex('eth_tokens').where('tokenAddress', tokenAddress).select('*')
         // var rows = await knex('eth_token_daily').where('TOKENADDRESS', tokenAddress).orderBy('SWAPAT', 'asc').limit(0 * page, 100).select(knex.raw('DATE(SWAPAT) as swapAt, AVGPRICE, MAXPRICE as HIGHPRICE, MINPRICE as LOWPRICE, VOLUME, SWAPCOUNT'))
-        var rows = await knex('eth_token_daily').where('TOKENADDRESS', tokenAddress).orderBy('SWAPAT', 'asc').limit(0 * page, 100).select('*')
+        var rows = await knex('eth_token_daily').where('TOKENADDRESS', tokenAddress).orderBy('SWAPAT', 'asc').select('*')
 
         return {
             status: 'Success!',

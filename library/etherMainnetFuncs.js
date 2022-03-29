@@ -384,7 +384,7 @@ module.exports.getTokenStatistics = async function getTokenStatistics(tokenAddr)
                     totalTransactions: res[1] + res[2].todayTransactions,
                     last24hTransactions: res[2].totalTransactions,
                     last24hVolume: res[2].totalVolume,
-                    // currentPrice: res[0].data.price,
+                    currentPrice: res[0].data.price,
                     priceChanges: {
                         priceChange30Min: {
                             price: res[2].price30,

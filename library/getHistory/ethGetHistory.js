@@ -1598,7 +1598,6 @@ async function getUSDPrice() {
             var token = dailyPast[i].token0Address
 
             if (token == ETH_ADDRESS) token = dailyPast[i].token1Address
-            // if (token <= '0x812485ac6eac722cb3c4e02d3a821a74f65cd0e2') continue
             if (!data[token]) data[token] = []
 
             dailyPast[i].SWAPAT = convertTimestampToString(new Date(dailyPast[i].SWAPAT).getTime(), true)
@@ -1669,79 +1668,22 @@ async function getUSDPrice() {
         // }
     }
 
-    async function calcLivePrice(outToken, baseToken) {
+    async function getTokenLastPrice() {
+        var rows = await knex(tokenDailyTableName).orderBy('SWAPAT', 'asc').select('*')
         var data = []
-        var token0Address = baseToken
-        var token1Address = outToken
 
-        if (token0Address > token1Address) {
-            token0Address = outToken
-            token1Address = baseToken
+        for (var i = 0; i < rows.length; i ++) {
+            data[rows[i].TOKENADDRESS] = rows[i].AVGPRICE
         }
 
-        var dailyPast = await knex(liveTableName).join(pairsTableName, pairsTableName + '.pairAddress', '=', liveTableName + '.PAIRADDRESS').where(pairsTableName + '.token0Address', token0Address).where(pairsTableName + '.token1Address', token1Address).orderBy(pairsTableName + '.createdAt', 'asc').select(liveTableName + '.*')
-        
-        for (var i = 0; i < dailyPast.length; i ++) {
-            dailyPast[i].swapAt = convertTimestampToString(new Date(dailyPast[i].swapAt).getTime(), true)
-
-            var basePrice = 1
-            
-            if (baseToken != USD_ADDRESS) basePrice = ethData[key].AVGPRICE
-
-            if (token0Address == baseToken) {
-                await knex(tokenLiveTableName).insert({
-                    tokenAddress: outToken,
-                    swapAt: dailyPast[i].swapAt,
-                    swapPrice: avg * basePrice,
-                    VOLUME: data[key].TOTALVOLUME0 * basePrice,
-                    SWAPCOUNT: data[key].SWAPCOUNT,
-                })
-            } else {
-                await knex(tokenLiveTableName).insert({
-                    TOKENADDRESS: outToken,
-                    SWAPAT: key,
-                    AVGPRICE: avg != 0 ? 1 / avg * basePrice : 0,
-                    MAXPRICE: data[key].MAXPRICE != 0 ? 1 / data[key].MAXPRICE * basePrice : 0,
-                    MINPRICE: data[key].MINPRICE != 0 ? 1 / data[key].MINPRICE * basePrice : 0,
-                    VOLUME: data[key].TOTALVOLUME1 * basePrice,
-                    SWAPCOUNT: data[key].SWAPCOUNT,
-                })
-            }
-        }
-
-        for (var key in data) {
-            var avg = data[key].TOTALVOLUME0 / data[key].TOTALVOLUME1
-            var basePrice = 1
-            
-            if (baseToken != USD_ADDRESS) basePrice = ethData[key].AVGPRICE
-
-            if (token0Address == baseToken) {
-                await knex(tokenLiveTableName).insert({
-                    tokenAddress: outToken,
-                    swapAt: key,
-                    swapPrice: avg * basePrice,
-                    VOLUME: data[key].TOTALVOLUME0 * basePrice,
-                    SWAPCOUNT: data[key].SWAPCOUNT,
-                })
-            } else {
-                await knex(tokenDailyTableName).insert({
-                    TOKENADDRESS: outToken,
-                    SWAPAT: key,
-                    AVGPRICE: avg != 0 ? 1 / avg * basePrice : 0,
-                    MAXPRICE: data[key].MAXPRICE != 0 ? 1 / data[key].MAXPRICE * basePrice : 0,
-                    MINPRICE: data[key].MINPRICE != 0 ? 1 / data[key].MINPRICE * basePrice : 0,
-                    VOLUME: data[key].TOTALVOLUME1 * basePrice,
-                    SWAPCOUNT: data[key].SWAPCOUNT,
-                })
-            }
+        for (var token in data) {
+            await knex(tokensTableName).where('tokenAddress', token).update({
+                lastPrice: data[token]
+            })
         }
     }
 
-    async function calcAllLivePrice() {
-
-    }
-
-    await calcAllDailyPrice()
+    await getTokenLastPrice()
 
     console.log('Finished')
 }

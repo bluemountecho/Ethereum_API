@@ -1,14 +1,79 @@
 var fs = require('fs')
 var path = require('path')
+const process = require('process')
+
+const chainName = process.argv[2]
 
 const { Console } = require("console");
 const myLogger = new Console({
-  stdout: fs.createWriteStream("eth_live_" + convertTimestampToString(new Date())  + ".txt"),
-  stderr: fs.createWriteStream("eth_live_" + convertTimestampToString(new Date())  + ".txt"),
+  stdout: fs.createWriteStream(chainName + ".txt"),
+  stderr: fs.createWriteStream(chainName + ".txt"),
 });
+
 const utf8 = require('utf8')
+const tokensTableName = chainName + '_tokens'
+const pairsTableName = chainName + '_pairs'
+const dailyPastTableName = chainName + '_daily'
+const liveTableName = chainName + '_live'
+const tokenDailyTableName = chainName + '_token_daily'
+const tokenLiveTableName = chainName + '_token_live'
+const proxyCnt = config[chainName].PROXYCOUNT
 
 Web3 = require('web3')
+
+var web3s = []
+
+if (config[chainName].endPointType == 1) {
+    for (var ii = 0; ii < proxyCnt; ii ++) {
+        web3s.push(new Web3(new Web3.providers.HttpProvider(config[chainName].web3Providers[0], {
+            // Enable auto reconnection
+            reconnect: {
+                auto: true,
+                delay: 5000, // ms
+                maxAttempts: 5,
+                onTimeout: false
+            },
+            keepAlive: true,
+            timeout: 20000,
+            headers: [{name: 'Access-Control-Allow-Origin', value: '*'}],
+            withCredentials: false,
+            agent: {
+                // httpsAgent: new HttpsProxyAgent('https://' + config.PROXY[ii]),
+                baseUrl: 'http://' + config.PROXY[ii]
+            }
+            // agent: {
+            //     // http: new HttpsProxyAgent('http://' + config.PROXY[ii]),
+            //     http: http.Agent('http://' + config.PROXY[ii]),
+            //     baseUrl: 'http://' + config.PROXY[ii]
+            // }
+        })))
+    }
+} else {
+    for (var ii = 0; ii < proxyCnt; ii ++) {
+        web3s.push(new Web3(new Web3.providers.HttpProvider(config[chainName].web3Providers[ii], {
+            // Enable auto reconnection
+            reconnect: {
+                auto: true,
+                delay: 5000, // ms
+                maxAttempts: 5,
+                onTimeout: false
+            },
+            keepAlive: true,
+            timeout: 20000,
+            headers: [{name: 'Access-Control-Allow-Origin', value: '*'}],
+            withCredentials: false,
+            agent: {
+                // httpsAgent: new HttpsProxyAgent('https://' + config.PROXY[ii]),
+                baseUrl: 'http://' + config.PROXY[ii]
+            }
+            // agent: {
+            //     // http: new HttpsProxyAgent('http://' + config.PROXY[ii]),
+            //     http: http.Agent('http://' + config.PROXY[ii]),
+            //     baseUrl: 'http://' + config.PROXY[ii]
+            // }
+        })))
+    }
+}
 
 const minERC20ABI = [
     {
@@ -195,7 +260,7 @@ var blocksData = []
 var lastBlockNumber = 14427628
 
 async function getTokenAndPairData() {
-    var res = await knex('eth_tokens').select('*')
+    var res = await knex(tokensTableName).select('*')
 
     myLogger.log(res.length)
 
@@ -208,7 +273,7 @@ async function getTokenAndPairData() {
         }
     }
 
-    res = await knex('eth_pairs').select('*')
+    res = await knex(pairsTableName).select('*')
 
     myLogger.log(res.length)
 
@@ -219,7 +284,8 @@ async function getTokenAndPairData() {
             decimals: res[i].decimals,
             baseToken: res[i].baseToken,
             blockNumber: res[i].blockNumber,
-            transactionID: res[i].transactionID
+            transactionID: res[i].transactionID,
+            lastPrice: res[i].lastPrice,
         }
     }
 }
@@ -283,7 +349,7 @@ async function getPairDecimals(pairAddress, createdAt) {
                 createdAt: createdAt
             }
 
-            await knex('eth_tokens').insert({
+            await knex(tokensTableName).insert({
                 tokenAddress: token0Address,
                 tokenDecimals: res[0][0],
                 tokenSymbol: utf8.encode(res[0][1]),
@@ -307,7 +373,7 @@ async function getPairDecimals(pairAddress, createdAt) {
                 createdAt: createdAt
             }
 
-            await knex('eth_tokens').insert({
+            await knex(tokensTableName).insert({
                 tokenAddress: token1Address,
                 tokenDecimals: res[1][0],
                 tokenSymbol: utf8.encode(res[1][1]),
@@ -330,42 +396,35 @@ async function writeTransactionHistoryFile(deleteDate, writeDate) {
 
     var rows = (await knex.raw('\
         SELECT\
-            eth_live.pairAddress AS PAIRADDRESS,\
-            CONCAT(YEAR( eth_live.swapAt ), "-", MONTH( eth_live.swapAt ), "-", DAY( eth_live.swapAt )) AS SWAPAT,\
-            avg( eth_live.swapPrice ) AS AVGPRICE,\
-            max( eth_live.swapPrice ) AS MAXPRICE,\
-            min( eth_live.swapPrice ) AS MINPRICE,\
-            sum( eth_live.swapAmount0 * ( eth_pairs.baseToken * 2 - 1 ) * ( eth_live.isBuy * - 2 + 1 ) ) AS VOLUME0,\
-            sum( eth_live.swapAmount1 * ( eth_pairs.baseToken * - 2 + 1 ) * ( eth_live.isBuy * - 2 + 1 ) ) AS VOLUME1,\
-            sum( eth_live.swapAmount0 ) AS TOTALVOLUME0,\
-            sum( eth_live.swapAmount1 ) AS TOTALVOLUME1,\
-            count( eth_live.swapMaker ) AS SWAPCOUNT \
+            ' + liveTableName + '.pairAddress AS PAIRADDRESS,\
+            CONCAT(YEAR( ' + liveTableName + '.swapAt ), "-", MONTH( ' + liveTableName + '.swapAt ), "-", DAY( ' + liveTableName + '.swapAt )) AS SWAPAT,\
+            avg( ' + liveTableName + '.swapPrice ) AS AVGPRICE,\
+            max( ' + liveTableName + '.swapPrice ) AS MAXPRICE,\
+            min( ' + liveTableName + '.swapPrice ) AS MINPRICE,\
+            sum( ' + liveTableName + '.swapAmount0 * ( ' + pairsTableName + '.baseToken * 2 - 1 ) * ( ' + liveTableName + '.isBuy * - 2 + 1 ) ) AS VOLUME0,\
+            sum( ' + liveTableName + '.swapAmount1 * ( ' + pairsTableName + '.baseToken * - 2 + 1 ) * ( ' + liveTableName + '.isBuy * - 2 + 1 ) ) AS VOLUME1,\
+            sum( ' + liveTableName + '.swapAmount0 ) AS TOTALVOLUME0,\
+            sum( ' + liveTableName + '.swapAmount1 ) AS TOTALVOLUME1,\
+            count( ' + liveTableName + '.swapMaker ) AS SWAPCOUNT \
         FROM\
-            eth_live\
-            LEFT JOIN eth_pairs ON eth_pairs.pairAddress = eth_live.pairAddress \
+            ' + liveTableName + '\
+            LEFT JOIN ' + pairsTableName + ' ON ' + pairsTableName + '.pairAddress = ' + liveTableName + '.pairAddress \
         WHERE\
-            DATE(eth_live.swapAt)="' + writeDate + '"\
+            DATE(' + liveTableName + '.swapAt)="' + writeDate + '"\
         GROUP BY\
-            eth_live.pairAddress,\
-            DATE( eth_live.swapAt ) \
+            ' + liveTableName + '.pairAddress,\
+            DATE( ' + liveTableName + '.swapAt ) \
         ORDER BY\
-            DATE( eth_live.swapAt)'))[0]
+            DATE( ' + liveTableName + '.swapAt)'))[0]
 
     for (var i = 0; i < rows.length; i ++) {
         var fileName = path + '/transactions/' + rows[i].PAIRADDRESS + '.txt'
         fs.appendFile(fileName, JSON.stringify(rows[i]) + '\n', "utf8", (err) => { })
     }
 
-    // rows = (await knex.raw('select CONCAT(YEAR( eth_live.swapAt ), "-", MONTH( eth_live.swapAt ), "-", DAY( eth_live.swapAt )) AS SWAPAT, swapMaker as SWAPMAKER, pairAddress from eth_live where DATE(eth_live.swapAt)="' + writeDate + '" order by swapAt'))[0]
+    await knex(liveTableName).where('swapAt', '<', deleteDate + ' ' + '00:00:00').delete()
 
-    // for (var i = 0; i < rows.length; i ++) {
-    //     var fileName = path + '/swapers/' + rows[i].pairAddress + '.txt'
-    //     fs.appendFile(fileName, JSON.stringify(rows[i]) + '\n', "utf8", (err) => { })
-    // }
-
-    await knex('eth_live').where('swapAt', '<', deleteDate + ' ' + '00:00:00').delete()
-
-    // myLogger.log(writeDate + " WRITE TRANSACTION HISTORY FILE FINISHED!!!")
+    myLogger.log(writeDate + " WRITE TRANSACTION HISTORY FILE FINISHED!!!")
 }
 
 async function init() {
@@ -377,7 +436,7 @@ async function init() {
             blockNumber = lastBlockNumber + 99
         }
 
-        results = await Promise.all([
+        var results = await Promise.all([
             web3.eth.getPastLogs({
                 fromBlock: lastBlockNumber,
                 toBlock: blockNumber,
@@ -432,7 +491,7 @@ async function init() {
                 }
 
                 try {
-                    await knex('eth_pairs').insert({
+                    await knex(pairsTableName).insert({
                         token0Address: token0Address,
                         token1Address: token1Address,
                         factoryAddress: factoryAddress,
@@ -521,7 +580,7 @@ async function init() {
                     }
 
                     try {
-                        await knex('eth_pairs').insert({
+                        await knex(pairsTableName).insert({
                             token0Address: decimals[1],
                             token1Address: decimals[2],
                             pairAddress: pairAddress,
@@ -533,7 +592,7 @@ async function init() {
                             createdAt: tmpDate
                         })
                     } catch (err) {
-                        await knex('eth_pairs').update({
+                        await knex(pairsTableName).update({
                             blockNumber: block,
                             transactionID: transactionID,
                             lastPrice: Math.abs(swap0 * 1.0 * 10 ** decimals[0] / swap1)
@@ -552,7 +611,7 @@ async function init() {
                     }
 
                     try {
-                        await knex('eth_live').insert(data)
+                        await knex(liveTableName).insert(data)
                     } catch (err) {
                         myLogger.log('V2 SWAP: ' + results[1][i].transactionHash)
                         myLogger.log(err)
@@ -562,7 +621,7 @@ async function init() {
                     pairsData[pairAddress].transactionID = transactionID
 
                     try {
-                        await knex('eth_pairs').update({
+                        await knex(pairsTableName).update({
                             blockNumber: block,
                             transactionID: transactionID,
                             lastPrice: Math.abs(swap0 * 1.0 * 10 ** decimals[0] / swap1)
@@ -584,7 +643,7 @@ async function init() {
                     }
 
                     try {
-                        await knex('eth_live').insert(data)
+                        await knex(liveTableName).insert(data)
                     } catch (err) {
                         myLogger.log('V2 SWAP: ' + results[1][i].transactionHash)
                         myLogger.log(err)
@@ -620,7 +679,7 @@ async function init() {
                 }
         
                 try {
-                    await knex('eth_pairs').insert({
+                    await knex(pairsTableName).insert({
                         token0Address: token0Address,
                         token1Address: token1Address,
                         factoryAddress: factoryAddress,
@@ -706,7 +765,7 @@ async function init() {
                     }
 
                     try {
-                        await knex('eth_pairs').insert({
+                        await knex(pairsTableName).insert({
                             token0Address: decimals[1],
                             token1Address: decimals[2],
                             pairAddress: pairAddress,
@@ -718,7 +777,7 @@ async function init() {
                             createdAt: tmpDate
                         })
                     } catch (err) {
-                        await knex('eth_pairs').update({
+                        await knex(pairsTableName).update({
                             blockNumber: block,
                             transactionID: transactionID,
                             lastPrice: Math.abs(swap0 * 1.0 * 10 ** decimals[0] / swap1)
@@ -737,7 +796,7 @@ async function init() {
                     }
 
                     try {
-                        await knex('eth_live').insert(data)
+                        await knex(liveTableName).insert(data)
                     } catch (err) {
                         myLogger.log('V3 SWAP: ' + results[3][i].transactionHash)
                         myLogger.log(err)
@@ -747,7 +806,7 @@ async function init() {
                     pairsData[pairAddress].transactionID = transactionID
 
                     try {
-                        await knex('eth_pairs').update({
+                        await knex(pairsTableName).update({
                             blockNumber: block,
                             transactionID: transactionID,
                             lastPrice: Math.abs(swap0 * 1.0 * 10 ** decimals[0] / swap1)
@@ -769,7 +828,7 @@ async function init() {
                     }
 
                     try {
-                        await knex('eth_live').insert(data)
+                        await knex(liveTableName).insert(data)
                     } catch (err) {
                         myLogger.log('V3 SWAP: ' + results[3][i].transactionHash)
                         myLogger.log(err)

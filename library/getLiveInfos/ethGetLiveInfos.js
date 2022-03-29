@@ -1,15 +1,13 @@
 var fs = require('fs')
 var path = require('path')
 const process = require('process')
-
+const config = require('../../config')
 const chainName = process.argv[2]
-
 const { Console } = require("console");
 const myLogger = new Console({
   stdout: fs.createWriteStream(chainName + ".txt"),
   stderr: fs.createWriteStream(chainName + ".txt"),
 });
-
 const utf8 = require('utf8')
 const tokensTableName = chainName + '_tokens'
 const pairsTableName = chainName + '_pairs'

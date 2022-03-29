@@ -17,6 +17,8 @@ const tokenDailyTableName = chainName + '_token_daily'
 const tokenLiveTableName = chainName + '_token_live'
 const proxyCnt = config[chainName].PROXYCOUNT
 const Web3 = require('web3')
+const USD_ADDRESS = config[chainName].USD_ADDRESS
+const ETH_ADDRESS = config[chainName].ETH_ADDRESS
 
 var web3s = []
 

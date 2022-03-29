@@ -1518,7 +1518,7 @@ async function getUSDPrice() {
         return a < b ? a : b
     }
 
-    async function calcDailyPrice(outToken, baseToken, flag = false) {
+    async function calcDailyPrice(outToken, baseToken) {
         var data = []
         var token0Address = baseToken
         var token1Address = outToken
@@ -1618,7 +1618,7 @@ async function getUSDPrice() {
             }
         }
 
-        console.log(data['0xf0f9D895aCa5c8678f706FB8216fa22957685A13'])
+        console.log(data['0xf0f9d895aca5c8678f706fb8216fa22957685a13'])
         return
 
         for (var token in data) {

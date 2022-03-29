@@ -1668,7 +1668,7 @@ async function getUSDPrice() {
         // }
     }
 
-    async function getTokenLastPrice() {
+    async function getTokenAndPairLastPrice() {
         var rows = await knex(tokenDailyTableName).orderBy('SWAPAT', 'asc').select('*')
         var data = []
 
@@ -1681,9 +1681,22 @@ async function getUSDPrice() {
                 lastPrice: data[token]
             })
         }
+        
+        rows = await knex(dailyPastTableName).orderBy('SWAPAT', 'asc').select('*')
+        data = []
+
+        for (var i = 0; i < rows.length; i ++) {
+            data[rows[i].PAIRADDRESS] = rows[i].AVGPRICE
+        }
+
+        for (var pair in data) {
+            await knex(pairsTableName).where('pairAddress', pair).update({
+                lastPrice: data[pair]
+            })
+        }
     }
 
-    await getTokenLastPrice()
+    await getTokenAndPairLastPrice()
 
     console.log('Finished')
 }

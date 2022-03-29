@@ -206,7 +206,6 @@ const options = {
     }
 };
 
-const web3 = new Web3(new Web3.providers.HttpProvider('https://eth-mainnet.alchemyapi.io/v2/UhrdEQkkqcqwwlm9wOXnYx71ut5BNDTd', options))
 const knex = require('knex')({
     client: 'mysql',
     connection: {
@@ -255,7 +254,7 @@ function convertTimestampToString(timestamp, flag = false) {
 var tokensData = []
 var pairsData = []
 var blocksData = []
-var lastBlockNumber = 14427628
+var lastBlockNumber = config[chainName].lastBlockNumber
 
 async function getTokenAndPairData() {
     var res = await knex(tokensTableName).select('*')
@@ -282,14 +281,12 @@ async function getTokenAndPairData() {
             token1Address: res[i].token1Address,
             decimals: res[i].decimals,
             baseToken: res[i].baseToken,
-            blockNumber: res[i].blockNumber,
-            transactionID: res[i].transactionID,
             lastPrice: res[i].lastPrice,
         }
     }
 }
 
-async function getTokenInfos(tokenAddress) {
+async function getTokenInfos(tokenAddress, web3) {
     try {
         const contract = new web3.eth.Contract(minERC20ABI, tokenAddress)
         var decimals, symbol, name
@@ -318,7 +315,7 @@ async function getTokenInfos(tokenAddress) {
     }    
 }
 
-async function getPairDecimals(pairAddress, createdAt) {
+async function getPairDecimals(pairAddress, createdAt, web3) {
     if (pairsData[pairAddress]) {
         return [pairsData[pairAddress].decimals, pairsData[pairAddress].token0Address, pairsData[pairAddress].token1Address]
     }
@@ -339,7 +336,7 @@ async function getPairDecimals(pairAddress, createdAt) {
             res[0][1] = tokensData[token0Address].tokenSymbol
             res[0][2] = tokensData[token0Address].tokenName
         } else {
-            res[0] = await getTokenInfos(token0Address)
+            res[0] = await getTokenInfos(token0Address, web3)
 
             tokensData[token0Address] = {
                 tokenDecimals: res[0][0],
@@ -363,7 +360,7 @@ async function getPairDecimals(pairAddress, createdAt) {
             res[1][1] = tokensData[token1Address].tokenSymbol
             res[1][2] = tokensData[token1Address].tokenName
         } else {
-            res[1] = await getTokenInfos(token1Address)
+            res[1] = await getTokenInfos(token1Address, web3)
 
             tokensData[token1Address] = {
                 tokenDecimals: res[1][0],
@@ -428,7 +425,7 @@ async function writeTransactionHistoryFile(deleteDate, writeDate) {
 
 async function init() {
     try {
-        var blockNumber = await web3.eth.getBlockNumber()
+        var blockNumber = await web3s[0].eth.getBlockNumber()
         var curBlock = blockNumber
 
         if (curBlock > lastBlockNumber + 99) {
@@ -436,22 +433,22 @@ async function init() {
         }
 
         var results = await Promise.all([
-            web3.eth.getPastLogs({
+            web3s[1].eth.getPastLogs({
                 fromBlock: lastBlockNumber,
                 toBlock: blockNumber,
                 topics: ['0x0d3648bd0f6ba80134a33ba9275ac585d9d315f0ad8355cddefde31afa28d0e9']
             }),
-            web3.eth.getPastLogs({
+            web3s[2].eth.getPastLogs({
                 fromBlock: lastBlockNumber,
                 toBlock: blockNumber,
                 topics: ['0xd78ad95fa46c994b6551d0da85fc275fe613ce37657fb8d5e3d130840159d822']
             }),
-            web3.eth.getPastLogs({
+            web3s[3].eth.getPastLogs({
                 fromBlock: lastBlockNumber,
                 toBlock: blockNumber,
                 topics: ['0x783cca1c0412dd0d695e784568c96da2e9c22ff989357a2e8b1d9b2b4e6b7118']
             }),
-            web3.eth.getPastLogs({
+            web3s[4].eth.getPastLogs({
                 fromBlock: lastBlockNumber,
                 toBlock: blockNumber,
                 topics: ['0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67']
@@ -466,52 +463,54 @@ async function init() {
         // myLogger.log('UNISWAP V3 SWAP        : ' + results[3].length)
 
         for (var i = 0; i < results[0].length; i ++) {
-            try {
-                var token0Address = '0x' + results[0][i].topics[1].substr(26, 40).toLowerCase()
-                var token1Address = '0x' + results[0][i].topics[2].substr(26, 40).toLowerCase()
-                var pairAddress = '0x' + results[0][i].data.substr(26, 40).toLowerCase()
-                var factoryAddress = results[0][i].address.toLowerCase()
-                var block = results[0][i].blockNumber
-                var resBlock = await web3.eth.getBlock(block)
-                var tmpDate = convertTimestampToString(resBlock.timestamp * 1000, true)
-                var res = await getPairDecimals(pairAddress, tmpDate)
-                var baseToken = tokensData[token0Address].createdAt < tokensData[token1Address].createdAt ? 0 : 1
-
-                // myLogger.log('-------------------------------------------')
-                // myLogger.log('V2 CREATED: ' + results[0][i].transactionHash)
-
-                pairsData[pairAddress] = {
-                    token0Address: token0Address,
-                    token1Address: token1Address,
-                    decimals: res[0],
-                    baseToken: baseToken,
-                    blockNumber: block,
-                    transactionID: 0
-                }
-
+            async function getOneV2Pair(result, web3) {
                 try {
-                    await knex(pairsTableName).insert({
+                    var token0Address = '0x' + result.topics[1].substr(26, 40).toLowerCase()
+                    var token1Address = '0x' + result.topics[2].substr(26, 40).toLowerCase()
+                    var pairAddress = '0x' + result.data.substr(26, 40).toLowerCase()
+                    var factoryAddress = result.address.toLowerCase()
+                    var block = result.blockNumber
+                    var resBlock = await web3.eth.getBlock(block)
+                    var tmpDate = convertTimestampToString(resBlock.timestamp * 1000, true)
+                    var res = await getPairDecimals(pairAddress, tmpDate, web3)
+                    var baseToken = tokensData[token0Address].createdAt < tokensData[token1Address].createdAt ? 0 : 1
+
+                    // myLogger.log('-------------------------------------------')
+                    // myLogger.log('V2 CREATED: ' + result.transactionHash)
+
+                    pairsData[pairAddress] = {
                         token0Address: token0Address,
                         token1Address: token1Address,
-                        factoryAddress: factoryAddress,
-                        pairAddress: pairAddress,
-                        createdAt: tmpDate,
-                        blockNumber: block,
-                        transactionID: 0,
+                        decimals: res[0],
                         baseToken: baseToken,
-                        decimals: res[0]
-                    })
-                } catch (err) {
-                    myLogger.log('V2 CREATED: ' + results[0][i].transactionHash)
-                    myLogger.log(err)
-                }
-            } catch (err) {
+                        blockNumber: block,
+                        transactionID: 0
+                    }
 
-            }            
+                    try {
+                        await knex(pairsTableName).insert({
+                            token0Address: token0Address,
+                            token1Address: token1Address,
+                            factoryAddress: factoryAddress,
+                            pairAddress: pairAddress,
+                            createdAt: tmpDate,
+                            blockNumber: block,
+                            transactionID: 0,
+                            baseToken: baseToken,
+                            decimals: res[0]
+                        })
+                    } catch (err) {
+                        myLogger.log('V2 CREATED: ' + result.transactionHash)
+                        myLogger.log(err)
+                    }
+                } catch (err) {
+
+                } 
+            }           
         }
 
         for (var i = 0; i < results[1].length; i += proxyCnt) {
-            async function getOneSwap2(result) {
+            async function getOneV2Swap(result, web3) {
                 try {
                     var amt0 = Number.parseInt(hexToBn(result.data.substr(2, 64)))
                     var amt1 = Number.parseInt(hexToBn(result.data.substr(66, 64)))
@@ -575,8 +574,6 @@ async function init() {
                             token0Address: decimals[1],
                             token1Address: decimals[2],
                             decimals: decimals[0],
-                            blockNumber: block,
-                            transactionID: transactionID
                         }
 
                         try {
@@ -584,8 +581,6 @@ async function init() {
                                 token0Address: decimals[1],
                                 token1Address: decimals[2],
                                 pairAddress: pairAddress,
-                                blockNumber: block,
-                                transactionID: transactionID,
                                 decimals: decimals[0],
                                 baseToken: baseToken,
                                 lastPrice: Math.abs(swap0 * 1.0 * 10 ** decimals[0] / swap1),
@@ -593,10 +588,8 @@ async function init() {
                             })
                         } catch (err) {
                             await knex(pairsTableName).update({
-                                blockNumber: block,
-                                transactionID: transactionID,
                                 lastPrice: Math.abs(swap0 * 1.0 * 10 ** decimals[0] / swap1)
-                            }).whereRaw('pairAddress="' + pairAddress + '" and (blockNumber<' + block + ' or (blockNumber=' + block + ' and transactionID<' + transactionID + '))')
+                            }).where('pairAddress', pairAddress)
                         }
 
                         var data = {
@@ -616,14 +609,9 @@ async function init() {
                             myLogger.log('V2 SWAP: ' + result.transactionHash)
                             myLogger.log(err)
                         }
-                    } else if (pairsData[pairAddress].blockNumber < block || (pairsData[pairAddress].blockNumber == block && pairsData[pairAddress].transactionID < transactionID)) {
-                        pairsData[pairAddress].blockNumber = block
-                        pairsData[pairAddress].transactionID = transactionID
-
+                    } else {
                         try {
                             await knex(pairsTableName).update({
-                                blockNumber: block,
-                                transactionID: transactionID,
                                 lastPrice: Math.abs(swap0 * 1.0 * 10 ** decimals[0] / swap1)
                             }).where('pairAddress', pairAddress)
                         } catch (err) {
@@ -656,9 +644,11 @@ async function init() {
 
             var funcs = []
 
-            for (var j = 0; j < proxyCnt && i + j < results[1].length; j ++) {
-                funcs.push(getOneSwap2(result[1][i + j]))
+            for (var k = 0; k < proxyCnt && i + k < results[1].length; k ++) {
+                funcs.push(getOneV2Swap(result[1][i + k], web3s[k]))
             }
+
+            await Promise.all(funcs)
         }
 
         for (var i = 0; i < results[2].length; i ++) {
@@ -808,14 +798,9 @@ async function init() {
                         myLogger.log('V3 SWAP: ' + results[3][i].transactionHash)
                         myLogger.log(err)
                     }
-                } else if (pairsData[pairAddress].blockNumber < block || (pairsData[pairAddress].blockNumber == block && pairsData[pairAddress].transactionID < transactionID)) {
-                    pairsData[pairAddress].blockNumber = block
-                    pairsData[pairAddress].transactionID = transactionID
-
+                } else {
                     try {
                         await knex(pairsTableName).update({
-                            blockNumber: block,
-                            transactionID: transactionID,
                             lastPrice: Math.abs(swap0 * 1.0 * 10 ** decimals[0] / swap1)
                         }).where('pairAddress', pairAddress)
                     } catch (err) {

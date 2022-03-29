@@ -1711,9 +1711,7 @@ async function init() {
 
     // await getTransactionHistory(FROMBLOCK)
 
-    // await getDailyFromFile()
-
-    await getUSDPrice()
+    // await getUSDPrice()
 }
 
 init()

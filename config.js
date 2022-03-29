@@ -117,7 +117,6 @@ module.exports.PROXY = [
 
 module.exports.eth = {    
     'web3Providers': [
-        'https://eth-mainnet.alchemyapi.io/v2/SszaZPuxxxVhD6TKaCScBk7SQN4EEO8t',
         'https://eth-mainnet.alchemyapi.io/v2/UhrdEQkkqcqwwlm9wOXnYx71ut5BNDTd',
         'https://eth-mainnet.alchemyapi.io/v2/GwVYJ0rBAGMeeC7nkaVdBimTapbyssKC',
         'https://eth-mainnet.alchemyapi.io/v2/KDRotLOmW8M21flLsKNaLN4IO5lB_6PN',
@@ -135,7 +134,8 @@ module.exports.eth = {
         'https://eth-mainnet.alchemyapi.io/v2/0-eOaucZ3wiI_2qkj6W4ExfohXDmaRjw',
         'https://eth-mainnet.alchemyapi.io/v2/gwQXpDW7dSs1cCCWM2elWLX7g1pe9tfu',
         'https://eth-mainnet.alchemyapi.io/v2/0_DTvXZh-Y7iIZppUg_yPfpDcdOG6M3t',
-        'https://eth-mainnet.alchemyapi.io/v2/gSyeUk2nIKtZMC_7xU1DnrB3DWeaXiRm'
+        'https://eth-mainnet.alchemyapi.io/v2/gSyeUk2nIKtZMC_7xU1DnrB3DWeaXiRm',
+        'https://eth-mainnet.alchemyapi.io/v2/SszaZPuxxxVhD6TKaCScBk7SQN4EEO8t',
     ],
     'endPointType': 1,
     'FROMBLOCK': 0,
@@ -144,7 +144,7 @@ module.exports.eth = {
     'TRANSACTIONV2': 200,
     'PAIRV1': 10000,
     'PAIRV2': 1000,
-    'PROXYCOUNT': 19,
+    'PROXYCOUNT': 18,
     'scanData': {
         apiKey: 'P5QXWEDN6PEQE4KB61J5GISXXNEKEYAGFM',
         scanSite: 'https://api.etherscan.io',

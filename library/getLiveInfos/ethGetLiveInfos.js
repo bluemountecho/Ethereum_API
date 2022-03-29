@@ -512,17 +512,17 @@ async function init() {
             }            
         }
 
-        for (var i = 0; i < results[1].length; i ++) {
-            async function getOneSwap2(results) {
+        for (var i = 0; i < results[1].length; i += proxyCnt) {
+            async function getOneSwap2(result) {
                 try {
-                    var amt0 = Number.parseInt(hexToBn(results.data.substr(2, 64)))
-                    var amt1 = Number.parseInt(hexToBn(results.data.substr(66, 64)))
-                    var amt2 = Number.parseInt(hexToBn(results.data.substr(130, 64)))
-                    var amt3 = Number.parseInt(hexToBn(results.data.substr(194, 64)))
+                    var amt0 = Number.parseInt(hexToBn(result.data.substr(2, 64)))
+                    var amt1 = Number.parseInt(hexToBn(result.data.substr(66, 64)))
+                    var amt2 = Number.parseInt(hexToBn(result.data.substr(130, 64)))
+                    var amt3 = Number.parseInt(hexToBn(result.data.substr(194, 64)))
                     var swap0 = amt0 - amt2
                     var swap1 = amt1 - amt3
-                    var pairAddress = results.address.toLowerCase()
-                    var block = results.blockNumber
+                    var pairAddress = result.address.toLowerCase()
+                    var block = result.blockNumber
                     var resBlock
 
                     if (!blocksData[block]) {
@@ -533,8 +533,8 @@ async function init() {
                     }
 
                     var tmpDate = convertTimestampToString(resBlock.timestamp * 1000, true)
-                    var transactionID = results.logIndex
-                    var transactionHash = results.transactionHash
+                    var transactionID = result.logIndex
+                    var transactionHash = result.transactionHash
                     var decimals = await getPairDecimals(pairAddress, tmpDate)
                     var baseToken = tokensData[decimals[1]].createdAt < tokensData[decimals[2]].createdAt ? 0 : 1
                     var isBuy = 0
@@ -570,7 +570,7 @@ async function init() {
                     swapMaker = '0x' + swapMaker
 
                     // myLogger.log('-------------------------------------------')
-                    // myLogger.log('V2 SWAP: ' + results.transactionHash)
+                    // myLogger.log('V2 SWAP: ' + result.transactionHash)
 
                     if (!pairsData[pairAddress]) {
                         pairsData[pairAddress] = {
@@ -615,7 +615,7 @@ async function init() {
                         try {
                             await knex(liveTableName).insert(data)
                         } catch (err) {
-                            myLogger.log('V2 SWAP: ' + results.transactionHash)
+                            myLogger.log('V2 SWAP: ' + result.transactionHash)
                             myLogger.log(err)
                         }
                     } else if (pairsData[pairAddress].blockNumber < block || (pairsData[pairAddress].blockNumber == block && pairsData[pairAddress].transactionID < transactionID)) {
@@ -629,7 +629,7 @@ async function init() {
                                 lastPrice: Math.abs(swap0 * 1.0 * 10 ** decimals[0] / swap1)
                             }).where('pairAddress', pairAddress)
                         } catch (err) {
-                            myLogger.log('V2 SWAP: ' + results.transactionHash)
+                            myLogger.log('V2 SWAP: ' + result.transactionHash)
                             myLogger.log(err)
                         }
 
@@ -647,13 +647,19 @@ async function init() {
                         try {
                             await knex(liveTableName).insert(data)
                         } catch (err) {
-                            myLogger.log('V2 SWAP: ' + results.transactionHash)
+                            myLogger.log('V2 SWAP: ' + result.transactionHash)
                             myLogger.log(err)
                         }
                     }
                 } catch (err) {
                     
                 }
+            }
+
+            var funcs = []
+
+            for (var j = 0; j < proxyCnt && i + j < results[1].length; j ++) {
+                funcs.push(getOneSwap2(result[1][i + j]))
             }
         }
 

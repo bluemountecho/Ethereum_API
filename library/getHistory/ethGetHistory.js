@@ -1591,15 +1591,18 @@ async function getUSDPrice() {
         }
 
         var dailyPast = await knex(dailyPastTableName).join(pairsTableName, pairsTableName + '.pairAddress', '=', dailyPastTableName + '.PAIRADDRESS').where(pairsTableName + '.token0Address', ETH_ADDRESS).orWhere(pairsTableName + '.token1Address', ETH_ADDRESS).orderBy(pairsTableName + '.createdAt', 'asc').select(dailyPastTableName + '.*').select(pairsTableName + '.token0Address').select(pairsTableName + '.token1Address')
-
-        console.log(dailyPast[0])
-        return
         
         for (var i = 0; i < dailyPast.length; i ++) {
+            var token = dailyPast[i].token0Address
+
+            if (token0Address == ETH_ADDRESS) token = dailyPast[i].token1Address
+            if (token <= '0x812485ac6eac722cb3c4e02d3a821a74f65cd0e2') continue
+            if (!data[token]) data[token] = []
+
             dailyPast[i].SWAPAT = convertTimestampToString(new Date(dailyPast[i].SWAPAT).getTime(), true)
 
-            if (!data[dailyPast[i].SWAPAT]) {
-                data[dailyPast[i].SWAPAT] = {
+            if (!data[token][dailyPast[i].SWAPAT]) {
+                data[token][dailyPast[i].SWAPAT] = {
                     MAXPRICE: dailyPast[i].MAXPRICE,
                     MINPRICE: dailyPast[i].MINPRICE,
                     TOTALVOLUME0: dailyPast[i].TOTALVOLUME0,
@@ -1607,43 +1610,48 @@ async function getUSDPrice() {
                     SWAPCOUNT: dailyPast[i].SWAPCOUNT,
                 }
             } else {
-                data[dailyPast[i].SWAPAT].TOTALVOLUME0 += dailyPast[i].TOTALVOLUME0
-                data[dailyPast[i].SWAPAT].TOTALVOLUME1 += dailyPast[i].TOTALVOLUME1
-                data[dailyPast[i].SWAPAT].SWAPCOUNT += dailyPast[i].SWAPCOUNT
+                data[token][dailyPast[i].SWAPAT].TOTALVOLUME0 += dailyPast[i].TOTALVOLUME0
+                data[token][dailyPast[i].SWAPAT].TOTALVOLUME1 += dailyPast[i].TOTALVOLUME1
+                data[token][dailyPast[i].SWAPAT].SWAPCOUNT += dailyPast[i].SWAPCOUNT
             }
         }
 
-        for (var key in data) {
-            try {
-                var avg = data[key].TOTALVOLUME0 / data[key].TOTALVOLUME1
-                var basePrice = 1
-                
-                if (baseToken != USD_ADDRESS) basePrice = ethData[key].AVGPRICE
+        console.log(data['0xf0f9D895aCa5c8678f706FB8216fa22957685A13'])
+        return
 
-                if (token0Address == baseToken) {
-                    await knex(tokenDailyTableName).insert({
-                        TOKENADDRESS: outToken,
-                        SWAPAT: key,
-                        AVGPRICE: avg * basePrice,
-                        MAXPRICE: data[key].MAXPRICE * basePrice,
-                        MINPRICE: data[key].MINPRICE * basePrice,
-                        VOLUME: data[key].TOTALVOLUME0 * basePrice,
-                        SWAPCOUNT: data[key].SWAPCOUNT,
-                    })
-                } else {
-                    await knex(tokenDailyTableName).insert({
-                        TOKENADDRESS: outToken,
-                        SWAPAT: key,
-                        AVGPRICE: avg != 0 ? 1 / avg * basePrice : 0,
-                        MAXPRICE: data[key].MAXPRICE != 0 ? 1 / data[key].MAXPRICE * basePrice : 0,
-                        MINPRICE: data[key].MINPRICE != 0 ? 1 / data[key].MINPRICE * basePrice : 0,
-                        VOLUME: data[key].TOTALVOLUME1 * basePrice,
-                        SWAPCOUNT: data[key].SWAPCOUNT,
-                    })
-                }
-            } catch (err) {
-                myLogger.log(err)
-            }            
+        for (var token in data) {
+            for (var key in data[token]) {
+                try {
+                    var avg = data[key].TOTALVOLUME0 / data[key].TOTALVOLUME1
+                    var basePrice = 1
+                    
+                    if (baseToken != USD_ADDRESS) basePrice = ethData[key].AVGPRICE
+    
+                    if (token0Address == baseToken) {
+                        await knex(tokenDailyTableName).insert({
+                            TOKENADDRESS: outToken,
+                            SWAPAT: key,
+                            AVGPRICE: avg * basePrice,
+                            MAXPRICE: data[key].MAXPRICE * basePrice,
+                            MINPRICE: data[key].MINPRICE * basePrice,
+                            VOLUME: data[key].TOTALVOLUME0 * basePrice,
+                            SWAPCOUNT: data[key].SWAPCOUNT,
+                        })
+                    } else {
+                        await knex(tokenDailyTableName).insert({
+                            TOKENADDRESS: outToken,
+                            SWAPAT: key,
+                            AVGPRICE: avg != 0 ? 1 / avg * basePrice : 0,
+                            MAXPRICE: data[key].MAXPRICE != 0 ? 1 / data[key].MAXPRICE * basePrice : 0,
+                            MINPRICE: data[key].MINPRICE != 0 ? 1 / data[key].MINPRICE * basePrice : 0,
+                            VOLUME: data[key].TOTALVOLUME1 * basePrice,
+                            SWAPCOUNT: data[key].SWAPCOUNT,
+                        })
+                    }
+                } catch (err) {
+                    myLogger.log(err)
+                }            
+            }
         }
 
         

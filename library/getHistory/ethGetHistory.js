@@ -1583,7 +1583,7 @@ async function getUSDPrice() {
     }
 
     async function calcAllDailyPrice() {
-        await calcDailyPrice(ETH_ADDRESS, USD_ADDRESS)
+        // await calcDailyPrice(ETH_ADDRESS, USD_ADDRESS)
 
         var data = []
         var rows = await knex(tokenDailyTableName).where('TOKENADDRESS', ETH_ADDRESS).select('*')

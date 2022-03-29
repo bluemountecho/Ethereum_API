@@ -713,13 +713,25 @@ module.exports.getDailyTokenPrice = async function getDailyTokenPrice(tokenAddr,
         var tokenAddress = tokenAddr.toLowerCase()
         var tokenInfo = await knex('eth_tokens').where('tokenAddress', tokenAddress).select('*')
         // var rows = await knex('eth_token_daily').where('TOKENADDRESS', tokenAddress).orderBy('SWAPAT', 'asc').limit(0 * page, 100).select(knex.raw('DATE(SWAPAT) as swapAt, AVGPRICE, MAXPRICE as HIGHPRICE, MINPRICE as LOWPRICE, VOLUME, SWAPCOUNT'))
-        var rows = await knex('eth_token_daily').where('TOKENADDRESS', tokenAddress).orderBy('SWAPAT', 'asc').select('*')
+        var rows = await knex('eth_token_daily').where('TOKENADDRESS', tokenAddress).orderBy('SWAPAT', 'desc').limit(100).offset(100 * page).select('*')
+        var data = []
+
+        for (var i = 0; i < rows.length; i ++) {
+            data.push({
+                SWAPAT: convertTimestampToString(new Date(rows[i].SWAPAT).getTime(), true),
+                AVGPRICE: rows[i].AVGPRICE.toFixed(30),
+                HIGHPRICE: rows[i].MAXPRICE.toFixed(30),
+                LOWPRICE: rows[i].MINPRICE.toFixed(30),
+                VOLUME: rows[i].VOLUME.toFixed(5),
+                SWAPCOUNT: rows[i].SWAPCOUNT,
+            })
+        }
 
         return {
             status: 'Success!',
             symbol: tokenInfo[0].tokenSymbol,
             name: tokenInfo[0].tokenName,
-            data: rows
+            data: data
         }
     } catch (err) {
         return {

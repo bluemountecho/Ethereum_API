@@ -1711,7 +1711,7 @@ async function init() {
 
     // await getTransactionHistory(FROMBLOCK)
 
-    // await getUSDPrice()
+    await getUSDPrice()
 }
 
 init()

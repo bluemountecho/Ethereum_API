@@ -150,7 +150,7 @@ module.exports.getLastPriceFromPair = async function getLastPriceFromPair(pairAd
 
 module.exports.getAllTokens = async function getAllTokens(page = 0) {
     try {
-        var rows = await knex('eth_tokens').orderBy('createdAt', 'desc').limit(100).offset(page * 100).select('*')
+        var rows = await knex('eth_tokens').orderBy('createdAt', 'desc').limit(50).offset(page * 50).select('*')
         var datas = []
         var funcs = []
 

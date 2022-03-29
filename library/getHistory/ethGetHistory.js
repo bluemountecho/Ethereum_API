@@ -1605,6 +1605,7 @@ async function getUSDPrice() {
 
             if (!data[token][dailyPast[i].SWAPAT]) {
                 data[token][dailyPast[i].SWAPAT] = {
+                    TOKEN: ETH_ADDRESS == dailyPast[i].token0Address,
                     MAXPRICE: dailyPast[i].MAXPRICE,
                     MINPRICE: dailyPast[i].MINPRICE,
                     TOTALVOLUME0: dailyPast[i].TOTALVOLUME0,
@@ -1624,7 +1625,7 @@ async function getUSDPrice() {
                     var avg = data[token][key].TOTALVOLUME0 / data[token][key].TOTALVOLUME1
                     var basePrice = ethData[key].AVGPRICE
     
-                    if (token0Address == ETH_ADDRESS) {
+                    if (data[token][key].TOKEN) {
                         await knex(tokenDailyTableName).insert({
                             TOKENADDRESS: token,
                             SWAPAT: key,

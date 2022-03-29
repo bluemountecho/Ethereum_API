@@ -886,70 +886,45 @@ module.exports.getLiveTokenPrice = async function getLiveTokenPrice(tokenAddr, f
     var tokenAddress = tokenAddr.toLowerCase()
     var tokenInfo = await knex('eth_tokens').where('tokenAddress', tokenAddress).select('*')
 
-    for (var i = 0; i < baseTokens.length; i ++) {
-        var funcs = []
+    try {
+        var tokenAddress = tokenAddr.toLowerCase()
+        var tokenInfo = await knex('eth_tokens').where('tokenAddress', tokenAddress).select('*')
+        // var rows = await knex('eth_token_daily').where('TOKENADDRESS', tokenAddress).orderBy('SWAPAT', 'asc').limit(0 * page, 100).select(knex.raw('DATE(SWAPAT) as swapAt, AVGPRICE, MAXPRICE as HIGHPRICE, MINPRICE as LOWPRICE, VOLUME, SWAPCOUNT'))
+        var rows = await knex('eth_live').where('tokenAddress', tokenAddress).orderBy('swapAt', 'desc').limit(100).offset(100 * page).select('*')
+        var data = []
+        var pairs = []
 
-        var token0Address = tokenAddress > baseTokens[i] ? baseTokens[i] : tokenAddress
-        var token1Address = tokenAddress < baseTokens[i] ? baseTokens[i] : tokenAddress
-        var token2Address = USDC_ADDRESS > baseTokens[i] ? baseTokens[i] : USDC_ADDRESS
-        var token3Address = USDC_ADDRESS < baseTokens[i] ? baseTokens[i] : USDC_ADDRESS
-
-        var res = await Promise.all([this.mergeLivePairData(token0Address, token1Address, flag, page), this.mergeLivePairData(token2Address, token3Address, flag)])
-        var res1 = res[0]
-        var res2 = res[1]
-
-        if (res1.length) {
-            if (token1Address != tokenAddress) {
-                for (var j = 0; j < res1.length; j ++) {
-                    res1[j].PRICE = (1.0 / res1[j].PRICE).toFixed(30)
-                }
+        for (var i = 0; i < rows.length; i ++) {
+            if (!pairs[rows[i].pairAddress]) {
+                pairs[rows[i].pairAddress] = (await knex('eth_pairs').where('pairAddress', rows[i].pairAddress).select('*'))[0]
             }
+
+            var swapAmount = pairs[rows[i].pairAddress].token0Address == rows[i].tokenAddress ? rows[i].swapAmount0 : rows[i].swapAmount1
+
+            data.push({
+                SWAPAT: convertTimestampToString(new Date(rows[i].swapAt).getTime(), true),
+                PRICE: rows[i].priceUSD.toFixed(30),
+                SWAPAMOUNTINUSD: (swapAmount * rows[i].priceUSD).toFixed(30),
+                SWAPAMOUNT0: rows[i].swapAmount0.toFixed(30),
+                SWAPAMOUNT1: rows[i].swapAmount1.toFixed(30),
+                SWAPMAKER: rows[i].swapMaker,
+                SWAPTRANSACTION: rows[i].swapTransactionHash,
+                BUYORSELL: rows[i].isBuy ? 'BUY' : 'SELL'
+            })
         }
 
-        if (res2.length) {
-            if (token2Address != USDC_ADDRESS) {
-                for (var j = 0; j < res2.length; j ++) {
-                    res2[j].PRICE = 1.0 / res2[j].PRICE
-                }
-            }
+        return {
+            status: 'Success!',
+            symbol: tokenInfo[0].tokenSymbol,
+            name: tokenInfo[0].tokenName,
+            data: data
         }
-
-        if (res1.length > 0 && res2.length > 0) {
-            var k = 0
-
-            for (var j = res1.length - 1; j >= 0; j --) {
-                var jd = (new Date(res1[j].SWAPAT)).getTime()
-                
-                while (true) {
-                    var kd = (new Date(res2[k].SWAPAT)).getTime()
-
-                    if (kd > jd) break
-
-                    k ++
-
-                    if (k >= res2.length) break
-                }
-
-                k --
-
-                if (k < 0) k = 0
-                
-                res1[j].PRICE = (res1[j].PRICE * res2[k].PRICE).toFixed(30)
-                res1[j].SWAPAMOUNTINUSD = ((token0Address == baseTokens[i] ? res1[j].SWAPAMOUNT0 : res1[j].SWAPAMOUNT1) * res2[k].PRICE).toFixed(30)
-            }
-            
-            return {
-                status: 'Success!',
-                symbol: tokenInfo[0].tokenSymbol,
-                name: tokenInfo[0].tokenName,
-                data: res1
-            }
+    } catch (err) {
+        return {
+            status: 'Fail',
+            message: "Server Error!",
+            data: []
         }
-    }
-    
-    return {
-        message: "Can't find swap route!",
-        data: []
     }
 }
 

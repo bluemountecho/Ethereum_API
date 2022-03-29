@@ -961,7 +961,7 @@ module.exports.getLivePairPrice = async function getLivePairPrice(pairAddr, page
 
         for (var i = 0; i < rows.length; i ++) {
             datas.push({
-                SWAPAT: rows[i].swapAt,
+                SWAPAT: convertTimestampToString(new Date(rows[i].swapAt).getTime(), true),
                 PRICE: (rows[i].swapPrice).toFixed(30),
                 SWAPAMOUNT0: (rows[i].swapAmount0).toFixed(30),
                 SWAPAMOUNT1: (rows[i].swapAmount1).toFixed(30),

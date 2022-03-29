@@ -22,6 +22,7 @@ const pastTableName = chainName + '_past'
 const tokensTableName = chainName + '_tokens'
 const pairsTableName = chainName + '_pairs'
 const dailyPastTableName = chainName + '_daily'
+const liveTableName = chainName + '_live'
 const tokenDailyTableName = chainName + '_token_daily'
 const tokenLiveTableName = chainName + '_token_live'
 const proxyCnt = config[chainName].PROXYCOUNT
@@ -1548,18 +1549,90 @@ async function getUSDPrice() {
         }
 
         for (var key in data) {
+            try {
+                var avg = data[key].TOTALVOLUME0 / data[key].TOTALVOLUME1
+                var basePrice = 1
+                
+                if (baseToken != USD_ADDRESS) basePrice = ethData[key].AVGPRICE
+
+                if (token0Address == baseToken) {
+                    await knex(tokenDailyTableName).insert({
+                        TOKENADDRESS: outToken,
+                        SWAPAT: key,
+                        AVGPRICE: avg * basePrice,
+                        MAXPRICE: data[key].MAXPRICE * basePrice,
+                        MINPRICE: data[key].MINPRICE * basePrice,
+                        VOLUME: data[key].TOTALVOLUME0 * basePrice,
+                        SWAPCOUNT: data[key].SWAPCOUNT,
+                    })
+                } else {
+                    await knex(tokenDailyTableName).insert({
+                        TOKENADDRESS: outToken,
+                        SWAPAT: key,
+                        AVGPRICE: avg != 0 ? 1 / avg * basePrice : 0,
+                        MAXPRICE: data[key].MAXPRICE != 0 ? 1 / data[key].MAXPRICE * basePrice : 0,
+                        MINPRICE: data[key].MINPRICE != 0 ? 1 / data[key].MINPRICE * basePrice : 0,
+                        VOLUME: data[key].TOTALVOLUME1 * basePrice,
+                        SWAPCOUNT: data[key].SWAPCOUNT,
+                    })
+                }
+            } catch (err) {
+                myLogger.log(err)
+            }            
+        }
+    }
+
+    async function calcLivePrice(outToken, baseToken) {
+        var data = []
+        var token0Address = baseToken
+        var token1Address = outToken
+
+        if (token0Address > token1Address) {
+            token0Address = outToken
+            token1Address = baseToken
+        }
+
+        var dailyPast = await knex(liveTableName).join(pairsTableName, pairsTableName + '.pairAddress', '=', liveTableName + '.PAIRADDRESS').where(pairsTableName + '.token0Address', token0Address).where(pairsTableName + '.token1Address', token1Address).orderBy(pairsTableName + '.createdAt', 'asc').select(liveTableName + '.*')
+        
+        for (var i = 0; i < dailyPast.length; i ++) {
+            dailyPast[i].swapAt = convertTimestampToString(new Date(dailyPast[i].swapAt).getTime(), true)
+
+            var basePrice = 1
+            
+            if (baseToken != USD_ADDRESS) basePrice = ethData[key].AVGPRICE
+
+            if (token0Address == baseToken) {
+                await knex(tokenLiveTableName).insert({
+                    tokenAddress: outToken,
+                    swapAt: dailyPast[i].swapAt,
+                    swapPrice: avg * basePrice,
+                    VOLUME: data[key].TOTALVOLUME0 * basePrice,
+                    SWAPCOUNT: data[key].SWAPCOUNT,
+                })
+            } else {
+                await knex(tokenLiveTableName).insert({
+                    TOKENADDRESS: outToken,
+                    SWAPAT: key,
+                    AVGPRICE: avg != 0 ? 1 / avg * basePrice : 0,
+                    MAXPRICE: data[key].MAXPRICE != 0 ? 1 / data[key].MAXPRICE * basePrice : 0,
+                    MINPRICE: data[key].MINPRICE != 0 ? 1 / data[key].MINPRICE * basePrice : 0,
+                    VOLUME: data[key].TOTALVOLUME1 * basePrice,
+                    SWAPCOUNT: data[key].SWAPCOUNT,
+                })
+            }
+        }
+
+        for (var key in data) {
             var avg = data[key].TOTALVOLUME0 / data[key].TOTALVOLUME1
             var basePrice = 1
             
             if (baseToken != USD_ADDRESS) basePrice = ethData[key].AVGPRICE
 
             if (token0Address == baseToken) {
-                await knex(tokenDailyTableName).insert({
-                    TOKENADDRESS: outToken,
-                    SWAPAT: key,
-                    AVGPRICE: avg * basePrice,
-                    MAXPRICE: data[key].MAXPRICE * basePrice,
-                    MINPRICE: data[key].MINPRICE * basePrice,
+                await knex(tokenLiveTableName).insert({
+                    tokenAddress: outToken,
+                    swapAt: key,
+                    swapPrice: avg * basePrice,
                     VOLUME: data[key].TOTALVOLUME0 * basePrice,
                     SWAPCOUNT: data[key].SWAPCOUNT,
                 })
@@ -1577,27 +1650,35 @@ async function getUSDPrice() {
         }
     }
 
-    await calcDailyPrice(ETH_ADDRESS, USD_ADDRESS)
+    async function calcAllDailyPrice() {
+        // await calcDailyPrice(ETH_ADDRESS, USD_ADDRESS)
 
-    var rows = await knex(tokenDailyTableName).where('TOKENADDRESS', ETH_ADDRESS).select('*')
+        var rows = await knex(tokenDailyTableName).where('TOKENADDRESS', ETH_ADDRESS).select('*')
 
-    for (var i = 0; i < rows.length; i ++) {
-        ethData[convertTimestampToString(new Date(rows[i].SWAPAT).getTime(), true)] = rows[i]
-    }
-
-    var tokens = await knex(tokensTableName).where('tokenAddress', '>', '0x21c75f7173b2f2765b5239fa3643077de5627019').select('*')
-
-    for (var i = 0; i < tokens.length; i += 30) {
-        var funcs = []
-
-        if (tokens[i].tokenAddress == ETH_ADDRESS) continue
-
-        for (var j = 0; j < 30 && i + j < tokens.length; j ++) {
-            funcs.push(calcDailyPrice(tokens[i + j].tokenAddress, ETH_ADDRESS))
+        for (var i = 0; i < rows.length; i ++) {
+            ethData[convertTimestampToString(new Date(rows[i].SWAPAT).getTime(), true)] = rows[i]
         }
-        
-        await Promise.all(funcs)
+
+        var tokens = await knex(tokensTableName).where('tokenAddress', '>', '0x6b264c09f7d77438d6ce37651fe86269f93a4586').select('*')
+
+        for (var i = 0; i < tokens.length; i += 30) {
+            var funcs = []
+
+            if (tokens[i].tokenAddress == ETH_ADDRESS) continue
+
+            for (var j = 0; j < 30 && i + j < tokens.length; j ++) {
+                funcs.push(calcDailyPrice(tokens[i + j].tokenAddress, ETH_ADDRESS))
+            }
+            
+            await Promise.all(funcs)
+        }
     }
+
+    async function calcAllLivePrice() {
+
+    }
+
+    await calcAllDailyPrice()
 
     console.log('Finished')
 }

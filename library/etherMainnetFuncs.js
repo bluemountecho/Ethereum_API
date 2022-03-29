@@ -211,24 +211,11 @@ module.exports.getTokensFromName = async function getTokensFromName(tokenName) {
 }
 
 async function getTokenTotalTrnasactions(tokenAddress) {
-    var rows = await knex('eth_pairs').where('token0Address', tokenAddress).orWhere('token1Address', tokenAddress).select('*')
+    var rows = await knex('eth_token_daily').where('TOKENADDRESS', tokenAddress).select('')
     var total = 0
 
     for (var i = 0; i < rows.length; i ++) {
-        try {
-            var content = fs.readFileSync('./database/ethereum/transactions/' + rows[i].pairAddress + '.txt', {encoding:'utf8', flag:'r'})
-            var datas = content.split('\n')
-            
-            for (var j = 0; j < datas.length - 1; j ++) {
-                datas[j] = JSON.parse(datas[j])
-            }
-
-            for (var j = 0; j < datas.length - 1; j ++) {
-                total += Number.parseInt(datas[j].SWAPCOUNT)
-            }
-        } catch (err) {
-
-        }
+        total += rows[i].SWAPCOUNT
     }
 
     return total
@@ -841,7 +828,14 @@ module.exports.getLiveTokenPrice = async function getLiveTokenPrice(tokenAddr, f
         var tokenAddress = tokenAddr.toLowerCase()
         var tokenInfo = await knex('eth_tokens').where('tokenAddress', tokenAddress).select('*')
         // var rows = await knex('eth_token_daily').where('TOKENADDRESS', tokenAddress).orderBy('SWAPAT', 'asc').limit(0 * page, 100).select(knex.raw('DATE(SWAPAT) as swapAt, AVGPRICE, MAXPRICE as HIGHPRICE, MINPRICE as LOWPRICE, VOLUME, SWAPCOUNT'))
-        var rows = await knex('eth_live').where('tokenAddress', tokenAddress).orderBy('swapAt', 'desc').limit(100).offset(100 * page).select('*')
+        var rows
+
+        if (page == -1) {
+            rows = await knex('eth_live').where('tokenAddress', tokenAddress).orderBy('swapAt', 'desc').select('*')
+        } else {
+            rows = await knex('eth_live').where('tokenAddress', tokenAddress).orderBy('swapAt', 'desc').limit(100).offset(100 * page).select('*')
+        }
+        
         var data = []
         var pairs = []
 

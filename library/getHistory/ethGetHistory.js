@@ -1583,6 +1583,8 @@ async function getUSDPrice() {
     }
 
     async function calcAllDailyPrice() {
+        await calcDailyPrice(ETH_ADDRESS, USD_ADDRESS)
+
         var data = []
         var rows = await knex(tokenDailyTableName).where('TOKENADDRESS', ETH_ADDRESS).select('*')
 
@@ -1591,8 +1593,6 @@ async function getUSDPrice() {
         }
 
         var dailyPast = await knex(dailyPastTableName).join(pairsTableName, pairsTableName + '.pairAddress', '=', dailyPastTableName + '.PAIRADDRESS').where(pairsTableName + '.token0Address', ETH_ADDRESS).orWhere(pairsTableName + '.token1Address', ETH_ADDRESS).orderBy(pairsTableName + '.createdAt', 'asc').select(dailyPastTableName + '.*').select(pairsTableName + '.token0Address').select(pairsTableName + '.token1Address')
-
-        console.log(dailyPast.length)
         
         for (var i = 0; i < dailyPast.length; i ++) {
             var token = dailyPast[i].token0Address
@@ -1618,20 +1618,15 @@ async function getUSDPrice() {
             }
         }
 
-        console.log(data['0xf0f9d895aca5c8678f706fb8216fa22957685a13'])
-        return
-
         for (var token in data) {
             for (var key in data[token]) {
                 try {
                     var avg = data[key].TOTALVOLUME0 / data[key].TOTALVOLUME1
-                    var basePrice = 1
-                    
-                    if (baseToken != USD_ADDRESS) basePrice = ethData[key].AVGPRICE
+                    var basePrice = ethData[key].AVGPRICE
     
-                    if (token0Address == baseToken) {
+                    if (token0Address == ETH_ADDRESS) {
                         await knex(tokenDailyTableName).insert({
-                            TOKENADDRESS: outToken,
+                            TOKENADDRESS: token,
                             SWAPAT: key,
                             AVGPRICE: avg * basePrice,
                             MAXPRICE: data[key].MAXPRICE * basePrice,
@@ -1641,7 +1636,7 @@ async function getUSDPrice() {
                         })
                     } else {
                         await knex(tokenDailyTableName).insert({
-                            TOKENADDRESS: outToken,
+                            TOKENADDRESS: token,
                             SWAPAT: key,
                             AVGPRICE: avg != 0 ? 1 / avg * basePrice : 0,
                             MAXPRICE: data[key].MAXPRICE != 0 ? 1 / data[key].MAXPRICE * basePrice : 0,

@@ -421,7 +421,7 @@ module.exports.velas = {
     'TOBLOCK': 28467315,
     'TRANSACTIONV1': 13600,
     'TRANSACTIONV2': 200,
-    'PAIRV1': 68000,
-    'PAIRV2': 1000,
+    'PAIRV1': 34000,
+    'PAIRV2': 500,
     'PROXYCOUNT': 68,
 }

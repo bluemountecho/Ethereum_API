@@ -572,8 +572,7 @@ async function writeTransactionHistoryFile(deleteDate, writeDate) {
             }
         }
     }
-
-    await calcDailyPrice(ETH_ADDRESS, USD_ADDRESS, writeDate)
+    
     await calcAllDailyPrice(writeDate)
 
     // myLogger.log(writeDate + " WRITE TRANSACTION HISTORY FILE FINISHED!!!")

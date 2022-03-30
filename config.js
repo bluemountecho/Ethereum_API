@@ -509,3 +509,17 @@ module.exports.fuse = {
     'PAIRV2': 1000,
     'PROXYCOUNT': 68,
 }
+
+module.exports.emerald = {
+    'web3Providers': [
+        'https://emerald.oasis.dev',
+    ],
+    'endPointType': 1,
+    'FROMBLOCK': 0,
+    'TOBLOCK': 884600,
+    'TRANSACTIONV1': 13600,
+    'TRANSACTIONV2': 200,
+    'PAIRV1': 68000,
+    'PAIRV2': 1000,
+    'PROXYCOUNT': 68,
+}

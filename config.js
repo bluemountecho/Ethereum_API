@@ -481,3 +481,17 @@ module.exports.hsc = {
     'PAIRV2': 1000,
     'PROXYCOUNT': 68,
 }
+
+module.exports.boba = {
+    'web3Providers': [
+        'https://mainnet.boba.network',
+    ],
+    'endPointType': 1,
+    'FROMBLOCK': 0,
+    'TOBLOCK': 427638,
+    'TRANSACTIONV1': 13600,
+    'TRANSACTIONV2': 200,
+    'PAIRV1': 68000,
+    'PAIRV2': 1000,
+    'PROXYCOUNT': 68,
+}

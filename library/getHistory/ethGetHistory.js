@@ -1710,12 +1710,12 @@ async function removeDuplicate() {
     await knex(liveTableName).delete()
 
     for (var i = 0; i < rows.length; i ++) {
-        if (!vis[rows[i].transactionHash]) {
-            vis[rows[i].transactionHash] = []
+        if (!vis[rows[i].swapTransactionHash]) {
+            vis[rows[i].swapTransactionHash] = []
         }
 
-        if (!vis[rows[i].transactionHash][rows[i].pairAddress]) {
-            vis[rows[i].transactionHash][rows[i].pairAddress] = true
+        if (!vis[rows[i].swapTransactionHash][rows[i].pairAddress]) {
+            vis[rows[i].swapTransactionHash][rows[i].pairAddress] = true
             await knex(liveTableName).insert(rows[i])
         }
     }
@@ -1724,15 +1724,15 @@ async function removeDuplicate() {
 async function init() {
     // await getAllPairs(FROMBLOCK)
 
-    // await getTokenAndPairData()
+    await getTokenAndPairData()
     
-    // myLogger.log('Getting token and pair data finished!')
-    // myLogger.log(FROMBLOCK + '~' + TOBLOCK + ' ' + pastTableName)
+    myLogger.log('Getting token and pair data finished!')
+    myLogger.log(FROMBLOCK + '~' + TOBLOCK + ' ' + pastTableName)
 
-    // await getTransactionHistory(FROMBLOCK)
+    await getTransactionHistory(FROMBLOCK)
 
     // await getUSDPrice()
-    await removeDuplicate()
+    // await removeDuplicate()
 }
 
 init()

@@ -572,7 +572,7 @@ async function writeTransactionHistoryFile(deleteDate, writeDate) {
             }
         }
     }
-    
+
     await calcAllDailyPrice(writeDate)
 
     // myLogger.log(writeDate + " WRITE TRANSACTION HISTORY FILE FINISHED!!!")
@@ -693,7 +693,7 @@ async function init() {
                     var tmpDate = convertTimestampToString(resBlock.timestamp * 1000, true)
                     var transactionID = result.logIndex
 
-                    if (block == lastBlockNumber && transactionID <= lastTransactionID) continue
+                    if (block == lastBlockNumber && transactionID <= lastTransactionID) return
                     if (block == blockNumber && transactionID > tmpLastTrans) tmpLastTrans = transactionID
 
                     var transactionHash = result.transactionHash
@@ -892,7 +892,7 @@ async function init() {
                     var tmpDate = convertTimestampToString(resBlock.timestamp * 1000, true)
                     var transactionID = result.logIndex
 
-                    if (block == lastBlockNumber && transactionID <= lastTransactionID) continue
+                    if (block == lastBlockNumber && transactionID <= lastTransactionID) return
                     if (block == blockNumber && transactionID > tmpLastTrans) tmpLastTrans = transactionID
 
                     var transactionHash = result.transactionHash

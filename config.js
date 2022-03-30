@@ -467,3 +467,17 @@ module.exports.smartbch = {
     'PAIRV2': 1000,
     'PROXYCOUNT': 68,
 }
+
+module.exports.hsc = {
+    'web3Providers': [
+        'https://http-mainnet.hoosmartchain.com',
+    ],
+    'endPointType': 1,
+    'FROMBLOCK': 0,
+    'TOBLOCK': 9622512,
+    'TRANSACTIONV1': 13600,
+    'TRANSACTIONV2': 200,
+    'PAIRV1': 68000,
+    'PAIRV2': 1000,
+    'PROXYCOUNT': 68,
+}

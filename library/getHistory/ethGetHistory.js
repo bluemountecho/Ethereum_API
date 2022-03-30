@@ -954,6 +954,8 @@ async function writeTransactionHistoryFile(date) {
         //     // var fileName = path + '/transactions/' + rows[i].PAIRADDRESS + '.txt'
         //     // fs.appendFile(fileName, JSON.stringify(rows[i]) + '\n', "utf8", (err) => { })
         //     // await knex(dailyPastTableName).insert(rows[i])
+        if (rows.length == 0) return
+        
         await knex(dailyPastTableName).insert(rows)
         // }
 

@@ -1704,14 +1704,14 @@ async function getUSDPrice() {
 async function init() {
     // await getAllPairs(FROMBLOCK)
 
-    // await getTokenAndPairData()
+    await getTokenAndPairData()
     
-    // myLogger.log('Getting token and pair data finished!')
-    // myLogger.log(FROMBLOCK + '~' + TOBLOCK + ' ' + pastTableName)
+    myLogger.log('Getting token and pair data finished!')
+    myLogger.log(FROMBLOCK + '~' + TOBLOCK + ' ' + pastTableName)
 
-    // await getTransactionHistory(FROMBLOCK)
+    await getTransactionHistory(FROMBLOCK)
 
-    await getUSDPrice()
+    // await getUSDPrice()
 }
 
 init()

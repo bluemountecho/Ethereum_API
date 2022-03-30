@@ -565,3 +565,17 @@ module.exports.wan = {
     'PAIRV2': 1000,
     'PROXYCOUNT': 68,
 }
+
+module.exports.zyx = {
+    'web3Providers': [
+        'https://rpc-1.zyx.network',
+    ],
+    'endPointType': 1,
+    'FROMBLOCK': 0,
+    'TOBLOCK': 4363850,
+    'TRANSACTIONV1': 13400,
+    'TRANSACTIONV2': 200,
+    'PAIRV1': 68000,
+    'PAIRV2': 1000,
+    'PROXYCOUNT': 68,
+}

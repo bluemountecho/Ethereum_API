@@ -537,3 +537,17 @@ module.exports.kardia = {
     'PAIRV2': 1000,
     'PROXYCOUNT': 68,
 }
+
+module.exports.iotex = {
+    'web3Providers': [
+        'https://babel-api.mainnet.iotex.io',
+    ],
+    'endPointType': 1,
+    'FROMBLOCK': 0,
+    'TOBLOCK': 16599025,
+    'TRANSACTIONV1': 13400,
+    'TRANSACTIONV2': 200,
+    'PAIRV1': 68000,
+    'PAIRV2': 1000,
+    'PROXYCOUNT': 68,
+}

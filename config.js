@@ -551,3 +551,17 @@ module.exports.iotex = {
     'PAIRV2': 1000,
     'PROXYCOUNT': 68,
 }
+
+module.exports.wan = {
+    'web3Providers': [
+        'https://gwan-ssl.wandevs.org:56891',
+    ],
+    'endPointType': 1,
+    'FROMBLOCK': 0,
+    'TOBLOCK': 19867382,
+    'TRANSACTIONV1': 13400,
+    'TRANSACTIONV2': 200,
+    'PAIRV1': 68000,
+    'PAIRV2': 1000,
+    'PROXYCOUNT': 68,
+}

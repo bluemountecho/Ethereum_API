@@ -389,7 +389,7 @@ module.exports.okc = {
         'https://exchainrpc.okex.org',
     ],
     'endPointType': 1,
-    'FROMBLOCK': 2322600,
+    'FROMBLOCK': 2322601,
     'TOBLOCK': 9957357,
     'TRANSACTIONV1': 13600,
     'TRANSACTIONV2': 200,

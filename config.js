@@ -445,7 +445,7 @@ module.exports.xdai = {
         'https://rpc.gnosischain.com',
     ],
     'endPointType': 1,
-    'FROMBLOCK': 0,
+    'FROMBLOCK': 11750400,
     'TOBLOCK': 21373720,
     'TRANSACTIONV1': 13600,
     'TRANSACTIONV2': 200,

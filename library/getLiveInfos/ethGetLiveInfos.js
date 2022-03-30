@@ -256,6 +256,8 @@ var tokensData = []
 var pairsData = []
 var blocksData = []
 var lastBlockNumber = config[chainName].lastBlockNumber
+var lastTransactionID = -1
+var visDate = []
 
 async function getTokenAndPairData() {
     var res = await knex(tokensTableName).select('*')
@@ -392,6 +394,7 @@ async function getPairDecimals(pairAddress, createdAt, web3) {
 
 async function writeTransactionHistoryFile(deleteDate, writeDate) {
     // var path = "../../database/ethereum"
+    if (visDate[writeDate]) return
 
     var rows = (await knex.raw('\
         SELECT\
@@ -419,6 +422,8 @@ async function writeTransactionHistoryFile(deleteDate, writeDate) {
     for (var i = 0; i < rows.length; i ++) {
         await knex(dailyPastTableName).insert(rows[i])
     }
+
+    visDate[writeDate] = true
 
     await knex(liveTableName).where('swapAt', '<', deleteDate + ' ' + '00:00:00').delete()
 
@@ -578,6 +583,7 @@ async function init() {
     try {
         var blockNumber = await web3s[0].eth.getBlockNumber()
         var curBlock = blockNumber
+        var tmpLastTrans = -1
 
         if (curBlock > lastBlockNumber + 99) {
             blockNumber = lastBlockNumber + 99
@@ -687,6 +693,10 @@ async function init() {
 
                     var tmpDate = convertTimestampToString(resBlock.timestamp * 1000, true)
                     var transactionID = result.logIndex
+
+                    if (block == lastBlockNumber && transactionID <= lastTransactionID) continue
+                    if (block == blockNumber && transactionID > tmpLastTrans) tmpLastTrans = transactionID
+
                     var transactionHash = result.transactionHash
                     var decimals = await getPairDecimals(pairAddress, tmpDate, web3)
                     var baseToken = tokensData[decimals[1]].createdAt < tokensData[decimals[2]].createdAt ? 0 : 1
@@ -882,6 +892,10 @@ async function init() {
                     
                     var tmpDate = convertTimestampToString(resBlock.timestamp * 1000, true)
                     var transactionID = result.logIndex
+
+                    if (block == lastBlockNumber && transactionID <= lastTransactionID) continue
+                    if (block == blockNumber && transactionID > tmpLastTrans) tmpLastTrans = transactionID
+
                     var transactionHash = result.transactionHash
                     var decimals = await getPairDecimals(pairAddress, tmpDate, web3)
                     var baseToken = tokensData[decimals[1]].createdAt < tokensData[decimals[2]].createdAt ? 0 : 1
@@ -1004,6 +1018,8 @@ async function init() {
 
             await Promise.all(funcs)
         }
+
+        lastTransactionID = tmpLastTrans
 
         var resBlock
 

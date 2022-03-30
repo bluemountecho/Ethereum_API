@@ -579,3 +579,17 @@ module.exports.zyx = {
     'PAIRV2': 1000,
     'PROXYCOUNT': 68,
 }
+
+module.exports.elastos = {
+    'web3Providers': [
+        'https://api.elastos.io/eth',
+    ],
+    'endPointType': 1,
+    'FROMBLOCK': 0,
+    'TOBLOCK': 11753167,
+    'TRANSACTIONV1': 13400,
+    'TRANSACTIONV2': 200,
+    'PAIRV1': 68000,
+    'PAIRV2': 1000,
+    'PROXYCOUNT': 68,
+}

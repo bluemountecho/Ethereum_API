@@ -517,9 +517,9 @@ module.exports.emerald = {
     'endPointType': 1,
     'FROMBLOCK': 0,
     'TOBLOCK': 884600,
-    'TRANSACTIONV1': 13600,
-    'TRANSACTIONV2': 200,
-    'PAIRV1': 68000,
-    'PAIRV2': 1000,
+    'TRANSACTIONV1': 6800,
+    'TRANSACTIONV2': 100,
+    'PAIRV1': 6800,
+    'PAIRV2': 100,
     'PROXYCOUNT': 68,
 }

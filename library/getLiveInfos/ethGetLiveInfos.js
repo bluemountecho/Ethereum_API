@@ -782,7 +782,7 @@ async function init() {
                     var data = {
                         pairAddress: pairAddress,
                         tokenAddress: tmpToken,
-                        swapPrice: Math.abs(swap0 * 1.0 * 10 ** decimals[0] / swap1),
+                        swapPrice: swap1 == 0 ? 0 : Math.abs(swap0 * 1.0 * 10 ** decimals[0] / swap1),
                         priceUSD: tmpPrice,
                         swapAmount0: Math.abs(swap0 / 10 ** tokensData[decimals[1]].tokenDecimals),
                         swapAmount1: Math.abs(swap1 / 10 ** tokensData[decimals[2]].tokenDecimals),
@@ -975,7 +975,7 @@ async function init() {
                     var data = {
                         pairAddress: pairAddress,
                         tokenAddress: tmpToken,
-                        swapPrice: Math.abs(swap0 * 1.0 * 10 ** decimals[0] / swap1),
+                        swapPrice: swap1 == 0 ? 0 : Math.abs(swap0 * 1.0 * 10 ** decimals[0] / swap1),
                         priceUSD: tmpPrice,
                         swapAmount0: Math.abs(swap0 / 10 ** tokensData[decimals[1]].tokenDecimals),
                         swapAmount1: Math.abs(swap1 / 10 ** tokensData[decimals[2]].tokenDecimals),

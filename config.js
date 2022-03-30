@@ -593,3 +593,17 @@ module.exports.elastos = {
     'PAIRV2': 1000,
     'PROXYCOUNT': 68,
 }
+
+module.exports.polis = {
+    'web3Providers': [
+        'https://rpc.polis.tech',
+    ],
+    'endPointType': 1,
+    'FROMBLOCK': 0,
+    'TOBLOCK': 3447091,
+    'TRANSACTIONV1': 13400,
+    'TRANSACTIONV2': 200,
+    'PAIRV1': 68000,
+    'PAIRV2': 1000,
+    'PROXYCOUNT': 68,
+}

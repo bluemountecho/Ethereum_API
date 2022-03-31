@@ -257,6 +257,7 @@ var pairsData = []
 var blocksData = []
 var lastBlockNumber = config[chainName].lastBlockNumber
 var lastTransactionID = -1
+var lastestBlock = 0
 var visDate = []
 
 async function getTokenAndPairData() {
@@ -582,11 +583,13 @@ async function init() {
     try {
         var blockNumber = await web3s[0].eth.getBlockNumber()
         var curBlock = blockNumber
-        var tmpLastTrans = -1
 
         if (curBlock > lastBlockNumber + 99) {
             blockNumber = lastBlockNumber + 99
         }
+
+        var tmpLastTrans = lastTransactionID
+        var tmpLastBlock = lastestBlock
 
         var results = await Promise.all([
             web3s[1].eth.getPastLogs({
@@ -693,8 +696,14 @@ async function init() {
                     var tmpDate = convertTimestampToString(resBlock.timestamp * 1000, true)
                     var transactionID = result.logIndex
 
-                    if (block == lastBlockNumber && transactionID <= lastTransactionID) return
-                    if (block == blockNumber && transactionID > tmpLastTrans) tmpLastTrans = transactionID
+                    if (block <= lastestBlock && transactionID <= lastTransactionID) return
+                    if (block > lastestBlock) {
+                        tmpLastTrans = -1
+                        tmpLastBlock = block
+                    }
+                    else if (block == lastestBlock) {
+                        tmpLastTrans = transactionID
+                    }
 
                     var transactionHash = result.transactionHash
                     var decimals = await getPairDecimals(pairAddress, tmpDate, web3)
@@ -892,8 +901,14 @@ async function init() {
                     var tmpDate = convertTimestampToString(resBlock.timestamp * 1000, true)
                     var transactionID = result.logIndex
 
-                    if (block == lastBlockNumber && transactionID <= lastTransactionID) return
-                    if (block == blockNumber && transactionID > tmpLastTrans) tmpLastTrans = transactionID
+                    if (block <= lastestBlock && transactionID <= lastTransactionID) return
+                    if (block > lastestBlock) {
+                        tmpLastTrans = -1
+                        tmpLastBlock = block
+                    }
+                    else if (block == lastestBlock) {
+                        tmpLastTrans = transactionID
+                    }
 
                     var transactionHash = result.transactionHash
                     var decimals = await getPairDecimals(pairAddress, tmpDate, web3)
@@ -1019,6 +1034,7 @@ async function init() {
         }
 
         lastTransactionID = tmpLastTrans
+        lastestBlock = tmpLastBlock
 
         var resBlock
 

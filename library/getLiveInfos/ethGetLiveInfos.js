@@ -696,12 +696,9 @@ async function init() {
                     var tmpDate = convertTimestampToString(resBlock.timestamp * 1000, true)
                     var transactionID = result.logIndex
 
-                    if (block <= lastestBlock && transactionID <= lastTransactionID) return
-                    if (block > lastestBlock) {
-                        tmpLastTrans = -1
+                    if (block < lastestBlock || (block == lastestBlock && transactionID <= lastTransactionID)) return
+                    if (block > tmpLastBlock || (block == tmpLastBlock && transactionID > tmpLastTrans)) {
                         tmpLastBlock = block
-                    }
-                    else if (block == lastestBlock) {
                         tmpLastTrans = transactionID
                     }
 
@@ -901,12 +898,9 @@ async function init() {
                     var tmpDate = convertTimestampToString(resBlock.timestamp * 1000, true)
                     var transactionID = result.logIndex
 
-                    if (block <= lastestBlock && transactionID <= lastTransactionID) return
-                    if (block > lastestBlock) {
-                        tmpLastTrans = -1
+                    if (block < lastestBlock || (block == lastestBlock && transactionID <= lastTransactionID)) return
+                    if (block > tmpLastBlock || (block == tmpLastBlock && transactionID > tmpLastTrans)) {
                         tmpLastBlock = block
-                    }
-                    else if (block == lastestBlock) {
                         tmpLastTrans = transactionID
                     }
 

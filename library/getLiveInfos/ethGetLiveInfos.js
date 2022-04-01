@@ -1068,7 +1068,7 @@ async function init() {
 
 async function updatePriceChanges() {
     var timeCur = new Date().getTime()
-    var time24hago = convertTimestampToString(timeCur - 1000 * 86400, true)
+    var time24hago = convertTimestampToString(timeCur - 2000 * 86400, true)
     var rows = await knex(liveTableName).where('swapAt', '>=', time24hago).orderBy('swapAt', 'desc').select('*')
     var olds = await knex(changesTableName).select('*')
     var info = []
@@ -1123,7 +1123,7 @@ async function updatePriceChanges() {
     }
 }
 
-setInterval(updatePriceChanges, 10000)
+setInterval(updatePriceChanges, 20000)
 
 getTokenAndPairData()
 .then(res => {

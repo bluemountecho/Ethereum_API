@@ -230,58 +230,19 @@ async function getTokenTotalTrnasactions(tokenAddress) {
 }
 
 module.exports.getLast24HourInfos = async function getLast24HourInfos(tokenAddress) {
-    var res = (await this.getLiveTokenPrice(tokenAddress, true, -1)).data
+    var res = (await knex('eth_changes').where('tokenAddress', tokenAddress))[0]
     var ret = {}
-    var date24ago = new Date().getTime() - 86400 * 1000
-    var date12ago = new Date().getTime() - 12 * 3600 * 1000
-    var date6ago = new Date().getTime() - 6 * 3600 * 1000
-    var date2ago = new Date().getTime() - 2 * 3600 * 1000
-    var date1ago = new Date().getTime() - 3600 * 1000
-    var date30ago = new Date().getTime() - 1800 * 1000
-    var today = convertTimestampToString(new Date().getTime(), true).split(' ')[0] + ' 00:00:00'
 
-    today = new Date(today).getTime()
-    ret.totalVolume = 0
-    ret.totalTransactions = 0
-    ret.todayTransactions = 0
-    ret.price30 = ret.price1 = ret.price2 = ret.price6 = ret.price12 = ret.price24 = 0
-
-    for (var i = 0; i < res.length; i ++) {
-        var tmpTime = new Date(res[i].SWAPAT).getTime()
-
-        if (tmpTime >= date24ago) {
-            ret.totalVolume += Number.parseFloat(res[i].SWAPAMOUNTINUSD)
-            ret.totalTransactions ++
-        }
-        
-        if (tmpTime >= today) {
-            ret.todayTransactions ++
-        }
-        
-        if (ret.price30 == 0 && new Date(res[i].SWAPAT).getTime() < date30ago) {
-            ret.price30 = res[i].PRICE
-        }
-
-        if (ret.price1 == 0 && new Date(res[i].SWAPAT).getTime() < date1ago) {
-            ret.price1 = res[i].PRICE
-        }
-
-        if (ret.price2 == 0 && new Date(res[i].SWAPAT).getTime() < date2ago) {
-            ret.price2 = res[i].PRICE
-        }
-
-        if (ret.price6 == 0 && new Date(res[i].SWAPAT).getTime() < date6ago) {
-            ret.price6 = res[i].PRICE
-        }
-
-        if (ret.price12 == 0 && new Date(res[i].SWAPAT).getTime() < date12ago) {
-            ret.price12 = res[i].PRICE
-        }
-
-        if (ret.price24 == 0 && new Date(res[i].SWAPAT).getTime() < date24ago) {
-            ret.price24 = res[i].PRICE
-        }
-    }
+    ret.totalVolume = res.volume24h
+    ret.totalTransactions = res.trans24h
+    ret.todayTransactions = res.transToday
+    ret.price5 = res.price5m
+    ret.price30 = res.price30m
+    ret.price1 = res.price1h
+    ret.price2 = res.price2h
+    ret.price6 = res.price6h
+    ret.price12 = res.price12h
+    ret.price24 = res.price24h
 
     return ret
 }
@@ -394,6 +355,10 @@ module.exports.getTokenStatistics = async function getTokenStatistics(tokenAddr)
                     last24hVolume: res[2].totalVolume,
                     currentPrice: res[0].data.price,
                     priceChanges: {
+                        priceChange5Min: {
+                            price: res[2].price5,
+                            changePercent: res[2].price5 == 0 ? 0 : -(100 - (res[0].data.price / res[2].price5 * 100)).toFixed(2)
+                        },
                         priceChange30Min: {
                             price: res[2].price30,
                             changePercent: res[2].price30 == 0 ? 0 : -(100 - (res[0].data.price / res[2].price30 * 100)).toFixed(2)

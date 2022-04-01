@@ -1116,6 +1116,8 @@ async function updatePriceChanges() {
 
     for (var token in info) {
         if (!vis[token]) {
+            info[token].tokenAddress = token
+            
             await knex(changesTableName).insert(info[token])
         }
     }

@@ -1117,15 +1117,15 @@ async function updatePriceChanges() {
     for (var token in info) {
         if (!vis[token]) {
             info[token].tokenAddress = token
-            
+
             await knex(changesTableName).insert(info[token])
         }
     }
 }
 
-updatePriceChanges()
+setInterval(updatePriceChanges, 10000)
 
-// getTokenAndPairData()
-// .then(res => {
-//     init()
-// })
+getTokenAndPairData()
+.then(res => {
+    init()
+})

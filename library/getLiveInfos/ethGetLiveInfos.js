@@ -1107,14 +1107,14 @@ async function updatePriceChanges() {
             if (timeCur - rowTime >= times[j] * 60000 && info[tokenAddress][priceFields[j]] == 0) {
                 info[tokenAddress][priceFields[j]] = rows[i].priceUSD
             }
+        }
 
-            if (rowTime >= timeToday) {
-                info[tokenAddress].transToday ++
-            }
+        if (rowTime >= timeToday) {
+            info[tokenAddress].transToday ++
+        }
 
-            if (timeCur - rowTime <= 86400 * 1000) {
-                info[tokenAddress].volume24h += (tokenAddress == pairsData[rows[i].pairAddress].token0Address ? rows[i].swapAmount0 : rows[i].swapAmount1) * rows[i].priceUSD
-            }
+        if (timeCur - rowTime <= 86400 * 1000) {
+            info[tokenAddress].volume24h += (tokenAddress == pairsData[rows[i].pairAddress].token0Address ? rows[i].swapAmount0 : rows[i].swapAmount1) * rows[i].priceUSD
         }
     }
 

@@ -14,7 +14,7 @@ const pairsTableName = chainName + '_pairs'
 const dailyPastTableName = chainName + '_daily'
 const liveTableName = chainName + '_live'
 const tokenDailyTableName = chainName + '_token_daily'
-const tokenLiveTableName = chainName + '_token_live'
+const changesTableName = chainName + '_changes'
 const proxyCnt = config[chainName].PROXYCOUNT
 const Web3 = require('web3')
 const USD_ADDRESS = config[chainName].USD_ADDRESS
@@ -1066,7 +1066,64 @@ async function init() {
     setTimeout(init, 100)
 }
 
-getTokenAndPairData()
-.then(res => {
-    init()
-})
+async function updatePriceChanges() {
+    var timeCur = new Date().getTime()
+    var time24hago = convertTimestampToString(timeCur - 1000 * 86400, true)
+    var rows = await knex(liveTableName).where('swapAt', '>=', time24hago).orderBy('swapAt', 'desc').select('*')
+    var olds = await knex(changesTableName).select('*')
+    var info = []
+    var vis = []
+    var priceFields = ['price24h', 'price12h', 'price6h', 'price2h', 'price1h', 'price30m', 'price5m']
+    var transFields = ['trans24h', 'trans12h', 'trans6h', 'trans2h', 'trans1h', 'trans30m', 'trans5m']
+    var times = [1440, 720, 360, 120, 60, 30, 5]
+
+    for (var i = 0; i < olds.length; i ++) {
+        vis[olds[i].tokenAddress] = true
+    }
+
+    for (var i = 0; i < rows.length; i ++) {
+        var tokenAddress = rows[i].tokenAddress
+
+        if (!info[tokenAddress]) {
+            info[tokenAddress] = {}
+
+            for (var j = 0; j < 7; j ++) {
+                info[tokenAddress][priceFields[j]] = 0
+                info[tokenAddress][transFields[j]] = 0
+            }
+        }
+
+        var rowTime = new Date(rows[i].swapAt).getTime()
+
+        for (var j = 0; j < 7; j ++) {
+            if (timeCur - rowTime <= times[j] * 60000) {
+                info[tokenAddress][transFields[j]] += 1
+            }
+
+            if (timeCur - rowTime >= times[j] * 60000 && info[tokenAddress][priceFields[j]] == 0) {
+                info[tokenAddress][priceFields[j]] = rows[i].priceUSD
+            }
+        }
+    }
+
+    for (var old in vis) {
+        if (!info[old]) {
+            await knex(changesTableName).where('tokenAddress', old).delete()
+        } else {
+            await knex(changesTableName).where('tokenAddress', old).update(info[old])
+        }
+    }
+
+    for (var token in info) {
+        if (!vis[token]) {
+            await knex(changesTableName).insert(info[token])
+        }
+    }
+}
+
+updatePriceChanges()
+
+// getTokenAndPairData()
+// .then(res => {
+//     init()
+// })

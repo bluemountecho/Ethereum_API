@@ -115,7 +115,7 @@ module.exports.PROXY = [
     "51.79.7.182:3128"
 ]
 
-module.exports.eth = {    
+module.exports.eth = {
     'web3Providers': [
         'https://eth-mainnet.alchemyapi.io/v2/UhrdEQkkqcqwwlm9wOXnYx71ut5BNDTd',
         'https://eth-mainnet.alchemyapi.io/v2/GwVYJ0rBAGMeeC7nkaVdBimTapbyssKC',
@@ -137,15 +137,15 @@ module.exports.eth = {
         'https://eth-mainnet.alchemyapi.io/v2/gSyeUk2nIKtZMC_7xU1DnrB3DWeaXiRm',
         'https://eth-mainnet.alchemyapi.io/v2/SszaZPuxxxVhD6TKaCScBk7SQN4EEO8t',
     ],
-    'endPointType': 1,
+    'endPointType': 0,
     'FROMBLOCK': 0,
     'TOBLOCK': 26028293,
     'TRANSACTIONV1': 2000,
     'TRANSACTIONV2': 200,
     'PAIRV1': 10000,
     'PAIRV2': 1000,
-    'PROXYCOUNT': 18,
-    'lastBlockNumber': 14490927,
+    'PROXYCOUNT': 19,
+    'lastBlockNumber': 14498996,
     'scanData': {
         apiKey: 'P5QXWEDN6PEQE4KB61J5GISXXNEKEYAGFM',
         scanSite: 'https://api.etherscan.io',

@@ -1069,71 +1069,75 @@ async function init() {
 }
 
 async function updatePriceChanges() {
-    var timeCur = new Date().getTime()
-    var time24hago = convertTimestampToString(timeCur - 2000 * 86400, true)
-    var timeToday = new Date(convertTimestampToString(timeCur, true).split(' ')[0] + ' 00:00:00').getTime()
-    var rows = await knex(liveTableName).where('swapAt', '>=', time24hago).orderBy('swapAt', 'desc').select('*')
-    var olds = await knex(changesTableName).select('*')
-    var info = []
-    var vis = []
-    var priceFields = ['price24h', 'price12h', 'price6h', 'price2h', 'price1h', 'price30m', 'price5m']
-    var transFields = ['trans24h', 'trans12h', 'trans6h', 'trans2h', 'trans1h', 'trans30m', 'trans5m']
-    var times = [1440, 720, 360, 120, 60, 30, 5]
+    try {
+        var timeCur = new Date().getTime()
+        var time24hago = convertTimestampToString(timeCur - 2000 * 86400, true)
+        var timeToday = new Date(convertTimestampToString(timeCur, true).split(' ')[0] + ' 00:00:00').getTime()
+        var rows = await knex(liveTableName).where('swapAt', '>=', time24hago).orderBy('swapAt', 'desc').select('*')
+        var olds = await knex(changesTableName).select('*')
+        var info = []
+        var vis = []
+        var priceFields = ['price24h', 'price12h', 'price6h', 'price2h', 'price1h', 'price30m', 'price5m']
+        var transFields = ['trans24h', 'trans12h', 'trans6h', 'trans2h', 'trans1h', 'trans30m', 'trans5m']
+        var times = [1440, 720, 360, 120, 60, 30, 5]
 
-    for (var i = 0; i < olds.length; i ++) {
-        vis[olds[i].tokenAddress] = true
-    }
+        for (var i = 0; i < olds.length; i ++) {
+            vis[olds[i].tokenAddress] = true
+        }
 
-    for (var i = 0; i < rows.length; i ++) {
-        var tokenAddress = rows[i].tokenAddress
+        for (var i = 0; i < rows.length; i ++) {
+            var tokenAddress = rows[i].tokenAddress
 
-        if (!info[tokenAddress]) {
-            info[tokenAddress] = {
-                transToday: 0,
-                volume24h: 0
+            if (!info[tokenAddress]) {
+                info[tokenAddress] = {
+                    transToday: 0,
+                    volume24h: 0
+                }
+
+                for (var j = 0; j < 7; j ++) {
+                    info[tokenAddress][priceFields[j]] = 0
+                    info[tokenAddress][transFields[j]] = 0
+                }
             }
+
+            var rowTime = new Date(rows[i].swapAt).getTime()
 
             for (var j = 0; j < 7; j ++) {
-                info[tokenAddress][priceFields[j]] = 0
-                info[tokenAddress][transFields[j]] = 0
+                if (timeCur - rowTime <= times[j] * 60000) {
+                    info[tokenAddress][transFields[j]] += 1
+                }
+
+                if (timeCur - rowTime >= times[j] * 60000 && info[tokenAddress][priceFields[j]] == 0) {
+                    info[tokenAddress][priceFields[j]] = rows[i].priceUSD
+                }
+            }
+
+            if (rowTime >= timeToday) {
+                info[tokenAddress].transToday ++
+            }
+
+            if (timeCur - rowTime <= 86400 * 1000) {
+                info[tokenAddress].volume24h += (tokenAddress == pairsData[rows[i].pairAddress].token0Address ? rows[i].swapAmount0 : rows[i].swapAmount1) * rows[i].priceUSD
             }
         }
 
-        var rowTime = new Date(rows[i].swapAt).getTime()
-
-        for (var j = 0; j < 7; j ++) {
-            if (timeCur - rowTime <= times[j] * 60000) {
-                info[tokenAddress][transFields[j]] += 1
-            }
-
-            if (timeCur - rowTime >= times[j] * 60000 && info[tokenAddress][priceFields[j]] == 0) {
-                info[tokenAddress][priceFields[j]] = rows[i].priceUSD
+        for (var old in vis) {
+            if (!info[old]) {
+                await knex(changesTableName).where('tokenAddress', old).delete()
+            } else {
+                await knex(changesTableName).where('tokenAddress', old).update(info[old])
             }
         }
 
-        if (rowTime >= timeToday) {
-            info[tokenAddress].transToday ++
-        }
+        for (var token in info) {
+            if (!vis[token]) {
+                info[token].tokenAddress = token
 
-        if (timeCur - rowTime <= 86400 * 1000) {
-            info[tokenAddress].volume24h += (tokenAddress == pairsData[rows[i].pairAddress].token0Address ? rows[i].swapAmount0 : rows[i].swapAmount1) * rows[i].priceUSD
+                await knex(changesTableName).insert(info[token])
+            }
         }
-    }
-
-    for (var old in vis) {
-        if (!info[old]) {
-            await knex(changesTableName).where('tokenAddress', old).delete()
-        } else {
-            await knex(changesTableName).where('tokenAddress', old).update(info[old])
-        }
-    }
-
-    for (var token in info) {
-        if (!vis[token]) {
-            info[token].tokenAddress = token
-
-            await knex(changesTableName).insert(info[token])
-        }
+    } catch (err) {
+        myLogger.log(err)
     }
 }
 

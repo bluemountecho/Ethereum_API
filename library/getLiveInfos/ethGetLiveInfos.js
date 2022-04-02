@@ -967,6 +967,8 @@ async function init() {
                             }).where('pairAddress', pairAddress)
                         }
                     } else {
+                        pairsData[pairAddress].lastPrice = swap1 == 0 ? 0 : Math.abs(swap0 * 1.0 * 10 ** decimals[0] / swap1)
+                        
                         try {
                             await knex(pairsTableName).update({
                                 lastPrice: swap1 == 0 ? 0 : Math.abs(swap0 * 1.0 * 10 ** decimals[0] / swap1)

@@ -1764,6 +1764,17 @@ async function createTables() {
         console.log(err)
     }
 
+    try {
+        await knex.raw('\
+            ALTER TABLE `' + tokensTableName + '`\
+                MODIFY tokenName text,\
+                RENAME COLUMN otherInfos TO coingeckoInfos,\
+                ADD COLUMN lastPrice double DEFAULT 0;\
+        ')
+    } catch (err) {
+        console.log(err)
+    }
+
     console.log('CREATING TABLES FINISHED!')
 }
 

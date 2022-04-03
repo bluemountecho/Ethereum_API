@@ -24,7 +24,7 @@ const pairsTableName = chainName + '_pairs'
 const dailyPastTableName = chainName + '_daily'
 const liveTableName = chainName + '_live'
 const tokenDailyTableName = chainName + '_token_daily'
-const tokenLiveTableName = chainName + '_token_live'
+const changesTableName = chainName + '_changes'
 const proxyCnt = config[chainName].PROXYCOUNT
 
 Web3 = require('web3')
@@ -1722,7 +1722,7 @@ async function removeDuplicate() {
 }
 
 async function createTables() {
-    try {        
+    try {
         await knex.raw('\
             ALTER TABLE `' + dailyPastTableName + '`\
                 DROP INDEX `PAIRADDRESS`,\
@@ -1732,11 +1732,11 @@ async function createTables() {
         console.log(err)
     }
 
-    try {        
+    try {
         await knex.raw('\
             ALTER TABLE `' + liveTableName + '`\
-                ADD COLUMN tokenAddress varchar(255) AFTER `pairAddress`,\
-                ADD COLUMN priceUSD double AFTER `swapPrice`,\
+                ADD COLUMN tokenAddress varchar(255),\
+                ADD COLUMN priceUSD double,\
                 DROP INDEX `pairAddress`,\
                 DROP INDEX `tokenAddress`,\
                 DROP INDEX `swapAt`,\

@@ -229,12 +229,12 @@ const knex = require('knex')({
     connection: {
         host : '127.0.0.1',
         port : 3306,
-        user : 'admin_root',
-        password : 'bOPTDZXP8Xvdf9I1',
-        database : 'admin_ethereum_api'
-        // user : 'root',
-        // password : '',
-        // database : 'ethereum_api'
+        // user : 'admin_root',
+        // password : 'bOPTDZXP8Xvdf9I1',
+        // database : 'admin_ethereum_api'
+        user : 'root',
+        password : '',
+        database : 'ethereum_api'
     }
 })
 
@@ -1721,6 +1721,15 @@ async function removeDuplicate() {
     }
 }
 
+async function createTables() {
+    await knex.raw('\
+        ALTER TABLE `eth_daily`\
+            ADD KEY `PAIRADDRESS` (`PAIRADDRESS`);\
+    ')
+
+    console.log('CREATING TABLES FINISHED!')
+}
+
 async function init() {
     // await getAllPairs(FROMBLOCK)
 
@@ -1732,7 +1741,8 @@ async function init() {
     // await getTransactionHistory(FROMBLOCK)
 
     // await getUSDPrice()
-    await removeDuplicate()
+    // await removeDuplicate()
+    await createTables()
 }
 
 init()

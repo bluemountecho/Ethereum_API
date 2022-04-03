@@ -1770,7 +1770,23 @@ async function createTables() {
                 MODIFY tokenName text,\
                 MODIFY createdAt AFTER links,\
                 RENAME COLUMN otherInfos TO coingeckoInfos,\
-                ADD COLUMN lastPrice double DEFAULT 0;\
+                ADD COLUMN lastPrice double NOT NULL DEFAULT 0;\
+        ')
+    } catch (err) {
+        console.log(err)
+    }
+
+    try {
+        await knex.raw('\
+            CREATE TABLE `' + tokenDailyTableName + '` (\
+                `TOKENADDRESS` varchar(255) DEFAULT NULL,\
+                `SWAPAT` timestamp NULL DEFAULT NULL,\
+                `AVGPRICE` double DEFAULT NULL,\
+                `MAXPRICE` double DEFAULT NULL,\
+                `MINPRICE` double DEFAULT NULL,\
+                `VOLUME` double DEFAULT NULL,\
+                `SWAPCOUNT` int(11) DEFAULT NULL\
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 ROW_FORMAT=DYNAMIC;\
         ')
     } catch (err) {
         console.log(err)

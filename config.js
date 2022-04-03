@@ -536,6 +536,8 @@ module.exports.emerald = {
     'PAIRV1': 6800,
     'PAIRV2': 100,
     'PROXYCOUNT': 68,
+    'USD_ADDRESS': "0x6cb9750a92643382e020ea9a170abb83df05f30b",
+    'ETH_ADDRESS': "0x21c718c22d52d0f3a789b752d4c2fd5908a8a733",
 }
 
 module.exports.kardia = {

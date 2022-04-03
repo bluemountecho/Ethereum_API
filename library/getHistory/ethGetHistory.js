@@ -1623,6 +1623,8 @@ async function getUSDPrice() {
         for (var token in data) {
             for (var key in data[token]) {
                 try {
+                    if (!ethData[key]) continue
+                    
                     var avg = data[token][key].TOTALVOLUME0 / data[token][key].TOTALVOLUME1
                     var basePrice = ethData[key].AVGPRICE
     

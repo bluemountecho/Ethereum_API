@@ -1800,6 +1800,43 @@ async function createTables() {
     } catch (err) {
         console.log(err)
     }
+    
+    try {
+        await knex.raw('\
+            CREATE TABLE `' + changesTableName + '` (\
+                `tokenAddress` varchar(255) NOT NULL,\
+                `price24h` double DEFAULT 0,\
+                `price12h` double DEFAULT 0,\
+                `price6h` double DEFAULT 0,\
+                `price2h` double DEFAULT 0,\
+                `price1h` double DEFAULT 0,\
+                `price30m` double DEFAULT 0,\
+                `price5m` double DEFAULT 0,\
+                `trans24h` int(11) DEFAULT 0,\
+                `trans12h` int(11) DEFAULT 0,\
+                `trans6h` int(11) DEFAULT 0,\
+                `trans2h` int(11) DEFAULT 0,\
+                `trans1h` int(11) DEFAULT 0,\
+                `trans30m` int(11) DEFAULT 0,\
+                `trans5m` int(11) DEFAULT 0,\
+                `transToday` int(11) NOT NULL DEFAULT 0,\
+                `volume24h` double NOT NULL DEFAULT 0\
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 ROW_FORMAT=DYNAMIC;\
+        ')
+    } catch (err) {
+        console.log(err)
+    }
+        
+    try {
+        await knex.raw('\
+            ALTER TABLE `' + changesTableName + '`\
+                ADD PRIMARY KEY (`tokenAddress`) USING BTREE;\
+        ')
+    } catch (err) {
+        console.log(err)
+    }
+
+    
 
     console.log('CREATING TABLES FINISHED!')
 }

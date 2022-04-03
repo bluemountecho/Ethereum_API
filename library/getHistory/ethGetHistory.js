@@ -1722,10 +1722,27 @@ async function removeDuplicate() {
 }
 
 async function createTables() {
-    await knex.raw('\
-        ALTER TABLE `' + dailyPastTableName + '`\
-            ADD KEY `PAIRADDRESS` (`PAIRADDRESS`);\
-    ')
+    try {        
+        await knex.raw('\
+            ALTER TABLE `' + dailyPastTableName + '`\
+                ADD KEY `PAIRADDRESS` (`PAIRADDRESS`);\
+        ')
+    } catch (err) {
+
+    }
+
+    try {        
+        await knex.raw('\
+            ALTER TABLE `' + liveTableName + '`\
+                ADD COLUMN tokenAddress varchar(255),\
+                ADD COLUMN priceUSD double,\
+                ADD KEY `pairAddress` (`pairAddress`,`tokenAddress`),\
+                ADD KEY `swapAt` (`swapAt`);\
+        ')
+    } catch (err) {
+    }
+
+
 
     console.log('CREATING TABLES FINISHED!')
 }

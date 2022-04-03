@@ -272,6 +272,8 @@ module.exports.avalanche = {
     'PAIRV1': 68000,
     'PAIRV2': 1000,
     'PROXYCOUNT': 68,
+    'USD_ADDRESS': "0xc7198437980c041c805a1edcba50c1ce5db95118",
+    'ETH_ADDRESS': "0xb31f66aa3c1e785363f0875a1b74e27b85fd66c7",
 }
 
 module.exports.fantom = {

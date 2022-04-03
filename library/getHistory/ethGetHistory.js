@@ -1791,6 +1791,15 @@ async function createTables() {
     } catch (err) {
         console.log(err)
     }
+    
+    try {
+        await knex.raw('\
+            ALTER TABLE `' + tokenDailyTableName + '`\
+                ADD KEY `TOKENADDRESS` (`TOKENADDRESS`);\
+        ')
+    } catch (err) {
+        console.log(err)
+    }
 
     console.log('CREATING TABLES FINISHED!')
 }

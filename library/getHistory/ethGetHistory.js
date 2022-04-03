@@ -1725,21 +1725,26 @@ async function createTables() {
     try {        
         await knex.raw('\
             ALTER TABLE `' + dailyPastTableName + '`\
+                DROP INDEX `PAIRADDRESS`,\
                 ADD KEY `PAIRADDRESS` (`PAIRADDRESS`);\
         ')
     } catch (err) {
-
+        console.log(err)
     }
 
     try {        
         await knex.raw('\
             ALTER TABLE `' + liveTableName + '`\
-                ADD COLUMN tokenAddress varchar(255) AFTER pairAddress,\
-                ADD COLUMN priceUSD double AFTER swapPrice,\
+                ADD COLUMN tokenAddress varchar(255) AFTER `pairAddress`,\
+                ADD COLUMN priceUSD double AFTER `swapPrice`,\
+                DROP INDEX `pairAddress`,\
+                DROP INDEX `tokenAddress`,\
+                DROP INDEX `swapAt`,\
                 ADD KEY `pairAddress` (`pairAddress`,`tokenAddress`),\
                 ADD KEY `swapAt` (`swapAt`);\
         ')
     } catch (err) {
+        console.log(err)
     }
 
 

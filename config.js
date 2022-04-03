@@ -524,6 +524,8 @@ module.exports.fuse = {
     'PAIRV1': 68000,
     'PAIRV2': 1000,
     'PROXYCOUNT': 68,
+    'USD_ADDRESS': "0x249be57637d8b013ad64785404b24aebae9b098b",
+    'ETH_ADDRESS': "0x0be9e53fd7edac9f859882afdda116645287c629",
 }
 
 module.exports.emerald = {

@@ -1698,6 +1698,7 @@ async function getUSDPrice() {
         }
     }
 
+    await calcAllDailyPrice()
     await getTokenAndPairLastPrice()
 
     console.log('Finished')
@@ -1848,9 +1849,9 @@ async function init() {
 
     // await getTransactionHistory(FROMBLOCK)
 
-    // await getUSDPrice()
+    await getUSDPrice()
     // await removeDuplicate()
-    await createTables()
+    // await createTables()
 }
 
 init()

@@ -1736,7 +1736,7 @@ async function createTables() {
         await knex.raw('\
             ALTER TABLE `' + liveTableName + '`\
                 ADD COLUMN tokenAddress varchar(255) AFTER pairAddress,\
-                ADD COLUMN priceUSD double AFTER swapPrice;\
+                ADD COLUMN priceUSD double DEFAULT 0 AFTER swapPrice;\
         ')
     } catch (err) {
         console.log(err)

@@ -494,6 +494,8 @@ module.exports.boba = {
     'PAIRV1': 68000,
     'PAIRV2': 1000,
     'PROXYCOUNT': 68,
+    'USD_ADDRESS': "0x66a2A913e447d6b4BF33EFbec43aAeF87890FBbc",
+    'ETH_ADDRESS': "0xa18bf3994c0cc6e3b63ac420308e5383f53120d7",
 }
 
 module.exports.fuse = {

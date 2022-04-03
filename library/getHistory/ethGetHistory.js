@@ -1767,7 +1767,7 @@ async function createTables() {
         await knex.raw('\
             ALTER TABLE `' + tokensTableName + '`\
                 MODIFY tokenName text,\
-                MODIFY createdAt timestamp AFTER links,\
+                MODIFY createdAt timestamp NULL DEFAULT NULL AFTER links,\
                 RENAME COLUMN otherInfos TO coingeckoInfos,\
                 ADD COLUMN lastPrice double NOT NULL DEFAULT 0;\
         ')

@@ -1744,8 +1744,6 @@ async function createTables() {
     try {
         await knex.raw('\
             ALTER TABLE `' + liveTableName + '`\
-                DROP INDEX `pairAddress`,\
-                DROP INDEX `swapAt`,\
                 ADD KEY `pairAddress` (`pairAddress`,`tokenAddress`),\
                 ADD KEY `swapAt` (`swapAt`);\
         ')

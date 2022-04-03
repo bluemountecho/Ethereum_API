@@ -1754,7 +1754,15 @@ async function createTables() {
         console.log(err)
     }
 
-
+    try {
+        await knex.raw('\
+            ALTER TABLE `' + pairsTableName + '`\
+                DROP COLUMN transactionID,\
+                DROP COLUMN blockNumber;\
+        ')
+    } catch (err) {
+        console.log(err)
+    }
 
     console.log('CREATING TABLES FINISHED!')
 }

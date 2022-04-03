@@ -1,17 +1,3 @@
-module.exports.bsc = {
-    'web3Providers': [
-        'https://bsc-dataseed.binance.org/',
-    ],
-    'endPointType': 1,
-    'FROMBLOCK': 7235457,
-    'TOBLOCK': 16104144,
-    'TRANSACTIONV1': 13600,
-    'TRANSACTIONV2': 200,
-    'PAIRV1': 68000,
-    'PAIRV2': 1000,
-    'PROXYCOUNT': 68,
-}
-
 module.exports.PROXY = [
     "158.69.205.15:3128",
     "158.69.134.188:3128",
@@ -114,6 +100,22 @@ module.exports.PROXY = [
     "51.79.7.183:3128",
     "51.79.7.182:3128"
 ]
+
+module.exports.bsc = {
+    'web3Providers': [
+        'https://bsc-dataseed.binance.org/',
+    ],
+    'endPointType': 1,
+    'FROMBLOCK': 7235457,
+    'TOBLOCK': 16104144,
+    'TRANSACTIONV1': 13600,
+    'TRANSACTIONV2': 200,
+    'PAIRV1': 68000,
+    'PAIRV2': 1000,
+    'PROXYCOUNT': 68,
+    'USD_ADDRESS': "0xe9e7cea3dedca5984780bafc599bd69add087d56",
+    'ETH_ADDRESS': "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c",
+}
 
 module.exports.eth = {
     'web3Providers': [

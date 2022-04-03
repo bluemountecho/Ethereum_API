@@ -233,6 +233,8 @@ module.exports.arbitrum = {
     'PAIRV1': 10000,
     'PAIRV2': 1000,
     'PROXYCOUNT': 10,
+    'USD_ADDRESS': "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8",
+    'ETH_ADDRESS': "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
 }
 
 module.exports.optimism = {

@@ -318,6 +318,8 @@ module.exports.cronos = {
     'PAIRV1': 68000,
     'PAIRV2': 1000,
     'PROXYCOUNT': 68,
+    'USD_ADDRESS': "0xc21223249ca28397b4b6541dffaecc539bff0c59",
+    'ETH_ADDRESS': "0x5c7f8a570d578ed84e63fdfa7b1ee72deae1ae23",
 }
 
 module.exports.aurora = {
@@ -604,6 +606,8 @@ module.exports.elastos = {
     'PAIRV1': 68000,
     'PAIRV2': 1000,
     'PROXYCOUNT': 68,
+    'USD_ADDRESS': "0xa06be0f5950781ce28d965e5efc6996e88a8c141",
+    'ETH_ADDRESS': "0x517e9e5d46c1ea8ab6f78677d6114ef47f71f6c4",
 }
 
 module.exports.polis = {

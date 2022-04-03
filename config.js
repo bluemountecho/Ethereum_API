@@ -446,6 +446,8 @@ module.exports.celo = {
     'PAIRV1': 68000,
     'PAIRV2': 1000,
     'PROXYCOUNT': 68,
+    'USD_ADDRESS': "0x918146359264c492bd6934071c6bd31c854edbc3",
+    'ETH_ADDRESS': "0x471ece3750da237f93b8e339c536989b8978a438",
 }
 
 module.exports.xdai = {

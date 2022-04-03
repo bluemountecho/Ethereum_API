@@ -1723,7 +1723,7 @@ async function removeDuplicate() {
 
 async function createTables() {
     await knex.raw('\
-        ALTER TABLE `eth_daily`\
+        ALTER TABLE `' + dailyPastTableName + '`\
             ADD KEY `PAIRADDRESS` (`PAIRADDRESS`);\
     ')
 

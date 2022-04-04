@@ -345,7 +345,7 @@ module.exports.aurora = {
     'PROXYCOUNT': 68,
     'USD_ADDRESS': "0x4988a896b1227218e4a686fde5eabdcabd91571f",
     'ETH_ADDRESS': "0xc42c30ac6cc15fac9bd938618bcaa1a1fae8501d",
-    'lastBlockNumber': 61644581,
+    'lastBlockNumber': 61641826,
 }
 
 module.exports.moonbeam = {

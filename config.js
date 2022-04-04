@@ -597,6 +597,7 @@ module.exports.kardia = {
     'PROXYCOUNT': 68,
     'USD_ADDRESS': "0x92364ec610efa050d296f1eeb131f2139fb8810e",
     'ETH_ADDRESS': "0xaf984e23eaa3e7967f3c5e007fbe397d8566d23d",
+    'lastBlockNumber': 7420723,
 }
 
 module.exports.iotex = {

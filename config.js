@@ -314,7 +314,7 @@ module.exports.harmony = {
     'PAIRV1': 68000,
     'PAIRV2': 1000,
     'PROXYCOUNT': 68,
-    'USD_ADDRESS': "0x985458E523dB3d53125813eD68c274899e9DfAb4",
+    'USD_ADDRESS': "0x985458e523db3d53125813ed68c274899e9dfab4",
     'ETH_ADDRESS': "0xcf664087a5bb0237a0bad6742852ec6c8d69a27a",
     'lastBlockNumber': 24193446,
 }
@@ -542,7 +542,7 @@ module.exports.boba = {
     'PAIRV1': 68000,
     'PAIRV2': 1000,
     'PROXYCOUNT': 68,
-    'USD_ADDRESS': "0x5de1677344d3cb0d7d465c10b72a8f60699c062d",
+    'USD_ADDRESS': "0x66a2a913e447d6b4bf33efbec43aaef87890fbbc",
     'ETH_ADDRESS': "0xa18bf3994c0cc6e3b63ac420308e5383f53120d7",
     'lastBlockNumber': 426928,
 }

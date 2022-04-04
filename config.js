@@ -306,6 +306,8 @@ module.exports.harmony = {
     'PAIRV1': 68000,
     'PAIRV2': 1000,
     'PROXYCOUNT': 68,
+    'USD_ADDRESS': "0x985458E523dB3d53125813eD68c274899e9DfAb4",
+    'ETH_ADDRESS': "0xcf664087a5bb0237a0bad6742852ec6c8d69a27a",
 }
 
 module.exports.cronos = {
@@ -394,6 +396,8 @@ module.exports.heco = {
     'PAIRV1': 68000,
     'PAIRV2': 1000,
     'PROXYCOUNT': 68,
+    'USD_ADDRESS': "0x0298c2b32eae4da002a15f36fdf7615bea3da047",
+    'ETH_ADDRESS': "0x5545153ccfca01fbd7dd11c0b23ba694d9509a6f",
 }
 
 module.exports.okc = {
@@ -494,6 +498,8 @@ module.exports.hsc = {
     'PAIRV1': 68000,
     'PAIRV2': 1000,
     'PROXYCOUNT': 68,
+    'USD_ADDRESS': "0xd16babe52980554520f6da505df4d1b124c815a7",
+    'ETH_ADDRESS': "0x3eff9d389d13d6352bfb498bcf616ef9b1beac87",
 }
 
 module.exports.boba = {
@@ -570,6 +576,8 @@ module.exports.iotex = {
     'PAIRV1': 68000,
     'PAIRV2': 1000,
     'PROXYCOUNT': 68,
+    'USD_ADDRESS': "0x6fbcdc1169b5130c59e72e51ed68a84841c98cd1",
+    'ETH_ADDRESS': "0xa00744882684c3e4747faefd68d283ea44099d03",
 }
 
 module.exports.wan = {

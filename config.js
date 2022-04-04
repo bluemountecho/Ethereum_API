@@ -212,6 +212,8 @@ module.exports.polygon = {
     'PAIRV1': 10000,
     'PAIRV2': 1000,
     'PROXYCOUNT': 40,
+    'USD_ADDRESS': "0x2791bca1f2de4661ed88a30c99a7a9449aa84174",
+    'ETH_ADDRESS': "0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270",
 }
 
 module.exports.arbitrum = {
@@ -260,6 +262,8 @@ module.exports.optimism = {
     'PAIRV1': 10000,
     'PAIRV2': 1000,
     'PROXYCOUNT': 10,
+    'USD_ADDRESS': "0xda10009cbd5d07dd0cecc66161fc93d7c9000da1",
+    'ETH_ADDRESS': "0x4200000000000000000000000000000000000006",
 }
 
 module.exports.avalanche = {
@@ -354,6 +358,8 @@ module.exports.moonbeam = {
     'PAIRV1': 68000,
     'PAIRV2': 1000,
     'PROXYCOUNT': 68,
+    'USD_ADDRESS': "0x818ec0a7fe18ff94269904fced6ae3dae6d6dc0b",
+    'ETH_ADDRESS': "0xacc15dc74880c9944775448304b263d191c6077f",
 }
 
 module.exports.moonriver = {
@@ -368,6 +374,8 @@ module.exports.moonriver = {
     'PAIRV1': 68000,
     'PAIRV2': 1000,
     'PROXYCOUNT': 68,
+    'USD_ADDRESS': "0xe3f5a90f9cb311505cd691a46596599aa1a0ad7d",
+    'ETH_ADDRESS': "0x98878b06940ae243284ca214f92bb71a2b032b8a",
 }
 
 module.exports.metis = {
@@ -382,6 +390,8 @@ module.exports.metis = {
     'PAIRV1': 68000,
     'PAIRV2': 1000,
     'PROXYCOUNT': 68,
+    'USD_ADDRESS': "0xea32a96608495e54156ae48931a7c20f0dcc1a21",
+    'ETH_ADDRESS': "0xdeaddeaddeaddeaddeaddeaddeaddeaddead0000",
 }
 
 module.exports.heco = {
@@ -412,6 +422,8 @@ module.exports.okc = {
     'PAIRV1': 68000,
     'PAIRV2': 1000,
     'PROXYCOUNT': 68,
+    'USD_ADDRESS': "0x382bb369d343125bfb2117af9c149795c6c65c50",
+    'ETH_ADDRESS': "0x8f8526dbfd6e38e3d8307702ca8469bae6c56c15",
 }
 
 module.exports.kcc = {
@@ -442,6 +454,8 @@ module.exports.velas = {
     'PAIRV1': 34000,
     'PAIRV2': 500,
     'PROXYCOUNT': 68,
+    'USD_ADDRESS': "0xc111c29a988ae0c0087d97b33c6e6766808a3bd3",
+    'ETH_ADDRESS': "0xc579d1f3cf86749e05cd06f7ade17856c2ce3126",
 }
 
 module.exports.celo = {
@@ -472,6 +486,8 @@ module.exports.xdai = {
     'PAIRV1': 68000,
     'PAIRV2': 1000,
     'PROXYCOUNT': 68,
+    'USD_ADDRESS': "0xddafbb505ad214d7b80b1f830fccc89b60fb7a83",
+    'ETH_ADDRESS': "0xe91d153e0b41518a2ce8dd3d7944fa863463a97d",
 }
 
 module.exports.smartbch = {
@@ -486,6 +502,8 @@ module.exports.smartbch = {
     'PAIRV1': 68000,
     'PAIRV2': 1000,
     'PROXYCOUNT': 68,
+    'USD_ADDRESS': "0x7b2b3c5308ab5b2a1d9a94d20d35ccdf61e05b72",
+    'ETH_ADDRESS': "0x3743ec0673453e5009310c727ba4eaf7b3a1cc04",
 }
 
 module.exports.hsc = {
@@ -596,6 +614,8 @@ module.exports.wan = {
     'PAIRV1': 68000,
     'PAIRV2': 1000,
     'PROXYCOUNT': 68,
+    'USD_ADDRESS': "0x11e77e27af5539872efed10abaa0b408cfd9fbbd",
+    'ETH_ADDRESS': "0xdabd997ae5e4799be47d6e69d9431615cba28f48",
 }
 
 module.exports.zyx = {
@@ -610,6 +630,8 @@ module.exports.zyx = {
     'PAIRV1': 68000,
     'PAIRV2': 1000,
     'PROXYCOUNT': 68,
+    'USD_ADDRESS': "0xb99c32a2da6766158b4ccf29b26e75dc22606ebd",
+    'ETH_ADDRESS': "0xc9e1aea009b0bae9141f3dc7523fb42fd48c8656",
 }
 
 module.exports.elastos = {
@@ -640,4 +662,6 @@ module.exports.polis = {
     'PAIRV1': 68000,
     'PAIRV2': 1000,
     'PROXYCOUNT': 68,
+    'USD_ADDRESS': "0x247123e806a27ea322bfd93e0273d04602dc942d",
+    'ETH_ADDRESS': "0x6fc851b8d66116627fb1137b9d5fe4e2e1bea978",
 }

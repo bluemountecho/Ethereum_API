@@ -655,6 +655,7 @@ module.exports.elastos = {
     'PROXYCOUNT': 68,
     'USD_ADDRESS': "0xa06be0f5950781ce28d965e5efc6996e88a8c141",
     'ETH_ADDRESS': "0x517e9e5d46c1ea8ab6f78677d6114ef47f71f6c4",
+    'lastBlockNumber': 11747896,
 }
 
 module.exports.polis = {

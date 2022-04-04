@@ -316,6 +316,7 @@ module.exports.harmony = {
     'PROXYCOUNT': 68,
     'USD_ADDRESS': "0x985458E523dB3d53125813eD68c274899e9DfAb4",
     'ETH_ADDRESS': "0xcf664087a5bb0237a0bad6742852ec6c8d69a27a",
+    'lastBlockNumber': 24193446,
 }
 
 module.exports.cronos = {

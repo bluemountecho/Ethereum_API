@@ -399,6 +399,7 @@ module.exports.metis = {
     'PROXYCOUNT': 68,
     'USD_ADDRESS': "0xea32a96608495e54156ae48931a7c20f0dcc1a21",
     'ETH_ADDRESS': "0xdeaddeaddeaddeaddeaddeaddeaddeaddead0000",
+    'lastBlockNumber': 1695872,
 }
 
 module.exports.heco = {

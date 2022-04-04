@@ -426,6 +426,8 @@ module.exports.kcc = {
     'PAIRV1': 68000,
     'PAIRV2': 1000,
     'PROXYCOUNT': 68,
+    'USD_ADDRESS': "0x0039f574ee5cc39bdd162e9a88e3eb1f111baf48",
+    'ETH_ADDRESS': "0x4446fc4eb47f2f6586f9faab68b3498f86c07521",
 }
 
 module.exports.velas = {
@@ -562,6 +564,8 @@ module.exports.kardia = {
     'PAIRV1': 68000,
     'PAIRV2': 1000,
     'PROXYCOUNT': 68,
+    'USD_ADDRESS': "0x92364ec610efa050d296f1eeb131f2139fb8810e",
+    'ETH_ADDRESS': "0xaf984e23eaa3e7967f3c5e007fbe397d8566d23d",
 }
 
 module.exports.iotex = {

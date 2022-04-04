@@ -505,6 +505,7 @@ module.exports.xdai = {
     'PROXYCOUNT': 68,
     'USD_ADDRESS': "0xddafbb505ad214d7b80b1f830fccc89b60fb7a83",
     'ETH_ADDRESS': "0xe91d153e0b41518a2ce8dd3d7944fa863463a97d",
+    'lastBlockNumber': 21368520,
 }
 
 module.exports.smartbch = {

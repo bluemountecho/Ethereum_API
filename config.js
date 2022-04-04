@@ -520,6 +520,7 @@ module.exports.smartbch = {
     'PROXYCOUNT': 68,
     'USD_ADDRESS': "0x7b2b3c5308ab5b2a1d9a94d20d35ccdf61e05b72",
     'ETH_ADDRESS': "0x3743ec0673453e5009310c727ba4eaf7b3a1cc04",
+    'lastBlockNumber': 3773970,
 }
 
 module.exports.hsc = {

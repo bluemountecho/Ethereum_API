@@ -1141,7 +1141,7 @@ async function updatePriceChanges() {
     }
 }
 
-setInterval(updatePriceChanges, 20000)
+setInterval(updatePriceChanges, 60000)
 
 getTokenAndPairData()
 .then(res => {

@@ -115,7 +115,7 @@ module.exports.bsc = {
     'PROXYCOUNT': 68,
     'USD_ADDRESS': "0xe9e7cea3dedca5984780bafc599bd69add087d56",
     'ETH_ADDRESS': "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c",
-    'lastBlockNumber': 16734924,
+    'lastBlockNumber': 16759780,
 }
 
 module.exports.eth = {
@@ -143,9 +143,9 @@ module.exports.eth = {
     'endPointType': 0,
     'FROMBLOCK': 0,
     'TOBLOCK': 26028293,
-    'TRANSACTIONV1': 2000,
+    'TRANSACTIONV1': 3800,
     'TRANSACTIONV2': 200,
-    'PAIRV1': 10000,
+    'PAIRV1': 19000,
     'PAIRV2': 1000,
     'PROXYCOUNT': 19,
     'lastBlockNumber': 14507265,
@@ -212,7 +212,7 @@ module.exports.polygon = {
     'TRANSACTIONV2': 200,
     'PAIRV1': 10000,
     'PAIRV2': 1000,
-    'PROXYCOUNT': 40,
+    'PROXYCOUNT': 10,
     'USD_ADDRESS': "0x2791bca1f2de4661ed88a30c99a7a9449aa84174",
     'ETH_ADDRESS': "0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270",
     'lastBlockNumber': 26518437,

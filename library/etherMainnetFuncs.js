@@ -12,7 +12,7 @@ const knex = require('knex')({
     }
 })
 const Web3 = require('web3')
-
+const config = require('../config')
 const minERC20ABI = [
     {
       "constant": true,
@@ -66,7 +66,12 @@ const options = {
     withCredentials: false,
 };
 
-const web3 = new Web3(new Web3.providers.HttpProvider('https://eth-mainnet.alchemyapi.io/v2/KDRotLOmW8M21flLsKNaLN4IO5lB_6PN', options))
+var networks = ["eth", "bsc", "polygon", "arbitrum", "optimism", "avalanche", "fantom", "harmony", "cronos", "aurora", "moonbeam", "moonriver", "metis", "heco", "okc", "kcc", "velas", "celo", "xdai", "smartbch", "hsc", "boba", "fuse", "emerald", "kardia", "iotex", "wan", "zyx", "elastos", "polis"]
+var web3s = []
+
+for (var i = 0; i < network.length; i ++) {
+    web3s[networks[i]] = new Web3(new Web3.providers.HttpProvider(config[networks[i]].web3Providers[0], options))
+}
 
 var fs = require('fs')
 
@@ -251,7 +256,7 @@ module.exports.getLast24HourInfos = async function getLast24HourInfos(network, t
 module.exports.getTokenInfo = async function getTokenInfo(network, tokenAddr) {
     try {
         var tokenAddress = tokenAddr.toLowerCase()
-        const contract = new web3.eth.Contract(minERC20ABI, tokenAddress)
+        const contract = new web3s[network].eth.Contract(minERC20ABI, tokenAddress)
         var rows = await knex(network + '_tokens').where('tokenAddress', tokenAddress).select('*')
         var totalSupply = await contract.methods.totalSupply().call()
         var tokenPrice = await this.getPriceOfToken(network, tokenAddress)
@@ -465,7 +470,7 @@ module.exports.getPairInfo = async function getPairInfo(pairAddr) {
             var token1Info = await this.getTokenInfo(network, rows[0].token1Address)
             var baseToken = rows[0].baseToken == 0 ? rows[0].token0Address : rows[0].token1Address
             var baseDecimals = rows[0].baseToken == 0 ? token0Info.data[0].decimals : token1Info.data[0].decimals
-            const contract = new web3.eth.Contract(minERC20ABI, baseToken)
+            const contract = new web3s[network].eth.Contract(minERC20ABI, baseToken)
             var res = await contract.methods.balanceOf(rows[0].pairAddress).call()
             var tokenPrice = await this.getPriceOfToken(network, baseToken)
 
@@ -888,7 +893,7 @@ module.exports.getDailyMarketCap = async function getDailyMarketCap(network, tok
     try {
         var tokenAddress = tokenAddr.toLowerCase()
         var data = (await this.getDailyTokenPrice(network, tokenAddress, page)).data
-        const contract = new web3.eth.Contract(minERC20ABI, tokenAddress)
+        const contract = new web3s[network].eth.Contract(minERC20ABI, tokenAddress)
         var totalSupply = await contract.methods.totalSupply().call()
         var tokenInfo = (await knex(network + '_tokens').where('tokenAddress', tokenAddress).select('*'))[0]
         var res = []

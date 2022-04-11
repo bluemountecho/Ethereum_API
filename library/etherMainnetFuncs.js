@@ -98,16 +98,16 @@ module.exports.getPriceOfToken = async function getPriceOfToken(network, tokenAd
     }
 }
 
-module.exports.getLastPriceFromPair = async function getLastPriceFromPair(pairAddress) {
+module.exports.getLastPriceFromPair = async function getLastPriceFromPair(network, pairAddress) {
     try {
-        var pairInfo = (await knex('eth_pairs').where('pairAddress', pairAddress).select('*'))[0]
+        var pairInfo = (await knex(network + '_pairs').where('pairAddress', pairAddress).select('*'))[0]
         var token0Address = pairInfo.token0Address
         var token1Address = pairInfo.token1Address
         var price = pairInfo.lastPrice
-        var price0 = await this.getPriceOfToken(token0Address)
-        var price1 = await this.getPriceOfToken(token1Address)
-        var token0Info = (await knex('eth_tokens').where('tokenAddress', token0Address).select('*'))[0]
-        var token1Info = (await knex('eth_tokens').where('tokenAddress', token1Address).select('*'))[0]
+        var price0 = await this.getPriceOfToken(network, token0Address)
+        var price1 = await this.getPriceOfToken(network, token1Address)
+        var token0Info = (await knex(network + '_tokens').where('tokenAddress', token0Address).select('*'))[0]
+        var token1Info = (await knex(network + '_tokens').where('tokenAddress', token1Address).select('*'))[0]
 
         if (price == 0) {
             return {
@@ -145,14 +145,14 @@ module.exports.getLastPriceFromPair = async function getLastPriceFromPair(pairAd
     }
 }
 
-module.exports.getAllTokens = async function getAllTokens(page = 0) {
+module.exports.getAllTokens = async function getAllTokens(network, page = 0) {
     try {
-        var rows = await knex('eth_tokens').orderBy('createdAt', 'desc').limit(50).offset(page * 50).select('*')
+        var rows = await knex(network + '_tokens').orderBy('createdAt', 'desc').limit(50).offset(page * 50).select('*')
         var datas = []
         var funcs = []
 
         for (var i = 0; i < rows.length; i ++) {
-            funcs.push(this.getTokenStatistics(rows[i].tokenAddress))
+            funcs.push(this.getTokenStatistics(network, rows[i].tokenAddress))
         }
 
         var res = await Promise.all(funcs)
@@ -181,9 +181,9 @@ module.exports.getAllTokens = async function getAllTokens(page = 0) {
     }
 }
 
-module.exports.getTokensFromName = async function getTokensFromName(tokenName) {
+module.exports.getTokensFromName = async function getTokensFromName(network, tokenName) {
     try {
-        var rows = await knex('eth_tokens')
+        var rows = await knex(network + '_tokens')
             .where('tokenSymbol', 'like', '%' + tokenName + '%')
             .orWhere('tokenName', 'like', '%' + tokenName + '%')
             .orderByRaw('LOWER(tokenSymbol)="' + tokenName.toLowerCase() + '" desc')
@@ -215,8 +215,8 @@ module.exports.getTokensFromName = async function getTokensFromName(tokenName) {
     }
 }
 
-async function getTokenTotalTrnasactions(tokenAddress) {
-    var rows = await knex('eth_token_daily').where('TOKENADDRESS', tokenAddress).select('')
+async function getTokenTotalTrnasactions(network, tokenAddress) {
+    var rows = await knex(network + '_token_daily').where('TOKENADDRESS', tokenAddress).select('')
     var total = 0
 
     for (var i = 0; i < rows.length; i ++) {
@@ -226,8 +226,8 @@ async function getTokenTotalTrnasactions(tokenAddress) {
     return total
 }
 
-module.exports.getLast24HourInfos = async function getLast24HourInfos(tokenAddress) {
-    var res = (await knex('eth_changes').where('tokenAddress', tokenAddress))[0]
+module.exports.getLast24HourInfos = async function getLast24HourInfos(network, tokenAddress) {
+    var res = (await knex(network + '_changes').where('tokenAddress', tokenAddress))[0]
     var ret = {}
 
     ret.totalVolume = res.volume24h
@@ -244,14 +244,14 @@ module.exports.getLast24HourInfos = async function getLast24HourInfos(tokenAddre
     return ret
 }
 
-module.exports.getTokenInfo = async function getTokenInfo(tokenAddr) {
+module.exports.getTokenInfo = async function getTokenInfo(network, tokenAddr) {
     try {
         var tokenAddress = tokenAddr.toLowerCase()
         const contract = new web3.eth.Contract(minERC20ABI, tokenAddress)
-        var rows = await knex('eth_tokens').where('tokenAddress', tokenAddress).select('*')
+        var rows = await knex(network + '_tokens').where('tokenAddress', tokenAddress).select('*')
         var totalSupply = await contract.methods.totalSupply().call()
-        var tokenPrice = await this.getPriceOfToken(tokenAddress)
-        var info = (await this.getTokenStatistics(tokenAddress)).data[0]
+        var tokenPrice = await this.getPriceOfToken(network, tokenAddress)
+        var info = (await this.getTokenStatistics(network, tokenAddress)).data[0]
 
         totalSupply = totalSupply / 10 ** rows[0].tokenDecimals
 
@@ -304,7 +304,7 @@ module.exports.getTokenInfo = async function getTokenInfo(tokenAddr) {
                     },
                     image: {
                         coingecko: infos.image,
-                        github: 'https://github.com/thefortube/trust-assets/blob/master/blockchains/ethereum/assets/' + Web3.utils.toChecksumAddress(tokenAddr) + '/logo.png?raw=true'
+                        // github: 'https://github.com/thefortube/trust-assets/blob/master/blockchains/ethereum/assets/' + Web3.utils.toChecksumAddress(tokenAddr) + '/logo.png?raw=true'
                     },
                 }]
             }
@@ -320,16 +320,16 @@ module.exports.getTokenInfo = async function getTokenInfo(tokenAddr) {
     }
 }
 
-module.exports.getTokenStatistics = async function getTokenStatistics(tokenAddr) {
+module.exports.getTokenStatistics = async function getTokenStatistics(network, tokenAddr) {
     try {
         var tokenAddress = tokenAddr.toLowerCase()
-        var rows = await knex('eth_tokens').where('tokenAddress', tokenAddress).select('*')
+        var rows = await knex(network + '_tokens').where('tokenAddress', tokenAddress).select('*')
 
         var funcs = []
 
-        funcs.push(this.getPriceOfToken(tokenAddress))
-        funcs.push(getTokenTotalTrnasactions(tokenAddress))
-        funcs.push(this.getLast24HourInfos(tokenAddress))
+        funcs.push(this.getPriceOfToken(netowrk, tokenAddress))
+        funcs.push(getTokenTotalTrnasactions(network, tokenAddress))
+        funcs.push(this.getLast24HourInfos(network, tokenAddress))
 
         var res = await Promise.all(funcs)
 
@@ -395,9 +395,9 @@ module.exports.getTokenStatistics = async function getTokenStatistics(tokenAddr)
     }
 }
 
-module.exports.getPairsFromName = async function getPairsFromName(tokenName) {
+module.exports.getPairsFromName = async function getPairsFromName(network, tokenName) {
     try {
-        var rows = await knex('eth_tokens')
+        var rows = await knex(network + '_tokens')
             .where('tokenSymbol', 'like', '%' + tokenName + '%')
             .orWhere('tokenName', 'like', '%' + tokenName + '%')
             .orderByRaw('LOWER(tokenSymbol)="' + tokenName.toLowerCase() + '" desc')
@@ -406,15 +406,15 @@ module.exports.getPairsFromName = async function getPairsFromName(tokenName) {
         var datas = []
 
         for (var i = 0; i < rows.length; i ++) {
-            var pairs = await knex('eth_pairs')
+            var pairs = await knex(network + '_pairs')
                 .where('token0Address', rows[i].tokenAddress)
                 .orWhere('token1Address', rows[i].tokenAddress)
                 .orderBy('createdAt', "desc")
                 .select('*')
             
             for (var j = 0; j < pairs.length; j ++) {
-                var token0Info = await knex('eth_tokens').where('tokenAddress', pairs[j].token0Address).select('*')
-                var token1Info = await knex('eth_tokens').where('tokenAddress', pairs[j].token1Address).select('*')
+                var token0Info = await knex(network + '_tokens').where('tokenAddress', pairs[j].token0Address).select('*')
+                var token1Info = await knex(network + '_tokens').where('tokenAddress', pairs[j].token1Address).select('*')
 
                 datas.push({
                     address: pairs[j].pairAddress,
@@ -448,7 +448,7 @@ module.exports.getPairsFromName = async function getPairsFromName(tokenName) {
 module.exports.getPairInfo = async function getPairInfo(pairAddr) {
     try {
         var pairAddress = pairAddr.toLowerCase()
-        var rows = await knex('eth_pairs').where('pairAddress', pairAddress).select('*')
+        var rows = await knex(network + '_pairs').where('pairAddress', pairAddress).select('*')
 
         if (rows.length == 0) {
             return {
@@ -457,13 +457,13 @@ module.exports.getPairInfo = async function getPairInfo(pairAddr) {
                 data: []
             }
         } else {
-            var token0Info = await this.getTokenInfo(rows[0].token0Address)
-            var token1Info = await this.getTokenInfo(rows[0].token1Address)
+            var token0Info = await this.getTokenInfo(network, rows[0].token0Address)
+            var token1Info = await this.getTokenInfo(network, rows[0].token1Address)
             var baseToken = rows[0].baseToken == 0 ? rows[0].token0Address : rows[0].token1Address
             var baseDecimals = rows[0].baseToken == 0 ? token0Info.data[0].decimals : token1Info.data[0].decimals
             const contract = new web3.eth.Contract(minERC20ABI, baseToken)
             var res = await contract.methods.balanceOf(rows[0].pairAddress).call()
-            var tokenPrice = await this.getPriceOfToken(baseToken)
+            var tokenPrice = await this.getPriceOfToken(network, baseToken)
 
             res = res / 10 ** baseDecimals
             res = res * tokenPrice.data.price * 2
@@ -493,140 +493,140 @@ module.exports.getPairInfo = async function getPairInfo(pairAddr) {
     }
 }
 
-async function getDailyPairData(pairAddr) {
-    try {
-        var pair = pairAddr.toLowerCase()
-        var datas = []
-        var content = fs.readFileSync('./database/ethereum/transactions/' + pair + '.txt', {encoding:'utf8', flag:'r'})
-        var rows = content.split('\n')
+// async function getDailyPairData(network, pairAddr) {
+//     try {
+//         var pair = pairAddr.toLowerCase()
+//         var datas = []
+//         var content = fs.readFileSync('./database/ethereum/transactions/' + pair + '.txt', {encoding:'utf8', flag:'r'})
+//         var rows = content.split('\n')
 
-        for (var i = 0; i < rows.length - 1; i ++) {
-            datas.push(JSON.parse(rows[i]))
-        }
+//         for (var i = 0; i < rows.length - 1; i ++) {
+//             datas.push(JSON.parse(rows[i]))
+//         }
 
-        for (var i = 0; i < datas.length; i ++) {
-            datas[i].AVGPRICE = datas[i].TOTALVOLUME0 / datas[i].TOTALVOLUME1
-        }
+//         for (var i = 0; i < datas.length; i ++) {
+//             datas[i].AVGPRICE = datas[i].TOTALVOLUME0 / datas[i].TOTALVOLUME1
+//         }
 
-        return datas
-    } catch (err) {
-        console.log(err)
-        return []
-    }
-}
+//         return datas
+//     } catch (err) {
+//         console.log(err)
+//         return []
+//     }
+// }
 
-async function mergeDailyPairData(rows, token0Address, token1Address, page = -1) {
-    var datas = []
-    var res = []
-    var funcs = []
+// async function mergeDailyPairData(network, rows, token0Address, token1Address, page = -1) {
+//     var datas = []
+//     var res = []
+//     var funcs = []
 
-    for (var i = 0; i < rows.length; i ++) {
-        funcs.push(getDailyPairData(rows[i].pairAddress))
-    }
+//     for (var i = 0; i < rows.length; i ++) {
+//         funcs.push(getDailyPairData(network, rows[i].pairAddress))
+//     }
 
-    funcs.push(knex.raw('\
-    SELECT\
-        eth_live.pairAddress AS PAIRADDRESS,\
-        CONCAT(YEAR( eth_live.swapAt ), "-", MONTH( eth_live.swapAt ), "-", DAY( eth_live.swapAt )) AS SWAPAT,\
-        avg( eth_live.swapPrice ) AS AVGPRICE,\
-        max( eth_live.swapPrice ) AS MAXPRICE,\
-        min( eth_live.swapPrice ) AS MINPRICE,\
-        sum( eth_live.swapAmount0 * ( eth_pairs.baseToken * 2 - 1 ) * ( eth_live.isBuy * - 2 + 1 ) ) AS VOLUME0,\
-        sum( eth_live.swapAmount1 * ( eth_pairs.baseToken * - 2 + 1 ) * ( eth_live.isBuy * - 2 + 1 ) ) AS VOLUME1,\
-        sum( eth_live.swapAmount0 ) AS TOTALVOLUME0,\
-        sum( eth_live.swapAmount1 ) AS TOTALVOLUME1,\
-        count( eth_live.swapMaker ) AS SWAPCOUNT \
-    FROM\
-        eth_live\
-        LEFT JOIN eth_pairs ON eth_pairs.pairAddress = eth_live.pairAddress \
-    WHERE\
-        eth_pairs.token0Address="' + token0Address + '" and eth_pairs.token1Address="' + token1Address + '" and DATE( eth_live.swapAt )="' + convertTimestampToString(new Date().getTime(), true).split(' ')[0] + '"\
-    GROUP BY\
-        DATE( eth_live.swapAt ) \
-    ORDER BY\
-        DATE( eth_live.swapAt)'))
+//     funcs.push(knex.raw('\
+//     SELECT\
+//         eth_live.pairAddress AS PAIRADDRESS,\
+//         CONCAT(YEAR( eth_live.swapAt ), "-", MONTH( eth_live.swapAt ), "-", DAY( eth_live.swapAt )) AS SWAPAT,\
+//         avg( eth_live.swapPrice ) AS AVGPRICE,\
+//         max( eth_live.swapPrice ) AS MAXPRICE,\
+//         min( eth_live.swapPrice ) AS MINPRICE,\
+//         sum( eth_live.swapAmount0 * ( eth_pairs.baseToken * 2 - 1 ) * ( eth_live.isBuy * - 2 + 1 ) ) AS VOLUME0,\
+//         sum( eth_live.swapAmount1 * ( eth_pairs.baseToken * - 2 + 1 ) * ( eth_live.isBuy * - 2 + 1 ) ) AS VOLUME1,\
+//         sum( eth_live.swapAmount0 ) AS TOTALVOLUME0,\
+//         sum( eth_live.swapAmount1 ) AS TOTALVOLUME1,\
+//         count( eth_live.swapMaker ) AS SWAPCOUNT \
+//     FROM\
+//         eth_live\
+//         LEFT JOIN eth_pairs ON eth_pairs.pairAddress = eth_live.pairAddress \
+//     WHERE\
+//         eth_pairs.token0Address="' + token0Address + '" and eth_pairs.token1Address="' + token1Address + '" and DATE( eth_live.swapAt )="' + convertTimestampToString(new Date().getTime(), true).split(' ')[0] + '"\
+//     GROUP BY\
+//         DATE( eth_live.swapAt ) \
+//     ORDER BY\
+//         DATE( eth_live.swapAt)'))
 
-    var oneDatas = await Promise.all(funcs)
+//     var oneDatas = await Promise.all(funcs)
 
-    for (var i = 0; i < rows.length; i ++) {
-        for (var j = 0; j < oneDatas[i].length; j ++) {
-            if (!datas[oneDatas[i][j].SWAPAT]) {
-                datas[oneDatas[i][j].SWAPAT] = []
-            }
+//     for (var i = 0; i < rows.length; i ++) {
+//         for (var j = 0; j < oneDatas[i].length; j ++) {
+//             if (!datas[oneDatas[i][j].SWAPAT]) {
+//                 datas[oneDatas[i][j].SWAPAT] = []
+//             }
 
-            datas[oneDatas[i][j].SWAPAT].push(oneDatas[i][j])
-        }
-    }
+//             datas[oneDatas[i][j].SWAPAT].push(oneDatas[i][j])
+//         }
+//     }
     
-    var livePairs = oneDatas[rows.length][0]
+//     var livePairs = oneDatas[rows.length][0]
 
-    for (var i = 0; i < livePairs.length; i ++) {
-        if (!datas[livePairs[i].SWAPAT]) {
-            datas[livePairs[i].SWAPAT] = []
-        }
+//     for (var i = 0; i < livePairs.length; i ++) {
+//         if (!datas[livePairs[i].SWAPAT]) {
+//             datas[livePairs[i].SWAPAT] = []
+//         }
 
-        datas[livePairs[i].SWAPAT].push(livePairs[i])
-    }
+//         datas[livePairs[i].SWAPAT].push(livePairs[i])
+//     }
 
-    for (var key in datas) {
-        var swapAt = key
-        var totalVolume0 = 0
-        var totalVolume1 = 0
-        var volume0 = 0
-        var volume1 = 0
-        var minPrice = 1000000000000000
-        var maxPrice = 0
+//     for (var key in datas) {
+//         var swapAt = key
+//         var totalVolume0 = 0
+//         var totalVolume1 = 0
+//         var volume0 = 0
+//         var volume1 = 0
+//         var minPrice = 1000000000000000
+//         var maxPrice = 0
 
-        for (var i = 0; i < datas[key].length; i ++) {
-            totalVolume0 += datas[key][i].TOTALVOLUME0
-            totalVolume1 += datas[key][i].TOTALVOLUME1
-            volume0 += datas[key][i].VOLUME0
-            volume1 += datas[key][i].VOLUME1
+//         for (var i = 0; i < datas[key].length; i ++) {
+//             totalVolume0 += datas[key][i].TOTALVOLUME0
+//             totalVolume1 += datas[key][i].TOTALVOLUME1
+//             volume0 += datas[key][i].VOLUME0
+//             volume1 += datas[key][i].VOLUME1
 
-            if (minPrice > datas[key][i].MINPRICE && datas[key][i].MINPRICE) minPrice = datas[key][i].MINPRICE
-            if (maxPrice < datas[key][i].MAXPRICE && datas[key][i].MAXPRICE) maxPrice = datas[key][i].MAXPRICE
-        }
+//             if (minPrice > datas[key][i].MINPRICE && datas[key][i].MINPRICE) minPrice = datas[key][i].MINPRICE
+//             if (maxPrice < datas[key][i].MAXPRICE && datas[key][i].MAXPRICE) maxPrice = datas[key][i].MAXPRICE
+//         }
 
-        res.push({
-            SWAPAT: swapAt,
-            TOTALVOLUME0: totalVolume0.toFixed(30),
-            TOTALVOLUME1: totalVolume1.toFixed(30),
-            VOLUME0: volume0.toFixed(30),
-            VOLUME1: volume1.toFixed(30),
-            LOWPRICE: minPrice.toFixed(30),
-            HIGHPRICE: maxPrice.toFixed(30),
-            AVGPRICE: (totalVolume0 / totalVolume1).toFixed(30)
-        })
-    }
+//         res.push({
+//             SWAPAT: swapAt,
+//             TOTALVOLUME0: totalVolume0.toFixed(30),
+//             TOTALVOLUME1: totalVolume1.toFixed(30),
+//             VOLUME0: volume0.toFixed(30),
+//             VOLUME1: volume1.toFixed(30),
+//             LOWPRICE: minPrice.toFixed(30),
+//             HIGHPRICE: maxPrice.toFixed(30),
+//             AVGPRICE: (totalVolume0 / totalVolume1).toFixed(30)
+//         })
+//     }
 
-    res.sort(function (a, b) {
-        var ad = (new Date(a.SWAPAT)).getTime()
-        var bd = (new Date(b.SWAPAT)).getTime()
+//     res.sort(function (a, b) {
+//         var ad = (new Date(a.SWAPAT)).getTime()
+//         var bd = (new Date(b.SWAPAT)).getTime()
 
-        if (ad > bd) return -1
-        if (ad < bd) return 1
-        return 0
-    })
+//         if (ad > bd) return -1
+//         if (ad < bd) return 1
+//         return 0
+//     })
 
-    if (page >= 0) {
-        var pageData = []
+//     if (page >= 0) {
+//         var pageData = []
 
-        for (var i = page * 100; i < page * 100 + 100 && i < res.length; i ++) {
-            pageData.push(res[i])
-        }
+//         for (var i = page * 100; i < page * 100 + 100 && i < res.length; i ++) {
+//             pageData.push(res[i])
+//         }
 
-        return pageData
-    }
+//         return pageData
+//     }
 
-    return res
-}
+//     return res
+// }
 
-module.exports.getDailyTokenPrice = async function getDailyTokenPrice(tokenAddr, page = 0) {
+module.exports.getDailyTokenPrice = async function getDailyTokenPrice(network, tokenAddr, page = 0) {
     try {
         var tokenAddress = tokenAddr.toLowerCase()
-        var tokenInfo = await knex('eth_tokens').where('tokenAddress', tokenAddress).select('*')
+        var tokenInfo = await knex(network + '_tokens').where('tokenAddress', tokenAddress).select('*')
         // var rows = await knex('eth_token_daily').where('TOKENADDRESS', tokenAddress).orderBy('SWAPAT', 'asc').limit(0 * page, 100).select(knex.raw('DATE(SWAPAT) as swapAt, AVGPRICE, MAXPRICE as HIGHPRICE, MINPRICE as LOWPRICE, VOLUME, SWAPCOUNT'))
-        var rows = await knex('eth_token_daily').where('TOKENADDRESS', tokenAddress).orderBy('SWAPAT', 'desc').limit(100).offset(100 * page).select('*')
+        var rows = await knex(network + '_token_daily').where('TOKENADDRESS', tokenAddress).orderBy('SWAPAT', 'desc').limit(100).offset(100 * page).select('*')
         var data = []
 
         for (var i = 0; i < rows.length; i ++) {
@@ -655,7 +655,7 @@ module.exports.getDailyTokenPrice = async function getDailyTokenPrice(tokenAddr,
     }
 }
 
-module.exports.getDailyPairPrice = async function getDailyPairPrice(pairAddr, page = 0) {
+module.exports.getDailyPairPrice = async function getDailyPairPrice(network, pairAddr, page = 0) {
     try {
         pairAddr = pairAddr.toLowerCase()
         
@@ -663,25 +663,25 @@ module.exports.getDailyPairPrice = async function getDailyPairPrice(pairAddr, pa
 
         var livePairs = (await knex.raw('\
         SELECT\
-            eth_live.pairAddress AS PAIRADDRESS,\
-            CONCAT(YEAR( eth_live.swapAt ), "-", MONTH( eth_live.swapAt ), "-", DAY( eth_live.swapAt )) AS SWAPAT,\
-            avg( eth_live.swapPrice ) AS AVGPRICE,\
-            max( eth_live.swapPrice ) AS MAXPRICE,\
-            min( eth_live.swapPrice ) AS MINPRICE,\
-            sum( eth_live.swapAmount0 * ( eth_pairs.baseToken * 2 - 1 ) * ( eth_live.isBuy * - 2 + 1 ) ) AS VOLUME0,\
-            sum( eth_live.swapAmount1 * ( eth_pairs.baseToken * - 2 + 1 ) * ( eth_live.isBuy * - 2 + 1 ) ) AS VOLUME1,\
-            sum( eth_live.swapAmount0 ) AS TOTALVOLUME0,\
-            sum( eth_live.swapAmount1 ) AS TOTALVOLUME1,\
-            count( eth_live.swapMaker ) AS SWAPCOUNT \
+            ' + network + '_live.pairAddress AS PAIRADDRESS,\
+            CONCAT(YEAR( ' + network + '_live.swapAt ), "-", MONTH( ' + network + '_live.swapAt ), "-", DAY( ' + network + '_live.swapAt )) AS SWAPAT,\
+            avg( ' + network + '_live.swapPrice ) AS AVGPRICE,\
+            max( ' + network + '_live.swapPrice ) AS MAXPRICE,\
+            min( ' + network + '_live.swapPrice ) AS MINPRICE,\
+            sum( ' + network + '_live.swapAmount0 * ( ' + network + '_pairs.baseToken * 2 - 1 ) * ( ' + network + '_live.isBuy * - 2 + 1 ) ) AS VOLUME0,\
+            sum( ' + network + '_live.swapAmount1 * ( ' + network + '_pairs.baseToken * - 2 + 1 ) * ( ' + network + '_live.isBuy * - 2 + 1 ) ) AS VOLUME1,\
+            sum( ' + network + '_live.swapAmount0 ) AS TOTALVOLUME0,\
+            sum( ' + network + '_live.swapAmount1 ) AS TOTALVOLUME1,\
+            count( ' + network + '_live.swapMaker ) AS SWAPCOUNT \
         FROM\
-            eth_live\
-            LEFT JOIN eth_pairs ON eth_pairs.pairAddress = eth_live.pairAddress \
+            ' + network + '_live\
+            LEFT JOIN ' + network + '_pairs ON ' + network + '_pairs.pairAddress = ' + network + '_live.pairAddress \
         WHERE\
-            eth_live.pairAddress="' + pairAddr + '" and DATE( eth_live.swapAt )="' + convertTimestampToString(new Date().getTime(), true).split(' ')[0] + '"\
+            ' + network + '_live.pairAddress="' + pairAddr + '" and DATE( ' + network + '_live.swapAt )="' + convertTimestampToString(new Date().getTime(), true).split(' ')[0] + '"\
         GROUP BY\
-            DATE( eth_live.swapAt ) \
+            DATE( ' + network + '_live.swapAt ) \
         ORDER BY\
-            DATE( eth_live.swapAt)'))[0]
+            DATE( ' + network + '_live.swapAt)'))[0]
 
         for (var i = 0; i < livePairs.length; i ++) {
             datas.push(livePairs[i])
@@ -719,34 +719,34 @@ module.exports.getDailyPairPrice = async function getDailyPairPrice(pairAddr, pa
     }
 }
 
-async function getLivePairData(token0Address, token1Address, flag) {
+async function getLivePairData(network, token0Address, token1Address, flag) {
     var rows 
 
     if (flag) {
         var date = convertTimestampToString(new Date().getTime() - 86400 * 1000, true).split(' ')[0] + ' 00:00:00'
 
-        rows = await knex('eth_live')
-            .join('eth_pairs', 'eth_pairs.pairAddress', '=', 'eth_live.pairAddress')
-            .where('eth_pairs.token0Address', token0Address)
-            .where('eth_pairs.token1Address', token1Address)
-            .where('eth_live.swapAt', '>=', date)
-            .select('eth_live.*', knex.raw('CONCAT(YEAR( eth_live.swapAt ), "-", MONTH( eth_live.swapAt ), "-", DAY( eth_live.swapAt ), " ", HOUR(eth_live.swapAt), ":", MINUTE(eth_live.swapAt), ":", SECOND(eth_live.swapAt)) as SWAPAT'))
+        rows = await knex(network + '_live')
+            .join(network + '_pairs', network + '_pairs.pairAddress', '=', network + '_live.pairAddress')
+            .where(network + '_pairs.token0Address', token0Address)
+            .where(network + '_pairs.token1Address', token1Address)
+            .where(network + '_live.swapAt', '>=', date)
+            .select(network + '_live.*', knex.raw('CONCAT(YEAR( ' + network + '_live.swapAt ), "-", MONTH( ' + network + '_live.swapAt ), "-", DAY( ' + network + '_live.swapAt ), " ", HOUR(' + network + '_live.swapAt), ":", MINUTE(' + network + '_live.swapAt), ":", SECOND(' + network + '_live.swapAt)) as SWAPAT'))
     } else {
-        rows = await knex('eth_live')
-            .join('eth_pairs', 'eth_pairs.pairAddress', '=', 'eth_live.pairAddress')
-            .where('eth_pairs.token0Address', token0Address)
-            .where('eth_pairs.token1Address', token1Address)
-            .select('eth_live.*', knex.raw('CONCAT(YEAR( eth_live.swapAt ), "-", MONTH( eth_live.swapAt ), "-", DAY( eth_live.swapAt ), " ", HOUR(eth_live.swapAt), ":", MINUTE(eth_live.swapAt), ":", SECOND(eth_live.swapAt)) as SWAPAT'))
+        rows = await knex(network + '_live')
+            .join(network + '_pairs', network + '_pairs.pairAddress', '=', network + '_live.pairAddress')
+            .where(network + '_pairs.token0Address', token0Address)
+            .where(network + '_pairs.token1Address', token1Address)
+            .select(network + '_live.*', knex.raw('CONCAT(YEAR( ' + network + '_live.swapAt ), "-", MONTH( ' + network + '_live.swapAt ), "-", DAY( ' + network + '_live.swapAt ), " ", HOUR(' + network + '_live.swapAt), ":", MINUTE(' + network + '_live.swapAt), ":", SECOND(' + network + '_live.swapAt)) as SWAPAT'))
     }
 
     return rows
 }
 
-module.exports.mergeLivePairData = async function mergeLivePairData(token0Address, token1Address, flag, page = -1) {
+module.exports.mergeLivePairData = async function mergeLivePairData(network, token0Address, token1Address, flag, page = -1) {
     var datas = []
     var res = []
 
-    var oneData = await getLivePairData(token0Address, token1Address, flag)
+    var oneData = await getLivePairData(network, token0Address, token1Address, flag)
 
     for (var j = 0; j < oneData.length; j ++) {
         if (!datas[oneData[j].SWAPAT]) {
@@ -796,20 +796,20 @@ module.exports.mergeLivePairData = async function mergeLivePairData(token0Addres
     return res
 }
 
-module.exports.getLiveTokenPrice = async function getLiveTokenPrice(tokenAddr, flag = false, page = 0) {
+module.exports.getLiveTokenPrice = async function getLiveTokenPrice(network, tokenAddr, flag = false, page = 0) {
     var tokenAddress = tokenAddr.toLowerCase()
-    var tokenInfo = await knex('eth_tokens').where('tokenAddress', tokenAddress).select('*')
+    var tokenInfo = await knex(network + '_tokens').where('tokenAddress', tokenAddress).select('*')
 
     try {
         var tokenAddress = tokenAddr.toLowerCase()
-        var tokenInfo = await knex('eth_tokens').where('tokenAddress', tokenAddress).select('*')
+        var tokenInfo = await knex(network + '_tokens').where('tokenAddress', tokenAddress).select('*')
         // var rows = await knex('eth_token_daily').where('TOKENADDRESS', tokenAddress).orderBy('SWAPAT', 'asc').limit(0 * page, 100).select(knex.raw('DATE(SWAPAT) as swapAt, AVGPRICE, MAXPRICE as HIGHPRICE, MINPRICE as LOWPRICE, VOLUME, SWAPCOUNT'))
         var rows
 
         if (page == -1) {
-            rows = await knex('eth_live').where('tokenAddress', tokenAddress).orderBy('swapAt', 'desc').select('*')
+            rows = await knex(network + '_live').where('tokenAddress', tokenAddress).orderBy('swapAt', 'desc').select('*')
         } else {
-            rows = await knex('eth_live').where('tokenAddress', tokenAddress).orderBy('swapAt', 'desc').limit(100).offset(100 * page).select('*')
+            rows = await knex(network + '_live').where('tokenAddress', tokenAddress).orderBy('swapAt', 'desc').limit(100).offset(100 * page).select('*')
         }
         
         var data = []
@@ -817,7 +817,7 @@ module.exports.getLiveTokenPrice = async function getLiveTokenPrice(tokenAddr, f
 
         for (var i = 0; i < rows.length; i ++) {
             if (!pairs[rows[i].pairAddress]) {
-                pairs[rows[i].pairAddress] = (await knex('eth_pairs').where('pairAddress', rows[i].pairAddress).select('*'))[0]
+                pairs[rows[i].pairAddress] = (await knex(network + '_pairs').where('pairAddress', rows[i].pairAddress).select('*'))[0]
             }
 
             var swapAmount = pairs[rows[i].pairAddress].token0Address == rows[i].tokenAddress ? rows[i].swapAmount0 : rows[i].swapAmount1
@@ -850,10 +850,10 @@ module.exports.getLiveTokenPrice = async function getLiveTokenPrice(tokenAddr, f
     }
 }
 
-module.exports.getLivePairPrice = async function getLivePairPrice(pairAddr, page = 0) {
+module.exports.getLivePairPrice = async function getLivePairPrice(network, pairAddr, page = 0) {
     try {
         var pair = pairAddr.toLowerCase()
-        var rows = await knex('eth_live').where('pairAddress', pair).orderBy('swapAt', 'desc').limit(100).offset(page * 100).select('*')
+        var rows = await knex(network + '_live').where('pairAddress', pair).orderBy('swapAt', 'desc').limit(100).offset(page * 100).select('*')
         var datas = []
 
         for (var i = 0; i < rows.length; i ++) {
@@ -880,13 +880,13 @@ module.exports.getLivePairPrice = async function getLivePairPrice(pairAddr, page
     }
 }
 
-module.exports.getDailyMarketCap = async function getDailyMarketCap(tokenAddr, page = 0) {
+module.exports.getDailyMarketCap = async function getDailyMarketCap(network, tokenAddr, page = 0) {
     try {
         var tokenAddress = tokenAddr.toLowerCase()
-        var data = (await this.getDailyTokenPrice(tokenAddress, page)).data
+        var data = (await this.getDailyTokenPrice(network, tokenAddress, page)).data
         const contract = new web3.eth.Contract(minERC20ABI, tokenAddress)
         var totalSupply = await contract.methods.totalSupply().call()
-        var tokenInfo = (await knex('eth_tokens').where('tokenAddress', tokenAddress).select('*'))[0]
+        var tokenInfo = (await knex(network + '_tokens').where('tokenAddress', tokenAddress).select('*'))[0]
         var res = []
 
         totalSupply = totalSupply / 10 ** tokenInfo.tokenDecimals
@@ -912,7 +912,7 @@ module.exports.getDailyMarketCap = async function getDailyMarketCap(tokenAddr, p
 }
 
 module.exports.getContavoInfo = async function getContavoInfo() {
-    var rows = await knex('eth_tokens').select('tokenAddress').select('totalHolders').select('holders').select('links')
+    var rows = await knex(network + '_tokens').select('tokenAddress').select('totalHolders').select('holders').select('links')
 
     return rows
 }

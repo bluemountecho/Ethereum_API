@@ -15,6 +15,7 @@ const Web3 = require('web3')
 
 const minERC20ABI = [
     {
+      "constant": true,
       "inputs": [
         {
           "internalType": "address",
@@ -30,10 +31,12 @@ const minERC20ABI = [
           "type": "uint256"
         }
       ],
+      "payable": false,
       "stateMutability": "view",
       "type": "function"
     },
     {
+      "constant": true,
       "inputs": [],
       "name": "totalSupply",
       "outputs": [
@@ -43,6 +46,7 @@ const minERC20ABI = [
           "type": "uint256"
         }
       ],
+      "payable": false,
       "stateMutability": "view",
       "type": "function"
     },

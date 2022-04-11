@@ -69,7 +69,7 @@ const options = {
 var networks = ["eth", "bsc", "polygon", "arbitrum", "optimism", "avalanche", "fantom", "harmony", "cronos", "aurora", "moonbeam", "moonriver", "metis", "heco", "okc", "kcc", "velas", "celo", "xdai", "smartbch", "hsc", "boba", "fuse", "emerald", "kardia", "iotex", "wan", "zyx", "elastos", "polis"]
 var web3s = []
 
-for (var i = 0; i < network.length; i ++) {
+for (var i = 0; i < networks.length; i ++) {
     web3s[networks[i]] = new Web3(new Web3.providers.HttpProvider(config[networks[i]].web3Providers[0], options))
 }
 

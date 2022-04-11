@@ -7,9 +7,6 @@ var logger = require('morgan');
 const basicAuth = require('express-basic-auth')
 
 var ethRouter = require('./routes/ethRoutes');
-var bscRouter = require('./routes/bscRoutes');
-var testRouter = require('./routes/crnRoutes')
-
 var app = express();
 
 // view engine setup
@@ -27,14 +24,12 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/crn', testRouter);
 app.use(basicAuth({
   users: { 'user': 'pass' },
   challenge: true,
   realm: 'foo',
 }))
-app.use('/eth', ethRouter);
-app.use('/bsc', bscRouter);
+app.use('/:network', ethRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

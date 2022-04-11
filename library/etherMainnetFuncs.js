@@ -327,7 +327,7 @@ module.exports.getTokenStatistics = async function getTokenStatistics(network, t
 
         var funcs = []
 
-        funcs.push(this.getPriceOfToken(netowrk, tokenAddress))
+        funcs.push(this.getPriceOfToken(network, tokenAddress))
         funcs.push(getTokenTotalTrnasactions(network, tokenAddress))
         funcs.push(this.getLast24HourInfos(network, tokenAddress))
 

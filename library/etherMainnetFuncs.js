@@ -74,9 +74,9 @@ function convertTimestampToString(timestamp, flag = false) {
     }
 }
 
-module.exports.getPriceOfToken = async function getPriceOfToken(tokenAddress) {
+module.exports.getPriceOfToken = async function getPriceOfToken(network, tokenAddress) {
     try {
-        var tokenInfo = await knex('eth_tokens').where('tokenAddress', tokenAddress).select('*')
+        var tokenInfo = await knex(network + '_tokens').where('tokenAddress', tokenAddress).select('*')
         
         return {
             stats: 'Success!',

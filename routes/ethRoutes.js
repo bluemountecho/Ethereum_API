@@ -3,7 +3,7 @@ var router = express.Router()
 var etherMainnetFuncs = require('../library/etherMainnetFuncs')
 
 router.get('/last_price/:tokenAddr', function(req, res, next) {
-  etherMainnetFuncs.getPriceOfToken(req.params.tokenAddr.toLowerCase())
+  etherMainnetFuncs.getPriceOfToken(req.network, req.params.tokenAddr.toLowerCase())
   .then((data) => {
     res.send(JSON.stringify(data))
   })
@@ -73,7 +73,6 @@ router.get('/live_pair_price/:pairAddr', function(req, res, next) {
 });
 
 router.get('/live_token_price/:tokenAddr', function(req, res, next) {
-  console.log(req.network)
   etherMainnetFuncs.getLiveTokenPrice(req.params.tokenAddr, false, req.query.page ? req.query.page : 0)
   .then((data) => {
     res.send(JSON.stringify(data))

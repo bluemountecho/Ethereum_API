@@ -29,7 +29,11 @@ app.use(basicAuth({
   challenge: true,
   realm: 'foo',
 }))
-app.use('/:network', ethRouter);
+
+app.use('/:network', function (req, res, next) {
+  req.network = req.params.network
+  next();
+}, ethRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

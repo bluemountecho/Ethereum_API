@@ -806,9 +806,6 @@ module.exports.mergeLivePairData = async function mergeLivePairData(network, tok
 }
 
 module.exports.getLiveTokenPrice = async function getLiveTokenPrice(network, tokenAddr, flag = false, page = 0) {
-    var tokenAddress = tokenAddr.toLowerCase()
-    var tokenInfo = await knex(network + '_tokens').where('tokenAddress', tokenAddress).select('*')
-
     try {
         var tokenAddress = tokenAddr.toLowerCase()
         var tokenInfo = await knex(network + '_tokens').where('tokenAddress', tokenAddress).select('*')

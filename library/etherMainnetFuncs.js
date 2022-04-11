@@ -11,9 +11,6 @@ const knex = require('knex')({
     //   database : 'ethereum_api'
     }
 })
-const utf8 = require('utf8')
-const baseTokens = require('./etherBaseTokens.json')
-const USDC_ADDRESS = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
 const Web3 = require('web3')
 
 const minERC20ABI = [
@@ -68,7 +65,7 @@ const options = {
 const web3 = new Web3(new Web3.providers.HttpProvider('https://eth-mainnet.alchemyapi.io/v2/KDRotLOmW8M21flLsKNaLN4IO5lB_6PN', options))
 
 var fs = require('fs')
-const { raw } = require('express')
+
 function convertTimestampToString(timestamp, flag = false) {
     if (flag == false) {
         return new Date(timestamp).toISOString().replace(/T/, ' ').replace(/\..+/, '').replace(/ /g, '_').replace(/:/g, '_').replace(/-/g, '_')

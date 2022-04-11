@@ -282,10 +282,8 @@ module.exports.getTokenInfo = async function getTokenInfo(network, tokenAddr) {
                     circulating_supply: ''
                 },
             }
-
-            console.log(rows[0])
             
-            if (rows[0].coingeckoInfos != '') {
+            if (rows[0].coingeckoInfos != '' && rows[0].coingeckoInfos != null) {
                 infos = JSON.parse(rows[0].coingeckoInfos)
             }
 

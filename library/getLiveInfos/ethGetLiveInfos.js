@@ -582,6 +582,10 @@ async function writeTransactionHistoryFile(deleteDate, writeDate) {
 }
 
 async function init() {
+    var ddd = await knex('main_live').groupBy('coin_id').select(knex.raw('COUNT(coin_id) as transactions, SUM(swapAmount) as volume, SUM(swapAmountUSD) as volumeUSD'))
+
+    console.log(ddd)
+
     try {
         var blockNumber = await web3s[0].eth.getBlockNumber()
         var curBlock = blockNumber

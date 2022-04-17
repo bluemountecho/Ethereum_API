@@ -409,7 +409,9 @@ module.exports.moonriver = {
     'PROXYCOUNT': 68,
     'USD_ADDRESS': "0xe3f5a90f9cb311505cd691a46596599aa1a0ad7d",
     'ETH_ADDRESS': "0x98878b06940ae243284ca214f92bb71a2b032b8a",
-    'lastBlockNumber': 1607774,
+    'lastBlockNumber': 1716522,
+    'ETH_DECIMAL': 18,
+    'ETH_ID': 12,
 }
 
 module.exports.metis = {

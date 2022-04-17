@@ -578,14 +578,30 @@ async function writeTransactionHistoryFile(deleteDate, writeDate) {
 
     await calcAllDailyPrice(writeDate)
 
+    if (chainName != 'eth') return
+    
+    rows = await knex('main_live')
+        .groupBy('coin_id')
+        .where(knex.raw('DATE(swapAt)="' + writeDate + '"'))
+        .select(knex.raw('coin_id, AVG(swapPrice) as swapPrice, COUNT(coin_id) as transactions, SUM(swapAmount) as volume, SUM(swapAmountUSD) as volumeUSD'))
+
+    for (var i = 0; i < rows.length; i ++) {
+        await knex('main_daily').insert({
+            coin_id: rows[i].coin_id,
+            swapAt: writeDate,
+            volume: rows[i].volume,
+            volumeUSD: rows[i].volumeUSD,
+            swapPrice: rows[i].swapPrice,
+            transactions: rows[i].transactions,
+        })
+    }
+
+    await knex('main_daily').where('swapAt', '<', deleteDate + ' ' + '00:00:00').delete()
+
     // myLogger.log(writeDate + " WRITE TRANSACTION HISTORY FILE FINISHED!!!")
 }
 
 async function init() {
-    var ddd = await knex('main_live').groupBy('coin_id').select(knex.raw('COUNT(coin_id) as transactions, SUM(swapAmount) as volume, SUM(swapAmountUSD) as volumeUSD'))
-
-    console.log(ddd)
-
     try {
         var blockNumber = await web3s[0].eth.getBlockNumber()
         var curBlock = blockNumber
@@ -632,7 +648,7 @@ async function init() {
                 if (coinsResult[i].transactions[j].value == '0') continue
 
                 var tmpAmount = Number.parseInt(coinsResult[i].transactions[j].value) / 10 ** ETH_DECIMAL
-                var tmpPrice = tokensData[ETH_ADDRESS].lastPrice * (1.0005 + Math.random() * 0.001)
+                var tmpPrice = tokensData[ETH_ADDRESS].lastPrice * (0.9995 + Math.random() * 0.001)
 
                 await knex('main_live').insert({
                     coin_id: ETH_ID,
@@ -778,7 +794,7 @@ async function init() {
                             token1Address: decimals[2],
                             decimals: decimals[0],
                             baseToken: baseToken,
-                            lastPrice: swap1 == 0 ? 0 : Math.abs(swap0 * 1.0 * 10 ** decimals[0] / swap1),
+                            lastPrice: swap1 == 0 ? 0 : Math.abs(swap0 / swap1 * 10 ** decimals[0]),
                         }
 
                         try {
@@ -788,20 +804,20 @@ async function init() {
                                 pairAddress: pairAddress,
                                 decimals: decimals[0],
                                 baseToken: baseToken,
-                                lastPrice: swap1 == 0 ? 0 : Math.abs(swap0 * 1.0 * 10 ** decimals[0] / swap1),
+                                lastPrice: swap1 == 0 ? 0 : Math.abs(swap0 / swap1 * 10 ** decimals[0]),
                                 createdAt: tmpDate
                             })
                         } catch (err) {
                             await knex(pairsTableName).update({
-                                lastPrice: swap1 == 0 ? 0 : Math.abs(swap0 * 1.0 * 10 ** decimals[0] / swap1)
+                                lastPrice: swap1 == 0 ? 0 : Math.abs(swap0 / swap1 * 10 ** decimals[0])
                             }).where('pairAddress', pairAddress)
                         }
                     } else {
-                        pairsData[pairAddress].lastPrice = swap1 == 0 ? 0 : Math.abs(swap0 * 1.0 * 10 ** decimals[0] / swap1)
+                        pairsData[pairAddress].lastPrice = swap1 == 0 ? 0 : Math.abs(swap0 / swap1 * 10 ** decimals[0])
 
                         try {
                             await knex(pairsTableName).update({
-                                lastPrice: swap1 == 0 ? 0 : Math.abs(swap0 * 1.0 * 10 ** decimals[0] / swap1)
+                                lastPrice: swap1 == 0 ? 0 : Math.abs(swap0 / swap1 * 10 ** decimals[0])
                             }).where('pairAddress', pairAddress)
                         } catch (err) {
                             myLogger.log('V2 SWAP: ' + result.transactionHash)
@@ -829,7 +845,7 @@ async function init() {
                     var data = {
                         pairAddress: pairAddress,
                         tokenAddress: tmpToken,
-                        swapPrice: swap1 == 0 ? 0 : Math.abs(swap0 * 1.0 * 10 ** decimals[0] / swap1),
+                        swapPrice: swap1 == 0 ? 0 : Math.abs(swap0 / swap1 * 10 ** decimals[0]),
                         priceUSD: tmpPrice,
                         swapAmount0: Math.abs(swap0 / 10 ** tokensData[decimals[1]].tokenDecimals),
                         swapAmount1: Math.abs(swap1 / 10 ** tokensData[decimals[2]].tokenDecimals),
@@ -980,7 +996,7 @@ async function init() {
                             token1Address: decimals[2],
                             decimals: decimals[0],
                             baseToken: baseToken,
-                            lastPrice: swap1 == 0 ? 0 : Math.abs(swap0 * 1.0 * 10 ** decimals[0] / swap1),
+                            lastPrice: swap1 == 0 ? 0 : Math.abs(swap0 / swap1 * 10 ** decimals[0]),
                         }
     
                         try {
@@ -990,20 +1006,20 @@ async function init() {
                                 pairAddress: pairAddress,
                                 decimals: decimals[0],
                                 baseToken: baseToken,
-                                lastPrice: swap1 == 0 ? 0 : Math.abs(swap0 * 1.0 * 10 ** decimals[0] / swap1),
+                                lastPrice: swap1 == 0 ? 0 : Math.abs(swap0 / swap1 * 10 ** decimals[0]),
                                 createdAt: tmpDate
                             })
                         } catch (err) {
                             await knex(pairsTableName).update({
-                                lastPrice: swap1 == 0 ? 0 : Math.abs(swap0 * 1.0 * 10 ** decimals[0] / swap1)
+                                lastPrice: swap1 == 0 ? 0 : Math.abs(swap0 / swap1 * 10 ** decimals[0])
                             }).where('pairAddress', pairAddress)
                         }
                     } else {
-                        pairsData[pairAddress].lastPrice = swap1 == 0 ? 0 : Math.abs(swap0 * 1.0 * 10 ** decimals[0] / swap1)
+                        pairsData[pairAddress].lastPrice = swap1 == 0 ? 0 : Math.abs(swap0 / swap1 * 10 ** decimals[0])
                         
                         try {
                             await knex(pairsTableName).update({
-                                lastPrice: swap1 == 0 ? 0 : Math.abs(swap0 * 1.0 * 10 ** decimals[0] / swap1)
+                                lastPrice: swap1 == 0 ? 0 : Math.abs(swap0 / swap1 * 10 ** decimals[0])
                             }).where('pairAddress', pairAddress)
                         } catch (err) {
                             myLogger.log('V3 SWAP: ' + result.transactionHash)
@@ -1031,7 +1047,7 @@ async function init() {
                     var data = {
                         pairAddress: pairAddress,
                         tokenAddress: tmpToken,
-                        swapPrice: swap1 == 0 ? 0 : Math.abs(swap0 * 1.0 * 10 ** decimals[0] / swap1),
+                        swapPrice: swap1 == 0 ? 0 : Math.abs(swap0 / swap1 * 10 ** decimals[0]),
                         priceUSD: tmpPrice,
                         swapAmount0: Math.abs(swap0 / 10 ** tokensData[decimals[1]].tokenDecimals),
                         swapAmount1: Math.abs(swap1 / 10 ** tokensData[decimals[2]].tokenDecimals),

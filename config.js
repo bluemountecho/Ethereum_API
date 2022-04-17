@@ -371,7 +371,7 @@ module.exports.aurora = {
     'USD_ADDRESS': "0x4988a896b1227218e4a686fde5eabdcabd91571f",
     'ETH_ADDRESS': "0xc42c30ac6cc15fac9bd938618bcaa1a1fae8501d",
     'lastBlockNumber': 63733750,
-    'ETH_DECIMAL': 24,
+    'ETH_DECIMAL': 18,
     'ETH_ID': 10,
 }
 

@@ -148,7 +148,7 @@ module.exports.eth = {
     'PAIRV1': 19000,
     'PAIRV2': 1000,
     'PROXYCOUNT': 19,
-    'lastBlockNumber': 14507265,
+    'lastBlockNumber': 14603352,
     'scanData': {
         apiKey: 'P5QXWEDN6PEQE4KB61J5GISXXNEKEYAGFM',
         scanSite: 'https://api.etherscan.io',

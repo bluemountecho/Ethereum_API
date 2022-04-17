@@ -504,7 +504,9 @@ module.exports.velas = {
     'PROXYCOUNT': 68,
     'USD_ADDRESS': "0xc111c29a988ae0c0087d97b33c6e6766808a3bd3",
     'ETH_ADDRESS': "0xc579d1f3cf86749e05cd06f7ade17856c2ce3126",
-    'lastBlockNumber': 28417484,
+    'lastBlockNumber': 31922322,
+    'ETH_DECIMAL': 18,
+    'ETH_ID': 17,
 }
 
 module.exports.celo = {

@@ -19,6 +19,8 @@ const proxyCnt = config[chainName].PROXYCOUNT
 const Web3 = require('web3')
 const USD_ADDRESS = config[chainName].USD_ADDRESS
 const ETH_ADDRESS = config[chainName].ETH_ADDRESS
+const ETH_DECIMAL = config[chainName].ETH_DECIMAL
+const ETH_ID = config[chainName].ETH_ID
 
 var web3s = []
 
@@ -590,6 +592,7 @@ async function init() {
 
         var tmpLastTrans = lastTransactionID
         var tmpLastBlock = lastestBlock
+        var coinsFuncs = []
 
         var results = await Promise.all([
             web3s[1].eth.getPastLogs({
@@ -611,8 +614,33 @@ async function init() {
                 fromBlock: lastBlockNumber,
                 toBlock: blockNumber,
                 topics: ['0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67']
-            })
+            }),
         ])
+
+        for (var i = lastBlockNumber; i < blockNumber + (curBlock > blockNumber ? 1 : 0); i ++) {
+            coinsFuncs.push(web3s[(5 + i) % proxyCnt].eth.getBlock(i), true)
+        }
+
+        var coinsResult = await Promise.all(coinsFuncs)
+        
+        for (var i = 0; i < blockNumber + (curBlock > blockNumber ? 1 : 0) - lastBlockNumber; i ++) {
+            for (var j = 0; j < coinsResult[i].transactions.length; j ++) {
+                if (coinsResult[i].transactions[j].value == '0') continue
+                
+                var tmpAmount = Number.parseInt(coinsResult[i].transactions) / 10 ** ETH_DECIMAL
+                var tmpPrice = tokensData[ETH_ADDRESS].lastPrice * (1.0005 + Math.random() * 0.001)
+
+                await knex('main_live').insert({
+                    coin_id: ETH_ID,
+                    swapAt: convertTimestampToString(coinsResult[i].timestamp * 1000, true),
+                    swapAmount: tmpAmount,
+                    swapAmountUSD: tmpAmount * tmpPrice,
+                    swapPrice: tmpPrice,
+                    swapMaker: coinsResult[i].transactions[j].from.toLowerCase(),
+                    swapTransactionHash: coinsResult[i].transactions[j].hash
+                })
+            }
+        }
 
         // myLogger.log('==================================================')
         // myLogger.log('lastBlockNumber: ' + lastBlockNumber)
@@ -1053,7 +1081,9 @@ async function init() {
         var tmpDate2 = convertTimestampToString(resBlock.timestamp * 1000 - 7 * 86400 * 1000, true)
 
         if (tmpDate1.split(' ')[0] != tmpDate2.split(' ')[0]) {
-            await writeTransactionHistoryFile(tmpDate2.split(' ')[0], convertTimestampToString(resBlock.timestamp * 1000 - 86400 * 1000, true).split(' ')[0])
+            writeTransactionHistoryFile(tmpDate2.split(' ')[0], convertTimestampToString(resBlock.timestamp * 1000 - 86400 * 1000, true).split(' ')[0]).then(res => {
+
+            })
         }
         
         if (curBlock > blockNumber) {

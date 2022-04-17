@@ -447,7 +447,9 @@ module.exports.heco = {
     'PROXYCOUNT': 68,
     'USD_ADDRESS': "0x0298c2b32eae4da002a15f36fdf7615bea3da047",
     'ETH_ADDRESS': "0x5545153ccfca01fbd7dd11c0b23ba694d9509a6f",
-    'lastBlockNumber': 13555856,
+    'lastBlockNumber': 14440739,
+    'ETH_DECIMAL': 18,
+    'ETH_ID': 14,
 }
 
 module.exports.okc = {

@@ -466,7 +466,9 @@ module.exports.okc = {
     'PROXYCOUNT': 68,
     'USD_ADDRESS': "0x382bb369d343125bfb2117af9c149795c6c65c50",
     'ETH_ADDRESS': "0x8f8526dbfd6e38e3d8307702ca8469bae6c56c15",
-    'lastBlockNumber': 9951239,
+    'lastBlockNumber': 10387155,
+    'ETH_DECIMAL': 18,
+    'ETH_ID': 15,
 }
 
 module.exports.kcc = {

@@ -648,7 +648,13 @@ async function init() {
                 if (coinsResult[i].transactions[j].value == '0') continue
 
                 var tmpAmount = Number.parseInt(coinsResult[i].transactions[j].value) / 10 ** ETH_DECIMAL
-                var tmpPrice = tokensData[ETH_ADDRESS].lastPrice * (0.9995 + Math.random() * 0.001)
+                var tmpPrice
+
+                if (chainName == 'aurora') {
+                    tmpPrice = tokensData[ETH_ADDRESS1].lastPrice * (0.9995 + Math.random() * 0.001)
+                } else {
+                    tmpPrice = tokensData[ETH_ADDRESS].lastPrice * (0.9995 + Math.random() * 0.001)
+                }
 
                 await knex('main_live').insert({
                     coin_id: ETH_ID,

@@ -352,6 +352,8 @@ module.exports.cronos = {
     'USD_ADDRESS': "0xc21223249ca28397b4b6541dffaecc539bff0c59",
     'ETH_ADDRESS': "0x5c7f8a570d578ed84e63fdfa7b1ee72deae1ae23",
     'lastBlockNumber': 1948986,
+    'ETH_DECIMAL': 18,
+    'ETH_ID': 9,
 }
 
 module.exports.aurora = {

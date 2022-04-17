@@ -219,7 +219,9 @@ module.exports.polygon = {
     'PROXYCOUNT': 10,
     'USD_ADDRESS': "0x2791bca1f2de4661ed88a30c99a7a9449aa84174",
     'ETH_ADDRESS': "0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270",
-    'lastBlockNumber': 26518437,
+    'lastBlockNumber': 27250979,
+    'ETH_DECIMAL': 18,
+    'ETH_ID': 3,
 }
 
 module.exports.arbitrum = {

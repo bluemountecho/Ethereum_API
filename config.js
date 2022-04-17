@@ -390,7 +390,9 @@ module.exports.moonbeam = {
     'PROXYCOUNT': 68,
     'USD_ADDRESS': "0x818ec0a7fe18ff94269904fced6ae3dae6d6dc0b",
     'ETH_ADDRESS': "0xacc15dc74880c9944775448304b263d191c6077f",
-    'lastBlockNumber': 626009,
+    'lastBlockNumber': 839994,
+    'ETH_DECIMAL': 18,
+    'ETH_ID': 11,
 }
 
 module.exports.moonriver = {

@@ -19,6 +19,7 @@ const proxyCnt = config[chainName].PROXYCOUNT
 const Web3 = require('web3')
 const USD_ADDRESS = config[chainName].USD_ADDRESS
 const ETH_ADDRESS = config[chainName].ETH_ADDRESS
+const ETH_ADDRESS1 = config[chainName].ETH_ADDRESS1
 const ETH_DECIMAL = config[chainName].ETH_DECIMAL
 const ETH_ID = config[chainName].ETH_ID
 

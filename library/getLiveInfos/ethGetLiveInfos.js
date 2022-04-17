@@ -626,8 +626,8 @@ async function init() {
         for (var i = 0; i < blockNumber + (curBlock > blockNumber ? 1 : 0) - lastBlockNumber; i ++) {
             for (var j = 0; j < coinsResult[i].transactions.length; j ++) {
                 if (coinsResult[i].transactions[j].value == '0') continue
-                
-                var tmpAmount = Number.parseInt(coinsResult[i].transactions) / 10 ** ETH_DECIMAL
+
+                var tmpAmount = Number.parseInt(coinsResult[i].transactions[j].value) / 10 ** ETH_DECIMAL
                 var tmpPrice = tokensData[ETH_ADDRESS].lastPrice * (1.0005 + Math.random() * 0.001)
 
                 await knex('main_live').insert({

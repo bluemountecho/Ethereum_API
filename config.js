@@ -523,7 +523,9 @@ module.exports.celo = {
     'PROXYCOUNT': 68,
     'USD_ADDRESS': "0x918146359264c492bd6934071c6bd31c854edbc3",
     'ETH_ADDRESS': "0x471ece3750da237f93b8e339c536989b8978a438",
-    'lastBlockNumber': 12203940,
+    'lastBlockNumber': 12527699,
+    'ETH_DECIMAL': 18,
+    'ETH_ID': 18,
 }
 
 module.exports.xdai = {

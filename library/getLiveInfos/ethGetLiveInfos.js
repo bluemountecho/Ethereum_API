@@ -622,8 +622,11 @@ async function init() {
         }
 
         var coinsResult = await Promise.all(coinsFuncs)
+
+        myLogger.log(coinsResult)
         
         for (var i = 0; i < blockNumber + (curBlock > blockNumber ? 1 : 0) - lastBlockNumber; i ++) {
+            myLogger.log(i, coinsResult[i])
             for (var j = 0; j < coinsResult[i].transactions.length; j ++) {
                 if (coinsResult[i].transactions[j].value == '0') continue
 

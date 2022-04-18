@@ -580,7 +580,9 @@ module.exports.hsc = {
     'PROXYCOUNT': 68,
     'USD_ADDRESS': "0xd16babe52980554520f6da505df4d1b124c815a7",
     'ETH_ADDRESS': "0x3eff9d389d13d6352bfb498bcf616ef9b1beac87",
-    'lastBlockNumber': 9613627,
+    'lastBlockNumber': 10162299,
+    'ETH_DECIMAL': 18,
+    'ETH_ID': 21,
 }
 
 module.exports.boba = {

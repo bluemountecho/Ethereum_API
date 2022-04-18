@@ -134,6 +134,39 @@ module.exports.networks = [
     'polis',
 ]
 
+module.exports.netMap = {
+    "binance-smart-chain": 'bsc',
+    "ethereum": 'eth',
+    "polygon-pos": 'polygon',
+    "arbitrum-one": 'arbitrum',
+    "optimistic-ethereum": 'optimism',
+    "avalanche": 'avalanche',
+    "fantom": 'fantom',
+    "harmony-shard-0": 'harmony',
+    "cronos": 'cronos',
+    "aurora": 'aurora',
+    "moonbeam": 'moonbeam',
+    "moonriver": 'moonriver',
+    "metis-andromeda": 'metis',
+    "huobi-token": 'heco',
+    "okex-chain": 'okc',
+    "kucoin-community-chain": 'kcc',
+    "velas": 'velas',
+    "celo": 'celo',
+    "xdai": 'xdai',
+    "smartbch": 'smartbch',
+    "hoo-smart-chain": 'hsc',
+    "boba": 'boba',
+    "fuse": 'fuse',
+    "oasis": 'emerald',
+    "kardiachain": 'kardia',
+    "iotex": 'iotex',
+    "wanchain": 'wan',
+    "zyx": 'zyx',
+    "elastos": 'elastos',
+    "polis-chain": 'polis',
+}
+
 module.exports.bsc = {
     'web3Providers': [
         'https://bsc-dataseed.binance.org/',

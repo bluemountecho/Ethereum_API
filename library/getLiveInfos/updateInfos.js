@@ -1,10 +1,12 @@
 var fs = require('fs')
 const config = require('../../config')
+const utf8 = require('utf8')
 const { Console } = require("console");
 const myLogger = new Console({
   stdout: fs.createWriteStream("update.txt"),
   stderr: fs.createWriteStream("update.txt"),
 });
+const axios = require('axios')
 const Web3 = require('web3');
 
 var web3s = []
@@ -67,6 +69,8 @@ for (var i = 0; i < config.networks.length; i ++) {
         }
     }
 }
+
+const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
 
 const minERC20ABI = [
     {
@@ -211,6 +215,35 @@ async function getCoinsList() {
     }
 
     setTimeout(getCoinsList, 1000)
+}
+
+async function getTotalSupply() {
+
+}
+
+async function getCoinGeckoInfo() {
+    var infos = (await axios.get('https://api.coingecko.com/api/v3/coins/list?include_platform=true')).data
+
+    for (var i = 0; i < infos.length; i ++) {
+        var keys = Object.keys(infos[i].platforms)
+
+        if (keys.length == 0) continue
+
+        var res = await axios.get('https://api.coingecko.com/api/v3/coins/' + infos[i].id)
+        var info = JSON.stringify(res.data)
+
+        for (var j = 0; j < keys.length; j ++) {
+            var address = infos[i].platforms[keys[j]]
+
+            if (address == '') continue
+
+            var net = config.netMap[keys[j]]
+
+            await knex(net + '_tokens').where('tokenAddress', tokenAddress).update('coingeckoInfos', utf8.encode(info))
+        }
+
+        await delay(1200)
+    }
 }
 
 async function init() {

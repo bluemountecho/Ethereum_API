@@ -150,6 +150,8 @@ async function getCoinsList() {
         await knex('main_coin_list').where('network', config.networks[i]).delete()
 
         for (var j = 0; j < rows.length; j ++) {
+            if (rows[j].tokenName.length > 50) continue
+            
             await knex('main_coin_list').insert({
                 tokenAddress: rows[j].tokenAddress,
                 network: config.networks[i],

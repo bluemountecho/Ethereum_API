@@ -218,7 +218,7 @@ async function getCoinsList() {
 }
 
 async function getTotalSupply() {
-    for (var i = 0; i < config.networks.length; i ++) {
+    for (var i = 2; i < config.networks.length; i ++) {
         var changesTableName = config.networks[i] + '_changes'
         var tokensTableName = config.networks[i] + '_tokens'
         var tmpWeb3s = web3s[config.networks[i]]
@@ -244,7 +244,7 @@ async function getTotalSupply() {
                     await knex(tokensTableName).where('tokenAddress', tokens[j + k].tokenAddress).update({'totalSupply': res[k] / 10 ** tokens[j + k].tokenDecimals})
                 }
             } catch (err) {
-                
+
             }
 
             await delay(200)

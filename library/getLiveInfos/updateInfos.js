@@ -232,7 +232,7 @@ async function getTotalSupply() {
 
             for (var k = 0; j + k < tokens.length && k < tmpWeb3s.length; k ++) {
                 var contract = new tmpWeb3s[k].eth.Contract(minERC20ABI, tokens[j + k].tokenAddress)
-                var totalSupply = await contract.methods.totalSupply().call()
+                var totalSupply = Number.parseInt(await contract.methods.totalSupply().call())
 
                 totalSupply /= 10 ** tokens[j + k].tokenDecimal
                 

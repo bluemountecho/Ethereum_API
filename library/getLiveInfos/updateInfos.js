@@ -226,8 +226,6 @@ async function getTotalSupply() {
 
         var tokens = await knex(changesTableName).join(tokensTableName, tokensTableName + '.tokenAddress', '=', changesTableName + '.tokenAddress').select('*')
 
-        myLogger.log(config.networks[i], tokens.length)
-
         for (var j = 0; j < tokens.length; j += tmpWeb3s.length) {
             try {
                 var funcs = []
@@ -241,7 +239,6 @@ async function getTotalSupply() {
                 var res = await Promise.all(funcs)
 
                 for (var k = 0; j + k < tokens.length && k < tmpWeb3s.length; k ++) {
-                    myLogger.log(tokens[j + k].tokenAddress, res[k] / 10 ** tokens[j + k].tokenDecimals)
                     await knex(tokensTableName).where('tokenAddress', tokens[j + k].tokenAddress).update({'totalSupply': res[k] / 10 ** tokens[j + k].tokenDecimals})
                 }
             } catch (err) {

@@ -147,7 +147,6 @@ async function getCoinsList() {
     for (var i = 0; i < config.networks.length; i ++) {
         var changesTableName = config.networks[i] + '_changes'
         var tokensTableName = config.networks[i] + '_tokens'
-        var pairsTableName = config.networks[i] + '_pairs'
 
         var rows = await knex(changesTableName).join(tokensTableName, changesTableName + '.tokenAddress', '=', tokensTableName + '.tokenAddress')
             .select(knex.raw(changesTableName + '.*, ' + tokensTableName + '.tokenName, ' + tokensTableName + '.tokenSymbol, ' + tokensTableName + '.totalSupply, ' + tokensTableName + '.coingeckoInfos, ' + tokensTableName + '.lastPrice'))
@@ -219,7 +218,34 @@ async function getCoinsList() {
 }
 
 async function getTotalSupply() {
+    for (var i = 0; i < config.networks.length; i ++) {
+        var changesTableName = config.networks[i] + '_changes'
+        var tokensTableName = config.networks[i] + '_tokens'
+        var tmpWeb3s = web3s[config.networks[i]]
 
+        var tokens = await knex(changesTableName).join(tokensTableName, tokensTableName + '.tokenAddress', '=', changesTableName + 'tokenAddress').select('*')
+
+        myLogger.log(config.networks[i], tokens.length)
+
+        for (var j = 0; j < tokens.length; j += tmpWeb3s.length) {
+            var funcs = []
+
+            for (var k = 0; j + k < tokens.length && k < tmpWeb3s.length; k ++) {
+                var contract = tmpWeb3s[k].eth.Contract(minERC20ABI, tokens[j + k].tokenAddress)
+
+                funcs.push(contract.methods.totalSupply().call())
+            }
+
+            var res = await Promise.all(funcs)
+
+            for (var k = 0; j + k < tokens.length && k < tmpWeb3s.length; k ++) {
+                myLogger.log(tokens[j + k].tokenAddress, res[k] / 10 ** tokens[j + k].tokenDecimal)
+                await knex(tokensTableName).where('tokenAddress', tokens[j + k].tokenAddress).update({'totalSupply': res[k] / 10 ** tokens[j + k].tokenDecimal})
+            }
+        }
+    }
+
+    setTimeout(getTotalSupply, 1000)
 }
 
 async function getCoinGeckoInfo() {
@@ -260,6 +286,7 @@ async function getCoinGeckoInfo() {
 async function init() {
     getCoinsList()
     getCoinGeckoInfo()
+    getTotalSupply()
 }
 
 init()

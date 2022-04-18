@@ -147,6 +147,7 @@ async function getCoinsList() {
     for (var i = 0; i < config.networks.length; i ++) {
         var changesTableName = config.networks[i] + '_changes'
         var tokensTableName = config.networks[i] + '_tokens'
+        var pairsTableName = config.networks[i] + '_pairs'
 
         var rows = await knex(changesTableName).join(tokensTableName, changesTableName + '.tokenAddress', '=', tokensTableName + '.tokenAddress')
             .select(knex.raw(changesTableName + '.*, ' + tokensTableName + '.tokenName, ' + tokensTableName + '.tokenSymbol, ' + tokensTableName + '.totalSupply, ' + tokensTableName + '.coingeckoInfos, ' + tokensTableName + '.lastPrice'))
@@ -225,7 +226,7 @@ async function getCoinGeckoInfo() {
 
     console.log(infos.length)
 
-    for (var i = 28; i < infos.length; i ++) {
+    for (var i = 1495; i < infos.length; i ++) {
         var keys = Object.keys(infos[i].platforms)
 
         if (keys.length == 0) continue

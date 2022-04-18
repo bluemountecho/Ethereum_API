@@ -163,7 +163,7 @@ async function getCoinsList() {
         for (var j = 0; j < rows.length; j ++) {
             if (rows[j].tokenName.length > 50) continue
             if (rows[j].lastPrice >= 100000) continue
-            if (rows[j].trans24h * 10000 <= rows[j].volume24h) continue
+            if (rows[j].trans24h * 200000 <= rows[j].volume24h) continue
 
             visChanges[rows[j].tokenAddress] = true
 
@@ -227,7 +227,7 @@ async function getCoinGeckoInfo() {
 
     console.log(infos.length)
 
-    for (var i = 3402; i < infos.length; i ++) {
+    for (var i = 3556; i < infos.length; i ++) {
         var keys = Object.keys(infos[i].platforms)
 
         if (keys.length == 0) continue

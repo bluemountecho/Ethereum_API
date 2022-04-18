@@ -146,30 +146,23 @@ async function getCoinsList() {
 
         var rows = await knex(changesTableName).join(tokensTableName, changesTableName + '.tokenAddress', '=', tokensTableName + '.tokenAddress')
             .select(knex.raw(changesTableName + '.*, ' + tokensTableName + '.tokenName, ' + tokensTableName + '.tokenSymbol, ' + tokensTableName + '.totalSupply, ' + tokensTableName + '.coingeckoInfos, ' + tokensTableName + '.lastPrice'))
+        var rows1 = await knex('main_coin_list').where('network', config.networks[i])
+
+        var visChanges = []
+        var visList = []
+
+        for (var j = 0; j < rows1.length; j ++) {
+            visList[rows1[j].tokenAddress]
+        }
+
+        for (var j = 0; j < rows.length; j ++) {
+            visChanges[rows[j].tokenAddress] = true
+        }
 
         for (var j = 0; j < rows.length; j ++) {
             if (rows[j].tokenName.length > 50) continue
 
-            try {
-                await knex('main_coin_list').insert({
-                    tokenAddress: rows[j].tokenAddress,
-                    network: config.networks[i],
-                    price24h: rows[j].price24h,
-                    price12h: rows[j].price12h,
-                    price6h: rows[j].price6h,
-                    price2h: rows[j].price2h,
-                    price1h: rows[j].price1h,
-                    price30m: rows[j].price30m,
-                    price5m: rows[j].price5m,
-                    pricenow: rows[j].lastPrice,
-                    trans24h: rows[j].trans24h,
-                    volume24h: rows[j].volume24h,
-                    marketcap: rows[j].totalSupply * rows[j].lastPrice,
-                    coinName: rows[j].tokenName,
-                    coinSymbol: rows[j].tokenSymbol,
-                    coinImage: (rows[j].coingeckoInfos && rows[j].coingeckoInfos != '') ? JSON.parse(rows[j].coingeckoInfos).image.large : '',
-                })
-            } catch (err) {
+            if (visChanges[rows[j].tokenAddress]) {
                 await knex('main_coin_list').update({
                     tokenAddress: rows[j].tokenAddress,
                     network: config.networks[i],
@@ -188,7 +181,32 @@ async function getCoinsList() {
                     coinSymbol: rows[j].tokenSymbol,
                     coinImage: (rows[j].coingeckoInfos && rows[j].coingeckoInfos != '') ? JSON.parse(rows[j].coingeckoInfos).image.large : '',
                 }).where("tokenAddress", rows[j].tokenAddress).where('network', config.networks[i])
+            } else {
+                await knex('main_coin_list').insert({
+                    tokenAddress: rows[j].tokenAddress,
+                    network: config.networks[i],
+                    price24h: rows[j].price24h,
+                    price12h: rows[j].price12h,
+                    price6h: rows[j].price6h,
+                    price2h: rows[j].price2h,
+                    price1h: rows[j].price1h,
+                    price30m: rows[j].price30m,
+                    price5m: rows[j].price5m,
+                    pricenow: rows[j].lastPrice,
+                    trans24h: rows[j].trans24h,
+                    volume24h: rows[j].volume24h,
+                    marketcap: rows[j].totalSupply * rows[j].lastPrice,
+                    coinName: rows[j].tokenName,
+                    coinSymbol: rows[j].tokenSymbol,
+                    coinImage: (rows[j].coingeckoInfos && rows[j].coingeckoInfos != '') ? JSON.parse(rows[j].coingeckoInfos).image.large : '',
+                })
             }
+        }
+
+        for (var token in visList) {
+            if (visChanges[token]) continue
+
+            await knex('main_coin_list').where('tokenAddress', token).where('network', config.networks[i])
         }
     }
 

@@ -160,11 +160,10 @@ async function getCoinsList() {
         }
 
         for (var j = 0; j < rows.length; j ++) {
-            visChanges[rows[j].tokenAddress] = true
-        }
-
-        for (var j = 0; j < rows.length; j ++) {
             if (rows[j].tokenName.length > 50) continue
+            if (rows[j].lastPrice >= 100000) continue
+
+            visChanges[rows[j].tokenAddress] = true
 
             if (visList[rows[j].tokenAddress]) {
                 await knex('main_coin_list').update({
@@ -210,7 +209,7 @@ async function getCoinsList() {
         for (var token in visList) {
             if (visChanges[token]) continue
 
-            await knex('main_coin_list').where('tokenAddress', token).where('network', config.networks[i])
+            await knex('main_coin_list').where('tokenAddress', token).where('network', config.networks[i]).delete()
         }
     }
 

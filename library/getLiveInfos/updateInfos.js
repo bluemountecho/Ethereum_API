@@ -147,8 +147,6 @@ async function getCoinsList() {
         var rows = await knex(changesTableName).join(tokensTableName, changesTableName + '.tokenAddress', '=', tokensTableName + '.tokenAddress')
             .select(knex.raw(changesTableName + '.*, ' + tokensTableName + '.tokenName, ' + tokensTableName + '.tokenSymbol, ' + tokensTableName + '.totalSupply, ' + tokensTableName + '.coingeckoInfos, ' + tokensTableName + '.lastPrice'))
 
-        await knex('main_coin_list').where('network', config.networks[i]).delete()
-
         for (var j = 0; j < rows.length; j ++) {
             if (rows[j].tokenName.length > 50) continue
 

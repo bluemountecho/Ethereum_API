@@ -694,7 +694,9 @@ module.exports.wan = {
     'PROXYCOUNT': 68,
     'USD_ADDRESS': "0x11e77e27af5539872efed10abaa0b408cfd9fbbd",
     'ETH_ADDRESS': "0xdabd997ae5e4799be47d6e69d9431615cba28f48",
-    'lastBlockNumber': 19861782,
+    'lastBlockNumber': 20167821,
+    'ETH_DECIMAL': 18,
+    'ETH_ID': 27,
 }
 
 module.exports.zyx = {

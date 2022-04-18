@@ -240,6 +240,7 @@ async function getCoinGeckoInfo() {
             var address = infos[i].platforms[keys[j]]
 
             if (address == '') continue
+            if (!config.netMap[keys[j]]) continue
 
             var net = config.netMap[keys[j]]
 

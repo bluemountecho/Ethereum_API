@@ -253,7 +253,7 @@ async function getCoinGeckoInfo() {
 
     console.log(infos.length)
 
-    for (var i = 3700; i < infos.length; i ++) {
+    for (var i = 5853; i < infos.length; i ++) {
         var keys = Object.keys(infos[i].platforms)
 
         if (keys.length == 0) continue

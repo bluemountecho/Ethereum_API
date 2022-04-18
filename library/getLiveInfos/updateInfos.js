@@ -162,6 +162,7 @@ async function getCoinsList() {
         for (var j = 0; j < rows.length; j ++) {
             if (rows[j].tokenName.length > 50) continue
             if (rows[j].lastPrice >= 100000) continue
+            if (rows[j].trans24h == 0 || rows[j].volume24h == 0) continue
             if (rows[j].trans24h * 400000 <= rows[j].volume24h) continue
 
             visChanges[rows[j].tokenAddress] = true
@@ -218,7 +219,7 @@ async function getCoinsList() {
 }
 
 async function getTotalSupply() {
-    for (var i = 2; i < config.networks.length; i ++) {
+    for (var i = 0; i < config.networks.length; i ++) {
         var changesTableName = config.networks[i] + '_changes'
         var tokensTableName = config.networks[i] + '_tokens'
         var tmpWeb3s = web3s[config.networks[i]]
@@ -259,7 +260,7 @@ async function getCoinGeckoInfo() {
 
     console.log(infos.length)
 
-    for (var i = 6332; i < infos.length; i ++) {
+    for (var i = 9116; i < infos.length; i ++) {
         var keys = Object.keys(infos[i].platforms)
 
         if (keys.length == 0) continue

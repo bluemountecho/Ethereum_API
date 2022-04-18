@@ -223,13 +223,16 @@ async function getTotalSupply() {
 
 async function getCoinGeckoInfo() {
     var infos = (await axios.get('https://api.coingecko.com/api/v3/coins/list?include_platform=true')).data
-    
+
     console.log(infos.length)
 
     for (var i = 0; i < infos.length; i ++) {
         var keys = Object.keys(infos[i].platforms)
 
         if (keys.length == 0) continue
+
+        myLogger.log('==========================')
+        myLogger.log(i)
 
         var res = await axios.get('https://api.coingecko.com/api/v3/coins/' + infos[i].id)
         var info = JSON.stringify(res.data)
@@ -240,6 +243,8 @@ async function getCoinGeckoInfo() {
             if (address == '') continue
 
             var net = config.netMap[keys[j]]
+
+            myLogger.log(address, net)
 
             await knex(net + '_tokens').where('tokenAddress', tokenAddress).update('coingeckoInfos', utf8.encode(info))
         }

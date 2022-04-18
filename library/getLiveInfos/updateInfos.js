@@ -242,6 +242,8 @@ async function getTotalSupply() {
                 myLogger.log(tokens[j + k].tokenAddress, res[k] / 10 ** tokens[j + k].tokenDecimals)
                 await knex(tokensTableName).where('tokenAddress', tokens[j + k].tokenAddress).update({'totalSupply': res[k] / 10 ** tokens[j + k].tokenDecimals})
             }
+
+            await delay(200)
         }
     }
 

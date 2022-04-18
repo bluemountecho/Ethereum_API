@@ -713,7 +713,9 @@ module.exports.zyx = {
     'PROXYCOUNT': 68,
     'USD_ADDRESS': "0xb99c32a2da6766158b4ccf29b26e75dc22606ebd",
     'ETH_ADDRESS': "0xc9e1aea009b0bae9141f3dc7523fb42fd48c8656",
-    'lastBlockNumber': 4354386,
+    'lastBlockNumber': 4904313,
+    'ETH_DECIMAL': 18,
+    'ETH_ID': 28,
 }
 
 module.exports.elastos = {

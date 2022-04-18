@@ -751,5 +751,7 @@ module.exports.polis = {
     'PROXYCOUNT': 68,
     'USD_ADDRESS': "0x247123e806a27ea322bfd93e0273d04602dc942d",
     'ETH_ADDRESS': "0x6fc851b8d66116627fb1137b9d5fe4e2e1bea978",
-    'lastBlockNumber': 3441973,
+    'lastBlockNumber': 3744390,
+    'ETH_DECIMAL': 18,
+    'ETH_ID': 30,
 }

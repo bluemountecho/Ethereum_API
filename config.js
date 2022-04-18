@@ -599,7 +599,9 @@ module.exports.boba = {
     'PROXYCOUNT': 68,
     'USD_ADDRESS': "0x66a2a913e447d6b4bf33efbec43aaef87890fbbc",
     'ETH_ADDRESS': "0xa18bf3994c0cc6e3b63ac420308e5383f53120d7",
-    'lastBlockNumber': 426928,
+    'lastBlockNumber': 480937,
+    'ETH_DECIMAL': 18,
+    'ETH_ID': 22,
 }
 
 module.exports.fuse = {

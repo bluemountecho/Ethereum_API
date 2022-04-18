@@ -225,7 +225,7 @@ async function getCoinGeckoInfo() {
 
     console.log(infos.length)
 
-    for (var i = 20; i < infos.length; i ++) {
+    for (var i = 28; i < infos.length; i ++) {
         var keys = Object.keys(infos[i].platforms)
 
         if (keys.length == 0) continue

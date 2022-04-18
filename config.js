@@ -101,6 +101,39 @@ module.exports.PROXY = [
     "51.79.7.182:3128"
 ]
 
+module.exports.networks = [
+    'bsc',
+    'eth',
+    'polygon',
+    'arbitrum',
+    'optimism',
+    'avalanche',
+    'fantom',
+    'harmony',
+    'cronos',
+    'aurora',
+    'moonbeam',
+    'moonriver',
+    'metis',
+    'heco',
+    'okc',
+    'kcc',
+    'velas',
+    'celo',
+    'xdai',
+    'smartbch',
+    'hsc',
+    'boba',
+    'fuse',
+    'emerald',
+    'kardia',
+    'iotex',
+    'wan',
+    'zyx',
+    'elastos',
+    'polis',
+]
+
 module.exports.bsc = {
     'web3Providers': [
         'https://bsc-dataseed.binance.org/',

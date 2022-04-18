@@ -152,7 +152,7 @@ async function getCoinsList() {
         var visList = []
 
         for (var j = 0; j < rows1.length; j ++) {
-            visList[rows1[j].tokenAddress]
+            visList[rows1[j].tokenAddress] = true
         }
 
         for (var j = 0; j < rows.length; j ++) {
@@ -162,7 +162,7 @@ async function getCoinsList() {
         for (var j = 0; j < rows.length; j ++) {
             if (rows[j].tokenName.length > 50) continue
 
-            if (visChanges[rows[j].tokenAddress]) {
+            if (visList[rows[j].tokenAddress]) {
                 await knex('main_coin_list').update({
                     tokenAddress: rows[j].tokenAddress,
                     network: config.networks[i],

@@ -166,7 +166,7 @@ async function getCoinsList() {
                 marketcap: rows[j].totalSupply * rows[j].lastPrice,
                 coinName: rows[j].tokenName,
                 coinSymbol: rows[j].tokenSymbol,
-                coinImage: rows[j].coingeckoInfos != '' ? JSON.parse(rows[j].coingeckoInfos).image.large : '',
+                coinImage: (rows[j].coingeckoInfos && rows[j].coingeckoInfos != '') ? JSON.parse(rows[j].coingeckoInfos).image.large : '',
             })
         }
     }

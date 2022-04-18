@@ -228,19 +228,23 @@ async function getTotalSupply() {
         myLogger.log(config.networks[i], tokens.length)
 
         for (var j = 0; j < tokens.length; j += tmpWeb3s.length) {
-            var funcs = []
+            try {
+                var funcs = []
 
-            for (var k = 0; j + k < tokens.length && k < tmpWeb3s.length; k ++) {
-                var contract = new tmpWeb3s[k].eth.Contract(minERC20ABI, tokens[j + k].tokenAddress)
+                for (var k = 0; j + k < tokens.length && k < tmpWeb3s.length; k ++) {
+                    var contract = new tmpWeb3s[k].eth.Contract(minERC20ABI, tokens[j + k].tokenAddress)
 
-                funcs.push(contract.methods.totalSupply().call())
-            }
+                    funcs.push(contract.methods.totalSupply().call())
+                }
 
-            var res = await Promise.all(funcs)
+                var res = await Promise.all(funcs)
 
-            for (var k = 0; j + k < tokens.length && k < tmpWeb3s.length; k ++) {
-                myLogger.log(tokens[j + k].tokenAddress, res[k] / 10 ** tokens[j + k].tokenDecimals)
-                await knex(tokensTableName).where('tokenAddress', tokens[j + k].tokenAddress).update({'totalSupply': res[k] / 10 ** tokens[j + k].tokenDecimals})
+                for (var k = 0; j + k < tokens.length && k < tmpWeb3s.length; k ++) {
+                    myLogger.log(tokens[j + k].tokenAddress, res[k] / 10 ** tokens[j + k].tokenDecimals)
+                    await knex(tokensTableName).where('tokenAddress', tokens[j + k].tokenAddress).update({'totalSupply': res[k] / 10 ** tokens[j + k].tokenDecimals})
+                }
+            } catch (err) {
+                
             }
 
             await delay(200)

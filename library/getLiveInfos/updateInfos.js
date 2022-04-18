@@ -223,7 +223,7 @@ async function getTotalSupply() {
         var tokensTableName = config.networks[i] + '_tokens'
         var tmpWeb3s = web3s[config.networks[i]]
 
-        var tokens = await knex(changesTableName).join(tokensTableName, tokensTableName + '.tokenAddress', '=', changesTableName + 'tokenAddress').select('*')
+        var tokens = await knex(changesTableName).join(tokensTableName, tokensTableName + '.tokenAddress', '=', changesTableName + '.tokenAddress').select('*')
 
         myLogger.log(config.networks[i], tokens.length)
 

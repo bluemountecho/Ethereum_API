@@ -223,6 +223,8 @@ async function getTotalSupply() {
 
 async function getCoinGeckoInfo() {
     var infos = (await axios.get('https://api.coingecko.com/api/v3/coins/list?include_platform=true')).data
+    
+    console.log(infos.length)
 
     for (var i = 0; i < infos.length; i ++) {
         var keys = Object.keys(infos[i].platforms)
@@ -244,10 +246,13 @@ async function getCoinGeckoInfo() {
 
         await delay(1200)
     }
+
+    setTimeout(getCoinGeckoInfo, 3600000 * 20)
 }
 
 async function init() {
     getCoinsList()
+    getCoinGeckoInfo()
 }
 
 init()

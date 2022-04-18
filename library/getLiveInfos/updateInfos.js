@@ -246,7 +246,7 @@ async function getCoinGeckoInfo() {
 
             myLogger.log(address, net)
 
-            await knex(net + '_tokens').where('tokenAddress', tokenAddress).update('coingeckoInfos', utf8.encode(info))
+            await knex(net + '_tokens').where('tokenAddress', address).update('coingeckoInfos', utf8.encode(info))
         }
 
         await delay(1200)

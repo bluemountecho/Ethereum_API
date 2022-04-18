@@ -231,7 +231,7 @@ async function getTotalSupply() {
             var funcs = []
 
             for (var k = 0; j + k < tokens.length && k < tmpWeb3s.length; k ++) {
-                var contract = tmpWeb3s[k].eth.Contract(minERC20ABI, tokens[j + k].tokenAddress)
+                var contract = new tmpWeb3s[k].eth.Contract(minERC20ABI, tokens[j + k].tokenAddress)
 
                 funcs.push(contract.methods.totalSupply().call())
             }

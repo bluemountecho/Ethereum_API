@@ -220,7 +220,7 @@ async function getCoinsList() {
     for (var i = 0; i < rows.length; i ++) {
         var coin = await knex('main_coins').where('coin_id', rows[i].coin_id).select('*')
 
-        await knex('main_coin_list').where('tokenAddress', rows[i].coin_id).where('network', 'main').update({
+        await knex('main_coin_list').where('tokenAddress', rows[i].coin_id.toString()).where('network', 'main').update({
             trans24h: rows[i].trans,
             volume24h: rows[i].volume,
             coinName: coin[0].coin_name,

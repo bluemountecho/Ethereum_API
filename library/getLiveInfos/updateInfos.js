@@ -221,6 +221,8 @@ async function getCoinsList() {
         var coin = await knex('main_coins').where('coin_id', rows[i].coin_id).select('*')
         var info = await knex('main_coin_list').where('tokenAddress', coin[0].coin_token_address).where('network', coin[0].coin_net).select('*')
 
+        if (info.length == 0) continue
+
         await knex('main_coin_list').where('tokenAddress', rows[i].coin_id.toString()).where('network', 'main').update({
             trans24h: rows[i].trans,
             volume24h: rows[i].volume,

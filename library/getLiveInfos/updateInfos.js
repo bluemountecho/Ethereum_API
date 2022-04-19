@@ -236,7 +236,7 @@ async function getCoinsList() {
             price30m: info[0].price30m * (0.9997 + Math.random() * 0.001),
             price5m: info[0].price5m * (0.9997 + Math.random() * 0.001),
             pricenow: info[0].pricenow * (0.9997 + Math.random() * 0.001),
-            marketcap: coin[0].coin_total_supply * info[0].pricenow,
+            marketcap: coin[0].coin_total_supply * (0.98 + Math.random() * 0.02),
             coinImage: (coin[0].coin_geckoInfo && coin[0].coin_geckoInfo != '') ? JSON.parse(coin[0].coin_geckoInfo).image.large : '',
         })
     }
@@ -247,37 +247,51 @@ async function getCoinsList() {
 }
 
 async function getTotalSupply() {
-    for (var i = 0; i < config.networks.length; i ++) {
-        var changesTableName = config.networks[i] + '_changes'
-        var tokensTableName = config.networks[i] + '_tokens'
-        var tmpWeb3s = web3s[config.networks[i]]
+    // for (var i = 0; i < config.networks.length; i ++) {
+    //     var changesTableName = config.networks[i] + '_changes'
+    //     var tokensTableName = config.networks[i] + '_tokens'
+    //     var tmpWeb3s = web3s[config.networks[i]]
 
-        var tokens = await knex(changesTableName).join(tokensTableName, tokensTableName + '.tokenAddress', '=', changesTableName + '.tokenAddress').select('*')
+    //     var tokens = await knex(changesTableName).join(tokensTableName, tokensTableName + '.tokenAddress', '=', changesTableName + '.tokenAddress').select('*')
 
-        for (var j = 0; j < tokens.length; j += tmpWeb3s.length) {
-            try {
-                var funcs = []
+    //     for (var j = 0; j < tokens.length; j += tmpWeb3s.length) {
+    //         try {
+    //             var funcs = []
 
-                for (var k = 0; j + k < tokens.length && k < tmpWeb3s.length; k ++) {
-                    var contract = new tmpWeb3s[k].eth.Contract(minERC20ABI, tokens[j + k].tokenAddress)
+    //             for (var k = 0; j + k < tokens.length && k < tmpWeb3s.length; k ++) {
+    //                 var contract = new tmpWeb3s[k].eth.Contract(minERC20ABI, tokens[j + k].tokenAddress)
 
-                    funcs.push(contract.methods.totalSupply().call())
-                }
+    //                 funcs.push(contract.methods.totalSupply().call())
+    //             }
 
-                var res = await Promise.all(funcs)
+    //             var res = await Promise.all(funcs)
 
-                for (var k = 0; j + k < tokens.length && k < tmpWeb3s.length; k ++) {
-                    await knex(tokensTableName).where('tokenAddress', tokens[j + k].tokenAddress).update({'totalSupply': res[k] / 10 ** tokens[j + k].tokenDecimals})
-                }
-            } catch (err) {
+    //             for (var k = 0; j + k < tokens.length && k < tmpWeb3s.length; k ++) {
+    //                 await knex(tokensTableName).where('tokenAddress', tokens[j + k].tokenAddress).update({'totalSupply': res[k] / 10 ** tokens[j + k].tokenDecimals})
+    //             }
+    //         } catch (err) {
 
-            }
+    //         }
 
-            await delay(200)
-        }
+    //         await delay(200)
+    //     }
+    // }
+
+    var rows = await knex('main_coins').select('*')
+
+    for (var i = 0; i < rows.length; i ++) {
+        var res = await axios.get('https://api.coingecko.com/api/v3/coins/' + config.coinMap[rows[i].coin_id])
+        var info = res.data
+
+        await knex('main_coins').where('coin_id', rows[i].coin_id).update({
+            coin_total_supply: info.market_data.market_cap.usd,
+            coin_geckoInfo: utf8.encode(JSON.stringify(info))
+        })
+
+        await delay(1200)
     }
 
-    setTimeout(getTotalSupply, 1000)
+    // setTimeout(getTotalSupply, 1000)
 }
 
 async function getCoinGeckoInfo() {
@@ -311,7 +325,7 @@ async function getCoinGeckoInfo() {
 async function init() {
     getCoinsList()
     // getCoinGeckoInfo()
-    // getTotalSupply()
+    getTotalSupply()
 }
 
 init()

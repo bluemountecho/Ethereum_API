@@ -923,7 +923,7 @@ module.exports.getContavoInfo = async function getContavoInfo() {
     return rows
 }
 
-module.exports.getAllCoinsList = async function getAllCoinsList() {
+module.exports.getAllCoinsList = async function getAllCoinsList(page = 0) {
     var mainCoins = await knex('main_coin_list').where('network', 'main').select('*')
     var geckoCoins = await knex('main_coin_list').where('network', '!=', 'main').where('coinImage', '!=', '').orderBy('coinImage').select('*')
     var otherCoins = await knex('main_coin_list').where('network', '!=', 'main').where('coinImage', '').orderBy('coinSymbol').select('*')
@@ -1059,5 +1059,11 @@ module.exports.getAllCoinsList = async function getAllCoinsList() {
         return 0
     })
 
-    return datas
+    var res = []
+
+    for (var i = 0; i < 100 && i + page * 100 < datas.length; i ++) {
+        res.push(datas[i + page * 100])
+    }
+
+    return res
 }

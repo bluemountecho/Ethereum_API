@@ -106,7 +106,7 @@ router.get('/coins', function(req, res, next) {
     return
   }
 
-  etherMainnetFuncs.getAllCoinsList()
+  etherMainnetFuncs.getAllCoinsList(req.query.page ? req.query.page : 0)
   .then((data) => {
     res.send(JSON.stringify(data))
   })

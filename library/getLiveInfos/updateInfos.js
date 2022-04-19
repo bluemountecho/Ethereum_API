@@ -218,9 +218,13 @@ async function getCoinsList() {
     var rows = await knex('main_live').whereRaw('swapAt>=DATE_SUB(NOW(), INTERVAL 24 HOUR)').groupBy('coin_id').select(knex.raw('*, sum(swapAmountUSD) as volume, count(coin_id) as trans'))
 
     for (var i = 0; i < rows.length; i ++) {
-        await knex('main_coin_list').insert({
-            tokenAddress: rows[i].coin_id,
-            network: 'main'
+        var coin = await knex('main_coins').where('coin_id', rows[i].coin_id).select('*')
+
+        await knex('main_coin_list').where('tokenAddress', rows[i].coin_id).where('network', 'main').update({
+            trans24h: rows[i].trans,
+            volume24h: rows[i].volume,
+            coinName: coin[0].coin_name,
+            coinSymbol: coin[0].coin_symbol,
         })
     }
 
@@ -285,10 +289,10 @@ async function getCoinGeckoInfo() {
             await knex(net + '_tokens').where('tokenAddress', address).update('coingeckoInfos', utf8.encode(info))
         }
 
-        await delay(1200)
+        await delay(2000)
     }
 
-    setTimeout(getCoinGeckoInfo, 3600000 * 20)
+    setTimeout(getCoinGeckoInfo, 3600000 * 10)
 }
 
 async function init() {

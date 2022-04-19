@@ -101,6 +101,11 @@ router.get('/token_statistics/:tokenAddr', function(req, res, next) {
 });
 
 router.get('/coins', function(req, res, next) {
+  if (req.network != 'all') {
+    res.send('')
+    return
+  }
+
   etherMainnetFuncs.getAllCoinsList()
   .then((data) => {
     res.send(JSON.stringify(data))

@@ -976,7 +976,7 @@ module.exports.getAllCoinsList = async function getAllCoinsList() {
             bef = geckoCoins[i].coinImage
             tmpvolume = geckoCoins[i].volume24h
         } else {
-            if (tmpvolume > geckoCoins[i].volume24h) {
+            if (tmpvolume < geckoCoins[i].volume24h) {
                 tmpdata.price24h = geckoCoins[i].price24h
                 tmpdata.price6h = geckoCoins[i].price6h
                 tmpdata.price2h = geckoCoins[i].price2h
@@ -1029,7 +1029,7 @@ module.exports.getAllCoinsList = async function getAllCoinsList() {
             bef = otherCoins[i].coinSymbol
             tmpvolume = otherCoins[i].volume24h
         } else {
-            if (tmpvolume > otherCoins[i].volume24h) {
+            if (tmpvolume < otherCoins[i].volume24h) {
                 tmpdata.price24h = otherCoins[i].price24h
                 tmpdata.price6h = otherCoins[i].price6h
                 tmpdata.price2h = otherCoins[i].price2h

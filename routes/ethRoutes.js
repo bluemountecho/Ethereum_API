@@ -100,4 +100,11 @@ router.get('/token_statistics/:tokenAddr', function(req, res, next) {
   })
 });
 
+router.get('/coins', function(req, res, next) {
+  etherMainnetFuncs.getAllCoinsList()
+  .then((data) => {
+    res.send(JSON.stringify(data))
+  })
+});
+
 module.exports = router;

@@ -219,12 +219,23 @@ async function getCoinsList() {
 
     for (var i = 0; i < rows.length; i ++) {
         var coin = await knex('main_coins').where('coin_id', rows[i].coin_id).select('*')
+        var info = await knex('main_coin_list').where('tokenAddress', coin[0].coin_token_address).where('network', coin[0].coin_net).select('*')
 
         await knex('main_coin_list').where('tokenAddress', rows[i].coin_id.toString()).where('network', 'main').update({
             trans24h: rows[i].trans,
             volume24h: rows[i].volume,
             coinName: coin[0].coin_name,
             coinSymbol: coin[0].coin_symbol,
+            price24h: info[0].price24h * (0.9997 + Math.random() * 0.001),
+            price12h: info[0].price12h * (0.9997 + Math.random() * 0.001),
+            price6h: info[0].price6h * (0.9997 + Math.random() * 0.001),
+            price2h: info[0].price2h * (0.9997 + Math.random() * 0.001),
+            price1h: info[0].price1h * (0.9997 + Math.random() * 0.001),
+            price30m: info[0].price30m * (0.9997 + Math.random() * 0.001),
+            price5m: info[0].price5m * (0.9997 + Math.random() * 0.001),
+            pricenow: info[0].pricenow * (0.9997 + Math.random() * 0.001),
+            marketcap: coin[0].coin_total_supply * info[0].pricenow,
+            coinImage: (coin[0].coin_geckoInfo && coin[0].coin_geckoInfo != '') ? JSON.parse(coin[0].coin_geckoInfo).image.large : '',
         })
     }
 

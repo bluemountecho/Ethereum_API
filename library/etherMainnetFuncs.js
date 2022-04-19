@@ -925,7 +925,7 @@ module.exports.getContavoInfo = async function getContavoInfo() {
 
 module.exports.getAllCoinsList = async function getAllCoinsList() {
     var mainCoins = await knex('main_coin_list').where('network', 'main').select('*')
-    var geckoCoins = await knex('main_coins_list').where('network', '!=', 'main').where('coinImage', '!=', '').orderBy('coinImage').select('*')
+    var geckoCoins = await knex('main_coin_list').where('network', '!=', 'main').where('coinImage', '!=', '').orderBy('coinImage').select('*')
     var otherCoins = await knex('main_coin_list').where('network', '!=', 'main').where('coinImage', '').orderBy('coinSymbol').select('*')
     var datas = []
 

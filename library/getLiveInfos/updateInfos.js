@@ -226,7 +226,7 @@ async function getCoinsList() {
 
     myLogger.log(convertTimestampToString(new Date().getTime(), true) + ' getCoinList')
 
-    setTimeout(getCoinsList, 1000)
+    // setTimeout(getCoinsList, 1000)
 }
 
 async function getTotalSupply() {

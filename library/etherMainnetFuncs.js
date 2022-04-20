@@ -256,9 +256,10 @@ module.exports.getLast24HourInfos = async function getLast24HourInfos(network, t
 module.exports.getTokenInfo = async function getTokenInfo(network, tokenAddr) {
     try {
         var tokenAddress = tokenAddr.toLowerCase()
-        const contract = new web3s[network].eth.Contract(minERC20ABI, tokenAddress)
+        // const contract = new web3s[network].eth.Contract(minERC20ABI, tokenAddress)
         var rows = await knex(network + '_tokens').where('tokenAddress', tokenAddress).select('*')
-        var totalSupply = await contract.methods.totalSupply().call()
+        // var totalSupply = await contract.methods.totalSupply().call()
+        var totalSupply = rows[0].totalSupply
         var tokenPrice = await this.getPriceOfToken(network, tokenAddress)
         var info = (await this.getTokenStatistics(network, tokenAddress)).data[0]
 

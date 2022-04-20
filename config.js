@@ -199,6 +199,7 @@ module.exports.coinMap = [
     'zyx',
     'elastos',
     'polis',
+    'bitcoin',
 ]
 
 module.exports.bsc = {

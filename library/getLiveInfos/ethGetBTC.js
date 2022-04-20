@@ -31,7 +31,7 @@ const knex = require('knex')({
 const baseURL = 'https://btc.getblock.io/mainnet/'
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
 
-var lastBlockNumber = 732509
+var lastBlockNumber = 732629
 var lastTransactionID = 0
 
 function convertTimestampToString(timestamp, flag = false) {

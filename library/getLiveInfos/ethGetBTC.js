@@ -20,12 +20,12 @@ const knex = require('knex')({
     connection: {
         host : '127.0.0.1',
         port : 3306,
-        // user : 'admin_root',
-        // password : 'bOPTDZXP8Xvdf9I1',
-        // database : 'admin_ethereum_api'
-        user : 'root',
-        password : '',
-        database : 'ethereum_api'
+        user : 'admin_root',
+        password : 'bOPTDZXP8Xvdf9I1',
+        database : 'admin_ethereum_api'
+        // user : 'root',
+        // password : '',
+        // database : 'ethereum_api'
     }
 })
 const baseURL = 'https://btc.getblock.io/mainnet/'
@@ -43,7 +43,7 @@ function convertTimestampToString(timestamp, flag = false) {
 }
 
 async function sendRequest(method, params) {
-    console.log(params)
+    myLogger.log(params)
 
     var res = await axios.post(baseURL, {
         jsonrpc: '2.0',
@@ -51,8 +51,6 @@ async function sendRequest(method, params) {
         params: params,
         id: 'getblock.io'
     }, axiosOption)
-
-    myLogger.log(res.data)
 
     return res.data
 }

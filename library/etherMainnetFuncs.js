@@ -263,7 +263,7 @@ module.exports.getTokenInfo = async function getTokenInfo(network, tokenAddr) {
         var tokenPrice = await this.getPriceOfToken(network, tokenAddress)
         var info = (await this.getTokenStatistics(network, tokenAddress)).data[0]
 
-        totalSupply = totalSupply / 10 ** rows[0].tokenDecimals
+        // totalSupply = totalSupply / 10 ** rows[0].tokenDecimals
 
         if (rows.length == 0) {
             return {

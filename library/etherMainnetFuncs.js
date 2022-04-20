@@ -923,7 +923,7 @@ module.exports.getContavoInfo = async function getContavoInfo() {
     return rows
 }
 
-module.exports.getAllCoinsList = async function getAllCoinsList(page = 0) {
+module.exports.getAllCoinsList = async function getAllCoinsList(page = 0, order = 'volume') {
     var mainCoins = await knex('main_coin_list').where('network', 'main').select('*')
     var geckoCoins = await knex('main_coin_list').where('network', '!=', 'main').where('coinImage', '!=', '').orderBy('coinImage').select('*')
     var otherCoins = await knex('main_coin_list').where('network', '!=', 'main').where('coinImage', '').orderBy('coinSymbol').select('*')
@@ -1053,11 +1053,20 @@ module.exports.getAllCoinsList = async function getAllCoinsList(page = 0) {
 
     datas.push(tmpdata)
 
-    datas.sort(function (a, b) {
-        if (a.volume24h > b.volume24h) return -1
-        if (a.volume24h < b.volume24h) return 1
-        return 0
-    })
+    if (order == 'volume') {
+        datas.sort(function (a, b) {
+            if (a.volume24h > b.volume24h) return -1
+            if (a.volume24h < b.volume24h) return 1
+            return 0
+        })
+    } else if (order == 'marketcap') {
+        
+        datas.sort(function (a, b) {
+            if (a.marketcap > b.marketcap) return -1
+            if (a.marketcap < b.marketcap) return 1
+            return 0
+        })
+    }
 
     var res = []
 

@@ -1228,10 +1228,10 @@ async function getTokenCoingeckoInfos() {
 
 async function getOneTokenScanInfos(tokenAddress, proxy) {   
     var res = await axios.request({
-        url: 'https://etherscan.io/token/' + tokenAddress + '#balances',
+        url: 'http://etherscan.io/token/' + tokenAddress + '#balances',
         method: 'GET',
         headers:{
-            'Access-Control-Allow-Origin': '*',
+            // 'Access-Control-Allow-Origin': '*',
             "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
             "accept-encoding": "gzip, deflate, br",
             "accept-language": "en-US,en;q=0.9,ko;q=0.8",

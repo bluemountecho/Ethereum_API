@@ -414,7 +414,7 @@ module.exports.fantom = {
     'PROXYCOUNT': 68,
     'USD_ADDRESS': "0x04068da6c83afcfa0e13ba15a6696662335d5b75",
     'ETH_ADDRESS': "0x21be370d5312f44cb42ce377bc9b8a0cef1a4c83",
-    'lastBlockNumber': 36306874,
+    'lastBlockNumber': 37085724,
     'ETH_DECIMAL': 18,
     'ETH_ID': 7,
 }

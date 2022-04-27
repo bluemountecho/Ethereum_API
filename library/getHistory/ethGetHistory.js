@@ -290,6 +290,7 @@ async function getURL(url, proxy) {
         if (!error && response.statusCode == 200) {
             defer.resolve(body)
         } else {
+            myLogger.log(error)
             defer.reject('')
         }
     })

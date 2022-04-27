@@ -1246,14 +1246,16 @@ async function getOneTokenScanInfos(tokenAddress, proxy) {
     // })
 
     var res = await getURL('https://etherscan.io/token/' + tokenAddress + '#balances', proxy)
-    var dom = new JSDOM(res)
-    var totalSupply = 0
-    
-    try {
-        totalSupply = dom.window.document.querySelector('span[title="Maximum Total Supply"]').parentElement.nextElementSibling.firstElementChild.getAttribute('title').replace(/,/g, '').replace(/ /g, '')
-    } catch (err) {
 
-    }
+    myLogger.log(res)
+    var dom = new JSDOM(res)
+    // var totalSupply = 0
+    
+    // try {
+    //     totalSupply = dom.window.document.querySelector('span[title="Maximum Total Supply"]').parentElement.nextElementSibling.firstElementChild.getAttribute('title').replace(/,/g, '').replace(/ /g, '')
+    // } catch (err) {
+
+    // }
 
     var totalHolders = 0
     
@@ -1263,35 +1265,35 @@ async function getOneTokenScanInfos(tokenAddress, proxy) {
 
     }
 
-    var links = {}
+    // var links = {}
 
-    try {
-        links['OfficialSite'] = dom.window.document.querySelector('#ContentPlaceHolder1_tr_officialsite_1').firstElementChild.childNodes[3].firstElementChild.getAttribute('href')
-    } catch (err) {
+    // try {
+    //     links['OfficialSite'] = dom.window.document.querySelector('#ContentPlaceHolder1_tr_officialsite_1').firstElementChild.childNodes[3].firstElementChild.getAttribute('href')
+    // } catch (err) {
 
-    }
+    // }
 
-    try {
-        var linkElems = dom.window.document.querySelector('.col-md-8 > .list-inline').childNodes
+    // try {
+    //     var linkElems = dom.window.document.querySelector('.col-md-8 > .list-inline').childNodes
     
-        for (var j = 0; j < linkElems.length; j ++) {
-            try {
-                var key = linkElems[j].firstElementChild.getAttribute('data-original-title').split(':')[0]
+    //     for (var j = 0; j < linkElems.length; j ++) {
+    //         try {
+    //             var key = linkElems[j].firstElementChild.getAttribute('data-original-title').split(':')[0]
 
-                if (key == 'Email') {
-                    links[key] = 'mailto:' + linkElems[j].firstElementChild.getAttribute('data-original-title').substr(key.length + 2)
-                } else {
-                    if (key == 'Github') {
-                        links[key] = 'https://' + linkElems[j].firstElementChild.getAttribute('href')
-                    } else {
-                        links[key] = linkElems[j].firstElementChild.getAttribute('href')
-                    }
-                }
-            } catch (err) {
-            }
-        }
-    } catch (err) {
-    }
+    //             if (key == 'Email') {
+    //                 links[key] = 'mailto:' + linkElems[j].firstElementChild.getAttribute('data-original-title').substr(key.length + 2)
+    //             } else {
+    //                 if (key == 'Github') {
+    //                     links[key] = 'https://' + linkElems[j].firstElementChild.getAttribute('href')
+    //                 } else {
+    //                     links[key] = linkElems[j].firstElementChild.getAttribute('href')
+    //                 }
+    //             }
+    //         } catch (err) {
+    //         }
+    //     }
+    // } catch (err) {
+    // }
     
     // res = await axios.request({
     //     url: 'https://etherscan.io/token/generic-tokenholders2?m=normal&p=1&a=' + tokenAddress,
@@ -1312,39 +1314,39 @@ async function getOneTokenScanInfos(tokenAddress, proxy) {
     //     // httpsAgent: new HttpsProxyAgent('https://' + proxy)
     // })
 
-    res = await getURL('https://etherscan.io/token/generic-tokenholders2?m=normal&p=1&a=' + tokenAddress, proxy)    
-    dom = new JSDOM(res)
+    // res = await getURL('https://etherscan.io/token/generic-tokenholders2?m=normal&p=1&a=' + tokenAddress, proxy)    
+    // dom = new JSDOM(res)
 
-    var rows = dom.window.document.querySelectorAll('tbody tr')
-    var holders = []
+    // var rows = dom.window.document.querySelectorAll('tbody tr')
+    // var holders = []
 
-    for (var j = 0; j < rows.length; j ++) {
-        try {
-            var amount = rows[j].childNodes[2].textContent.replace(/,/g, '').replace(/ /g, '')
-            var address = j
-            var elem = rows[j].childNodes[1].querySelector('span[data-toggle="tooltip"]')
+    // for (var j = 0; j < rows.length; j ++) {
+    //     try {
+    //         var amount = rows[j].childNodes[2].textContent.replace(/,/g, '').replace(/ /g, '')
+    //         var address = j
+    //         var elem = rows[j].childNodes[1].querySelector('span[data-toggle="tooltip"]')
 
-            if (elem == null) {
-                address = rows[j].childNodes[1].querySelector('a').textContent
-            } else {
-                var tmp = elem.getAttribute('title').split('(')
-                address = tmp[tmp.length - 1].split(')')[0]
-            }
+    //         if (elem == null) {
+    //             address = rows[j].childNodes[1].querySelector('a').textContent
+    //         } else {
+    //             var tmp = elem.getAttribute('title').split('(')
+    //             address = tmp[tmp.length - 1].split(')')[0]
+    //         }
 
-            holders.push({
-                address: address,
-                amount: amount
-            })
-        } catch (err) {
+    //         holders.push({
+    //             address: address,
+    //             amount: amount
+    //         })
+    //     } catch (err) {
 
-        }
-    }
+    //     }
+    // }
 
     await knex(tokensTableName).where('tokenAddress', tokenAddress).update({
-        totalSupply: totalSupply,
+        // totalSupply: totalSupply,
         totalHolders: totalHolders,
-        links: JSON.stringify(links),
-        holders: JSON.stringify(holders)
+        // links: JSON.stringify(links),
+        // holders: JSON.stringify(holders)
     })
 
     // await knex(tokensTableName).insert({
@@ -1377,10 +1379,7 @@ async function getTokenScanInfos() {
     //     }
     // }
 
-    tokens = await knex(tokensTableName)
-        // .orderBy('createdAt', 'asc')
-        .whereRaw('totalSupply is NULL')
-        .select('*')
+    tokens = await knex(changesTableName).select('*')
 
     // var tokens = (await axios.get('http://stjepan:stjepan@51.83.184.35:8888/eth/all_tokens')).data.data
 
@@ -1393,7 +1392,7 @@ async function getTokenScanInfos() {
     //     myLogger.log(i)
     // }
 
-    for (var i = 0; i < tokens.length; i += 5) {
+    for (var i = 0; i < tokens.length; i += 10) {
         myLogger.log(i)
         var funcs = []
 
@@ -1725,118 +1724,116 @@ async function removeDuplicate() {
 }
 
 async function createTables() {
-    try {
-        await knex.raw('\
-            ALTER TABLE `' + dailyPastTableName + '`\
-                ADD KEY `PAIRADDRESS` (`PAIRADDRESS`);\
-        ')
-    } catch (err) {
-        console.log(err)
-    }
+    // try {
+    //     await knex.raw('\
+    //         ALTER TABLE `' + dailyPastTableName + '`\
+    //             ADD KEY `PAIRADDRESS` (`PAIRADDRESS`);\
+    //     ')
+    // } catch (err) {
+    //     console.log(err)
+    // }
 
-    try {
-        await knex.raw('\
-            ALTER TABLE `' + liveTableName + '`\
-                ADD COLUMN tokenAddress varchar(255) AFTER pairAddress,\
-                ADD COLUMN priceUSD double DEFAULT 0 AFTER swapPrice;\
-        ')
-    } catch (err) {
-        console.log(err)
-    }
+    // try {
+    //     await knex.raw('\
+    //         ALTER TABLE `' + liveTableName + '`\
+    //             ADD COLUMN tokenAddress varchar(255) AFTER pairAddress,\
+    //             ADD COLUMN priceUSD double DEFAULT 0 AFTER swapPrice;\
+    //     ')
+    // } catch (err) {
+    //     console.log(err)
+    // }
 
-    try {
-        await knex.raw('\
-            ALTER TABLE `' + liveTableName + '`\
-                ADD KEY `pairAddress` (`pairAddress`,`tokenAddress`),\
-                ADD KEY `swapAt` (`swapAt`);\
-        ')
-    } catch (err) {
-        console.log(err)
-    }
+    // try {
+    //     await knex.raw('\
+    //         ALTER TABLE `' + liveTableName + '`\
+    //             ADD KEY `pairAddress` (`pairAddress`,`tokenAddress`),\
+    //             ADD KEY `swapAt` (`swapAt`);\
+    //     ')
+    // } catch (err) {
+    //     console.log(err)
+    // }
 
-    try {
-        await knex.raw('\
-            ALTER TABLE `' + pairsTableName + '`\
-                DROP COLUMN transactionID,\
-                DROP COLUMN blockNumber;\
-        ')
-    } catch (err) {
-        console.log(err)
-    }
+    // try {
+    //     await knex.raw('\
+    //         ALTER TABLE `' + pairsTableName + '`\
+    //             DROP COLUMN transactionID,\
+    //             DROP COLUMN blockNumber;\
+    //     ')
+    // } catch (err) {
+    //     console.log(err)
+    // }
 
-    try {
-        await knex.raw('\
-            ALTER TABLE `' + tokensTableName + '`\
-                MODIFY tokenName text,\
-                MODIFY createdAt timestamp NULL DEFAULT NULL AFTER links,\
-                RENAME COLUMN otherInfos TO coingeckoInfos,\
-                ADD COLUMN lastPrice double NOT NULL DEFAULT 0;\
-        ')
-    } catch (err) {
-        console.log(err)
-    }
+    // try {
+    //     await knex.raw('\
+    //         ALTER TABLE `' + tokensTableName + '`\
+    //             MODIFY tokenName text,\
+    //             MODIFY createdAt timestamp NULL DEFAULT NULL AFTER links,\
+    //             RENAME COLUMN otherInfos TO coingeckoInfos,\
+    //             ADD COLUMN lastPrice double NOT NULL DEFAULT 0;\
+    //     ')
+    // } catch (err) {
+    //     console.log(err)
+    // }
 
-    try {
-        await knex.raw('\
-            CREATE TABLE `' + tokenDailyTableName + '` (\
-                `TOKENADDRESS` varchar(255) DEFAULT NULL,\
-                `SWAPAT` timestamp NULL DEFAULT NULL,\
-                `AVGPRICE` double DEFAULT NULL,\
-                `MAXPRICE` double DEFAULT NULL,\
-                `MINPRICE` double DEFAULT NULL,\
-                `VOLUME` double DEFAULT NULL,\
-                `SWAPCOUNT` int(11) DEFAULT NULL\
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 ROW_FORMAT=DYNAMIC;\
-        ')
-    } catch (err) {
-        console.log(err)
-    }
+    // try {
+    //     await knex.raw('\
+    //         CREATE TABLE `' + tokenDailyTableName + '` (\
+    //             `TOKENADDRESS` varchar(255) DEFAULT NULL,\
+    //             `SWAPAT` timestamp NULL DEFAULT NULL,\
+    //             `AVGPRICE` double DEFAULT NULL,\
+    //             `MAXPRICE` double DEFAULT NULL,\
+    //             `MINPRICE` double DEFAULT NULL,\
+    //             `VOLUME` double DEFAULT NULL,\
+    //             `SWAPCOUNT` int(11) DEFAULT NULL\
+    //         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 ROW_FORMAT=DYNAMIC;\
+    //     ')
+    // } catch (err) {
+    //     console.log(err)
+    // }
     
-    try {
-        await knex.raw('\
-            ALTER TABLE `' + tokenDailyTableName + '`\
-                ADD KEY `TOKENADDRESS` (`TOKENADDRESS`);\
-        ')
-    } catch (err) {
-        console.log(err)
-    }
+    // try {
+    //     await knex.raw('\
+    //         ALTER TABLE `' + tokenDailyTableName + '`\
+    //             ADD KEY `TOKENADDRESS` (`TOKENADDRESS`);\
+    //     ')
+    // } catch (err) {
+    //     console.log(err)
+    // }
     
-    try {
-        await knex.raw('\
-            CREATE TABLE `' + changesTableName + '` (\
-                `tokenAddress` varchar(255) NOT NULL,\
-                `price24h` double DEFAULT 0,\
-                `price12h` double DEFAULT 0,\
-                `price6h` double DEFAULT 0,\
-                `price2h` double DEFAULT 0,\
-                `price1h` double DEFAULT 0,\
-                `price30m` double DEFAULT 0,\
-                `price5m` double DEFAULT 0,\
-                `trans24h` int(11) DEFAULT 0,\
-                `trans12h` int(11) DEFAULT 0,\
-                `trans6h` int(11) DEFAULT 0,\
-                `trans2h` int(11) DEFAULT 0,\
-                `trans1h` int(11) DEFAULT 0,\
-                `trans30m` int(11) DEFAULT 0,\
-                `trans5m` int(11) DEFAULT 0,\
-                `transToday` int(11) NOT NULL DEFAULT 0,\
-                `volume24h` double NOT NULL DEFAULT 0\
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 ROW_FORMAT=DYNAMIC;\
-        ')
-    } catch (err) {
-        console.log(err)
-    }
+    // try {
+    //     await knex.raw('\
+    //         CREATE TABLE `' + changesTableName + '` (\
+    //             `tokenAddress` varchar(255) NOT NULL,\
+    //             `price24h` double DEFAULT 0,\
+    //             `price12h` double DEFAULT 0,\
+    //             `price6h` double DEFAULT 0,\
+    //             `price2h` double DEFAULT 0,\
+    //             `price1h` double DEFAULT 0,\
+    //             `price30m` double DEFAULT 0,\
+    //             `price5m` double DEFAULT 0,\
+    //             `trans24h` int(11) DEFAULT 0,\
+    //             `trans12h` int(11) DEFAULT 0,\
+    //             `trans6h` int(11) DEFAULT 0,\
+    //             `trans2h` int(11) DEFAULT 0,\
+    //             `trans1h` int(11) DEFAULT 0,\
+    //             `trans30m` int(11) DEFAULT 0,\
+    //             `trans5m` int(11) DEFAULT 0,\
+    //             `transToday` int(11) NOT NULL DEFAULT 0,\
+    //             `volume24h` double NOT NULL DEFAULT 0\
+    //         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 ROW_FORMAT=DYNAMIC;\
+    //     ')
+    // } catch (err) {
+    //     console.log(err)
+    // }
         
-    try {
-        await knex.raw('\
-            ALTER TABLE `' + changesTableName + '`\
-                ADD PRIMARY KEY (`tokenAddress`) USING BTREE;\
-        ')
-    } catch (err) {
-        console.log(err)
-    }
-
-    
+    // try {
+    //     await knex.raw('\
+    //         ALTER TABLE `' + changesTableName + '`\
+    //             ADD PRIMARY KEY (`tokenAddress`) USING BTREE;\
+    //     ')
+    // } catch (err) {
+    //     console.log(err)
+    // }    
 
     console.log('CREATING TABLES FINISHED!')
 }
@@ -1856,7 +1853,7 @@ async function init() {
     // await createTables()
 }
 
-init()
+// init()
 
 // getAllPairs(FROMBLOCK)
 
@@ -1877,5 +1874,5 @@ init()
 // addMissedTokens()
 // getTokenSourceCodes()
 // getTokenCoingeckoInfos()
-// getTokenScanInfos()
+getTokenScanInfos()
 // getContavoInfo()

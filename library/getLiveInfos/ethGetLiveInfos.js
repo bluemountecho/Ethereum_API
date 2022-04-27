@@ -612,8 +612,6 @@ async function init() {
             blockNumber = lastBlockNumber + 99
         }
 
-        console.log(lastBlockNumber, blockNumber)
-
         var tmpLastTrans = lastTransactionID
         var tmpLastBlock = lastestBlock
         var coinsFuncs = []
@@ -1095,7 +1093,7 @@ async function init() {
         console.log(results[4].length)
 
         for (var i = 0; i < results[4].length; i ++) {
-            var amt = Number.parseInt(hexToBn(result.data.substr(2, 64)))
+            var amt = Number.parseInt(hexToBn(results[4][i].data.substr(2, 64)))
             var swapMaker = '0x' + results[4][i].topics[1].substr(26, 40).toLowerCase()
             var addr = results[4][i].address.toLowerCase()
             var hash = results[4][i].transactionHash.toLowerCase()
@@ -1112,7 +1110,7 @@ async function init() {
                 var resBlock
 
                 if (!blocksData[block]) {
-                    resBlock = await web3.eth.getBlock(block)
+                    resBlock = await web3s[0].eth.getBlock(block)
                     blocksData[block] = {timestamp: resBlock.timestamp}
                 } else {
                     resBlock = blocksData[block]

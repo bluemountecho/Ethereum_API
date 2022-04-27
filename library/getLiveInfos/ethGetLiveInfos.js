@@ -1173,7 +1173,7 @@ async function updatePriceChanges() {
         var timeCur = new Date().getTime()
         var time24hago = convertTimestampToString(timeCur - 2000 * 86400, true)
         var timeToday = new Date(convertTimestampToString(timeCur, true).split(' ')[0] + ' 00:00:00').getTime()
-        var rows = await knex(liveTableName).where('swapAt', '>=', time24hago).orderBy('swapAt', 'desc').select('*')
+        var rows = await knex(tokenLiveTableName).where('swapAt', '>=', time24hago).select('*')
         var olds = await knex(changesTableName).select('*')
         var info = []
         var vis = []
@@ -1208,7 +1208,7 @@ async function updatePriceChanges() {
                 }
 
                 if (timeCur - rowTime >= times[j] * 60000 && info[tokenAddress][priceFields[j]] == 0) {
-                    info[tokenAddress][priceFields[j]] = rows[i].priceUSD
+                    info[tokenAddress][priceFields[j]] = rows[i].swapPrice
                 }
             }
 
@@ -1217,7 +1217,7 @@ async function updatePriceChanges() {
             }
 
             if (timeCur - rowTime <= 86400 * 1000) {
-                info[tokenAddress].volume24h += (tokenAddress == pairsData[rows[i].pairAddress].token0Address ? rows[i].swapAmount0 : rows[i].swapAmount1) * rows[i].priceUSD
+                info[tokenAddress].volume24h += rows[i].swapAmount * rows[i].swapPrice
             }
         }
 

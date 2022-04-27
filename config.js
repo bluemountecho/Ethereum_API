@@ -348,7 +348,7 @@ module.exports.arbitrum = {
     'PROXYCOUNT': 10,
     'USD_ADDRESS': "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8",
     'ETH_ADDRESS': "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
-    'lastBlockNumber': 9978967,
+    'lastBlockNumber': 10677889,
     'ETH_DECIMAL': 18,
     'ETH_ID': 4,
 }

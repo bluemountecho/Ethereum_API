@@ -376,7 +376,7 @@ module.exports.optimism = {
     'PROXYCOUNT': 10,
     'USD_ADDRESS': "0xda10009cbd5d07dd0cecc66161fc93d7c9000da1",
     'ETH_ADDRESS': "0x4200000000000000000000000000000000000006",
-    'lastBlockNumber': 5934248,
+    'lastBlockNumber': 6614604,
     'ETH_DECIMAL': 18,
     'ETH_ID': 5,
 }

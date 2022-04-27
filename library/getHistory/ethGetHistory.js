@@ -1232,22 +1232,22 @@ async function getOneTokenScanInfos(tokenAddress, proxy) {
         method: 'GET',
         headers:{
             'Access-Control-Allow-Origin': '*',
-            // "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
-            // "accept-encoding": "gzip, deflate, br",
-            // "accept-language": "en-US,en;q=0.9,ko;q=0.8",
-            // "cache-control": "no-cache",
+            "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+            "accept-encoding": "gzip, deflate, br",
+            "accept-language": "en-US,en;q=0.9,ko;q=0.8",
+            "cache-control": "no-cache",
             // "cookie": "etherscan_cookieconsent=True; __stripe_mid=d2e2d34f-807a-41e8-bbf2-1ac37dbe4455ee5c38; _ga_0JZ9C3M56S=GS1.1.1644113367.18.1.1644113367.0; cf_clearance=Pj7K0iTSGxl_qnQbZMgTjQn7Zy6.MW_BiCYOtZw7_X0-1645496763-0-150; etherscan_userid=talentboy726; etherscan_pwd=4792:Qdxb:HQrUBxwrp5ikbOIBSKYXMTPd7O++ma2M7Q84FltPmh8=; etherscan_autologin=True; _ga_XPR6BMZXSN=GS1.1.1650302413.5.1.1650302823.0; _ga=GA1.2.1180657611.1636121565; __cflb=02DiuFnsSsHWYH8WqVXaqGvd6BSBaXQLTxDDFmvVCK7ue; _gid=GA1.2.1618376717.1650956619; amp_fef1e8=82983145-731b-44bd-a14d-0951d7f20e72R...1g1ibmlmr.1g1iboqlp.39.p.42; ASP.NET_SessionId=quvnbzlmckj1jmnfvhm4ksdl",
-            // "pragma": "no-cache",
-            // "referer": "https://etherscan.io/search?f=0&q=wbtc",
-            // "sec-ch-ua": '" Not A;Brand";v="99", "Chromium";v="100", "Google Chrome";v="100"',
-            // "sec-ch-ua-mobile": "?0",
-            // "sec-ch-ua-platform": "Windows",
-            // "sec-fetch-dest": "document",
-            // "sec-fetch-mode": "navigate",
-            // "sec-fetch-site": "same-origin",
-            // "sec-fetch-user": "?1",
-            // "upgrade-insecure-requests": 1,
-            // "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36",
+            "pragma": "no-cache",
+            "referer": "https://etherscan.io/search?f=0&q=wbtc",
+            "sec-ch-ua": '" Not A;Brand";v="99", "Chromium";v="100", "Google Chrome";v="100"',
+            "sec-ch-ua-mobile": "?0",
+            "sec-ch-ua-platform": "Windows",
+            "sec-fetch-dest": "document",
+            "sec-fetch-mode": "navigate",
+            "sec-fetch-site": "same-origin",
+            "sec-fetch-user": "?1",
+            "upgrade-insecure-requests": 1,
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36",
         },
         // proxy: 'http://38.91.57.43:3128',
         // reconnect: {
@@ -1259,7 +1259,7 @@ async function getOneTokenScanInfos(tokenAddress, proxy) {
         // keepAlive: true,
         // timeout: 200000,
         // withCredentials: false,
-        agent: new HttpsProxyAgent('http://' + proxy)
+        // agent: new HttpsProxyAgent('http://' + proxy)
     })
 
     var res = await axios.fetchPage('https://etherscan.io/token/' + tokenAddress + '#balances', proxy)

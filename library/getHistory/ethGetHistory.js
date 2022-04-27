@@ -1861,7 +1861,7 @@ async function createTables() {
 
         try {
             await knex.raw('\
-            CREATE TABLE ' + config.networks[i] + '`_token_live` (\
+            CREATE TABLE `' + config.networks[i] + '_token_live` (\
                 `tokenAddress` varchar(255) DEFAULT NULL,\
                 `swapPrice` double DEFAULT NULL,\
                 `swapAmount` double DEFAULT NULL,\

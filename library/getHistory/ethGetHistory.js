@@ -1854,7 +1854,35 @@ async function createTables() {
     //     ')
     // } catch (err) {
     //     console.log(err)
-    // }    
+    // }
+
+    for (var i = 0; i < config.networks.length; i ++) {
+        if (config.networks[i] == 'eth') continue
+
+        try {
+            await knex.raw('\
+            CREATE TABLE ' + config.networks[i] + '`_token_live` (\
+                `tokenAddress` varchar(255) DEFAULT NULL,\
+                `swapPrice` double DEFAULT NULL,\
+                `swapAmount` double DEFAULT NULL,\
+                `swapMaker` varchar(255) DEFAULT NULL,\
+                `swapTransactionHash` varchar(255) DEFAULT NULL,\
+                `swapAt` timestamp NULL DEFAULT NULL\
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 ROW_FORMAT=DYNAMIC;\
+            ')
+        } catch (err) {
+            console.log(err)
+        }
+        
+        try {
+            await knex.raw('\
+            ALTER TABLE `' + config.networks[i] + '_token_live`\
+                ADD KEY `tokenAddress` (`tokenAddress`);\
+            ')
+        } catch (err) {
+            console.log(err)
+        }
+    }
 
     console.log('CREATING TABLES FINISHED!')
 }
@@ -1869,12 +1897,12 @@ async function init() {
 
     // await getTransactionHistory(FROMBLOCK)
 
-    await getUSDPrice()
+    // await getUSDPrice()
     // await removeDuplicate()
-    // await createTables()
+    await createTables()
 }
 
-// init()
+init()
 
 // getAllPairs(FROMBLOCK)
 
@@ -1895,5 +1923,5 @@ async function init() {
 // addMissedTokens()
 // getTokenSourceCodes()
 // getTokenCoingeckoInfos()
-getTokenScanInfos()
+// getTokenScanInfos()
 // getContavoInfo()

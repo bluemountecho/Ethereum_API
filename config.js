@@ -776,7 +776,7 @@ module.exports.iotex = {
     'PROXYCOUNT': 68,
     'USD_ADDRESS': "0x6fbcdc1169b5130c59e72e51ed68a84841c98cd1",
     'ETH_ADDRESS': "0xa00744882684c3e4747faefd68d283ea44099d03",
-    'lastBlockNumber': 16922950,
+    'lastBlockNumber': 17089072,
     'ETH_DECIMAL': 18,
     'ETH_ID': 26,
 }

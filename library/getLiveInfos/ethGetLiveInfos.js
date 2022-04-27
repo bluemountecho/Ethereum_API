@@ -431,6 +431,7 @@ async function writeTransactionHistoryFile(deleteDate, writeDate) {
     visDate[writeDate] = true
 
     await knex(liveTableName).where('swapAt', '<', deleteDate + ' ' + '00:00:00').delete()
+    await knex(tokenLiveTableName).where('swapAt', '<', deleteDate + ' ' + '00:00:00').delete()
 
     var ethData = []
 

@@ -395,7 +395,7 @@ module.exports.avalanche = {
     'PROXYCOUNT': 68,
     'USD_ADDRESS': "0xc7198437980c041c805a1edcba50c1ce5db95118",
     'ETH_ADDRESS': "0xb31f66aa3c1e785363f0875a1b74e27b85fd66c7",
-    'lastBlockNumber': 13545264,
+    'lastBlockNumber': 13974561,
     'ETH_DECIMAL': 18,
     'ETH_ID': 6,
 }

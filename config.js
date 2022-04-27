@@ -529,7 +529,7 @@ module.exports.metis = {
     'PROXYCOUNT': 68,
     'USD_ADDRESS': "0xea32a96608495e54156ae48931a7c20f0dcc1a21",
     'ETH_ADDRESS': "0xdeaddeaddeaddeaddeaddeaddeaddeaddead0000",
-    'lastBlockNumber': 2344248,
+    'lastBlockNumber': 2451181,
     'ETH_DECIMAL': 18,
     'ETH_ID': 13,
 }

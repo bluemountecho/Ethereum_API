@@ -1227,26 +1227,26 @@ async function getTokenCoingeckoInfos() {
 }
 
 async function getOneTokenScanInfos(tokenAddress, proxy) {   
-    // var res = await axios.request({
-    //     url: 'https://etherscan.io/token/' + tokenAddress + '#balances',
-    //     method: 'GET',
-    //     headers:{
-    //         'Access-Control-Allow-Origin': '*',
-    //     },
-    //     proxy: 'http://38.91.57.43:3128',
-    //     // reconnect: {
-    //     //     auto: true,
-    //     //     delay: 5000, // ms
-    //     //     maxAttempts: 5,
-    //     //     onTimeout: false
-    //     // },
-    //     // keepAlive: true,
-    //     // timeout: 200000,
-    //     // withCredentials: false,
-    //     // httpsAgent: new HttpsProxyAgent('https://' + proxy)
-    // })
+    var res = await axios.request({
+        url: 'https://etherscan.io/token/' + tokenAddress + '#balances',
+        method: 'GET',
+        headers:{
+            'Access-Control-Allow-Origin': '*',
+        },
+        // proxy: 'http://38.91.57.43:3128',
+        // reconnect: {
+        //     auto: true,
+        //     delay: 5000, // ms
+        //     maxAttempts: 5,
+        //     onTimeout: false
+        // },
+        // keepAlive: true,
+        // timeout: 200000,
+        // withCredentials: false,
+        httpsAgent: new HttpsProxyAgent('https://' + proxy)
+    })
 
-    var res = await getURL('https://etherscan.io/token/' + tokenAddress + '#balances', proxy)
+    // var res = await getURL('https://etherscan.io/token/' + tokenAddress + '#balances', proxy)
 
     myLogger.log(res)
     var dom = new JSDOM(res)

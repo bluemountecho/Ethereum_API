@@ -1262,7 +1262,7 @@ async function getOneTokenScanInfos(tokenAddress, proxy) {
         // agent: new HttpsProxyAgent('http://' + proxy)
     })
 
-    var res = await axios.fetchPage('https://etherscan.io/token/' + tokenAddress + '#balances', proxy)
+    // var res = await axios.fetchPage('https://etherscan.io/token/' + tokenAddress + '#balances', proxy)
 
     // var res = await getURL('https://etherscan.io/token/' + tokenAddress + '#balances', proxy)
 

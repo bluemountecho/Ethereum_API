@@ -1174,7 +1174,7 @@ async function updatePriceChanges() {
         var timeCur = new Date().getTime()
         var time24hago = convertTimestampToString(timeCur - 2000 * 86400, true)
         var timeToday = new Date(convertTimestampToString(timeCur, true).split(' ')[0] + ' 00:00:00').getTime()
-        var rows = await knex(tokenLiveTableName).where('swapAt', '>=', time24hago).select('*')
+        var rows = await knex(tokenLiveTableName).where('swapAt', '>=', time24hago).orderBy('swapAt', 'desc').select('*')
         var olds = await knex(changesTableName).select('*')
         var info = []
         var vis = []

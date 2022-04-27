@@ -1239,9 +1239,11 @@ async function updatePriceChanges() {
     } catch (err) {
         myLogger.log(err)
     }
+
+    setTimeout(updatePriceChanges, 1000)
 }
 
-setInterval(updatePriceChanges, 20000)
+updatePriceChanges()
 
 getTokenAndPairData()
 .then(res => {

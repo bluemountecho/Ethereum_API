@@ -14,6 +14,7 @@ const pairsTableName = chainName + '_pairs'
 const dailyPastTableName = chainName + '_daily'
 const liveTableName = chainName + '_live'
 const tokenDailyTableName = chainName + '_token_daily'
+const tokenLiveTableName = chainName + '_token_live'
 const changesTableName = chainName + '_changes'
 const proxyCnt = config[chainName].PROXYCOUNT
 const Web3 = require('web3')
@@ -611,6 +612,8 @@ async function init() {
             blockNumber = lastBlockNumber + 99
         }
 
+        console.log(lastBlockNumber, blockNumber)
+
         var tmpLastTrans = lastTransactionID
         var tmpLastBlock = lastestBlock
         var coinsFuncs = []
@@ -636,10 +639,15 @@ async function init() {
                 toBlock: blockNumber,
                 topics: ['0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67']
             }),
+            web3s[5].eth.getPastLogs({
+                fromBlock: lastBlockNumber,
+                toBlock: blockNumber,
+                topics: ['0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef']
+            }),
         ])
 
         for (var i = lastBlockNumber; i < blockNumber + (curBlock > blockNumber ? 1 : 0); i ++) {
-            coinsFuncs.push(web3s[(5 + i) % proxyCnt].eth.getBlock(i, true))
+            coinsFuncs.push(web3s[(6 + i) % proxyCnt].eth.getBlock(i, true))
         }
 
         var coinsResult = await Promise.all(coinsFuncs)
@@ -1084,6 +1092,45 @@ async function init() {
             await Promise.all(funcs)
         }
 
+        console.log(results[4].length)
+
+        for (var i = 0; i < results[4].length; i ++) {
+            var amt = Number.parseInt(hexToBn(result.data.substr(2, 64)))
+            var swapMaker = '0x' + results[4][i].topics[1].substr(26, 40).toLowerCase()
+            var addr = results[4][i].address.toLowerCase()
+            var hash = results[4][i].transactionHash.toLowerCase()
+            var block = results[4][i].blockNumber
+            var transactionID = results[4][i].logIndex
+
+            if (block < lastestBlock || (block == lastestBlock && transactionID <= lastTransactionID)) continue
+            if (block > tmpLastBlock || (block == tmpLastBlock && transactionID > tmpLastTrans)) {
+                tmpLastBlock = block
+                tmpLastTrans = transactionID
+            }
+
+            try {
+                var resBlock
+
+                if (!blocksData[block]) {
+                    resBlock = await web3.eth.getBlock(block)
+                    blocksData[block] = {timestamp: resBlock.timestamp}
+                } else {
+                    resBlock = blocksData[block]
+                }
+
+                await knex(tokenLiveTableName).insert({
+                    tokenAddress: addr,
+                    swapPrice: tokensData[addr].lastPrice * (0.9995 + Math.random() * 0.001),
+                    swapAmount: amt / 10 ** tokensData[addr].tokenDecimals,
+                    swapMaker: swapMaker,
+                    swapTransactionHash: hash,
+                    swapAt: convertTimestampToString(resBlock.timestamp * 1000, true)
+                })
+            } catch (err) {
+
+            }
+        }
+
         lastTransactionID = tmpLastTrans
         lastestBlock = tmpLastBlock
 
@@ -1198,7 +1245,7 @@ async function updatePriceChanges() {
     }
 }
 
-setInterval(updatePriceChanges, 60000)
+setInterval(updatePriceChanges, 20000)
 
 getTokenAndPairData()
 .then(res => {

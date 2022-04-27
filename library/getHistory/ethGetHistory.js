@@ -1265,6 +1265,8 @@ async function getOneTokenScanInfos(tokenAddress, proxy) {
 
     }
 
+    myLogger.log(tokenAddress, proxy, totalHolders)
+
     // var links = {}
 
     // try {

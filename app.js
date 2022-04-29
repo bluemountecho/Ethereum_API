@@ -25,7 +25,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(basicAuth({
-  users: { 'user': 'pass' },
+  users: { 'vdfhg4y4g(#%*g': 'U#GT*Gy98TH89y87gS4*(#TG*EG8&(*#YTGEH' },
   challenge: true,
   realm: 'foo',
 }))

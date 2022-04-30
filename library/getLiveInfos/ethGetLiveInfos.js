@@ -604,6 +604,14 @@ async function writeTransactionHistoryFile(deleteDate, writeDate) {
     // myLogger.log(writeDate + " WRITE TRANSACTION HISTORY FILE FINISHED!!!")
 }
 
+async function getLastBlock() {
+    var rows = await knex(liveTableName).select('swapTransactionHash').orderBy('swapAt', 'desc').limit(1).offset(0)
+    var hash = rows[0].swapTransactionHash
+    var res = await web3s[0].eth.getTransaction(hash)
+
+    lastBlockNumber = res.blockNumber
+}
+
 async function init() {
     try {
         var blockNumber = await web3s[0].eth.getBlockNumber()
@@ -638,43 +646,43 @@ async function init() {
                 toBlock: blockNumber,
                 topics: ['0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67']
             }),
-            // web3s[5].eth.getPastLogs({
-            //     fromBlock: lastBlockNumber,
-            //     toBlock: blockNumber,
-            //     topics: ['0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef']
-            // }),
+            web3s[5].eth.getPastLogs({
+                fromBlock: lastBlockNumber,
+                toBlock: blockNumber,
+                topics: ['0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef']
+            }),
         ])
 
-        // for (var i = lastBlockNumber; i < blockNumber + (curBlock > blockNumber ? 1 : 0); i ++) {
-        //     coinsFuncs.push(web3s[(6 + i) % proxyCnt].eth.getBlock(i, true))
-        // }
+        for (var i = lastBlockNumber; i < blockNumber + (curBlock > blockNumber ? 1 : 0); i ++) {
+            coinsFuncs.push(web3s[(6 + i) % proxyCnt].eth.getBlock(i, true))
+        }
 
-        // var coinsResult = await Promise.all(coinsFuncs)
+        var coinsResult = await Promise.all(coinsFuncs)
         
-        // for (var i = 0; i < blockNumber + (curBlock > blockNumber ? 1 : 0) - lastBlockNumber; i ++) {
-        //     for (var j = 0; j < coinsResult[i].transactions.length; j ++) {
-        //         if (coinsResult[i].transactions[j].value == '0') continue
+        for (var i = 0; i < blockNumber + (curBlock > blockNumber ? 1 : 0) - lastBlockNumber; i ++) {
+            for (var j = 0; j < coinsResult[i].transactions.length; j ++) {
+                if (coinsResult[i].transactions[j].value == '0') continue
 
-        //         var tmpAmount = Number.parseInt(coinsResult[i].transactions[j].value) / 10 ** ETH_DECIMAL
-        //         var tmpPrice
+                var tmpAmount = Number.parseInt(coinsResult[i].transactions[j].value) / 10 ** ETH_DECIMAL
+                var tmpPrice
 
-        //         if (chainName == 'aurora') {
-        //             tmpPrice = tokensData[ETH_ADDRESS1].lastPrice * (0.9995 + Math.random() * 0.001)
-        //         } else {
-        //             tmpPrice = tokensData[ETH_ADDRESS].lastPrice * (0.9995 + Math.random() * 0.001)
-        //         }
+                if (chainName == 'aurora') {
+                    tmpPrice = tokensData[ETH_ADDRESS1].lastPrice * (0.9995 + Math.random() * 0.001)
+                } else {
+                    tmpPrice = tokensData[ETH_ADDRESS].lastPrice * (0.9995 + Math.random() * 0.001)
+                }
 
-        //         await knex('main_live').insert({
-        //             coin_id: ETH_ID,
-        //             swapAt: convertTimestampToString(coinsResult[i].timestamp * 1000, true),
-        //             swapAmount: tmpAmount,
-        //             swapAmountUSD: tmpAmount * tmpPrice,
-        //             swapPrice: tmpPrice,
-        //             swapMaker: coinsResult[i].transactions[j].from.toLowerCase(),
-        //             swapTransactionHash: coinsResult[i].transactions[j].hash
-        //         })
-        //     }
-        // }
+                await knex('main_live').insert({
+                    coin_id: ETH_ID,
+                    swapAt: convertTimestampToString(coinsResult[i].timestamp * 1000, true),
+                    swapAmount: tmpAmount,
+                    swapAmountUSD: tmpAmount * tmpPrice,
+                    swapPrice: tmpPrice,
+                    swapMaker: coinsResult[i].transactions[j].from.toLowerCase(),
+                    swapTransactionHash: coinsResult[i].transactions[j].hash
+                })
+            }
+        }
 
         // myLogger.log('==================================================')
         // myLogger.log('lastBlockNumber: ' + lastBlockNumber)
@@ -1091,42 +1099,42 @@ async function init() {
             await Promise.all(funcs)
         }
 
-        // for (var i = 0; i < results[4].length; i ++) {
-        //     try {
-        //         var amt = Number.parseInt(hexToBn(results[4][i].data.substr(2, 64)))
-        //         var swapMaker = '0x' + results[4][i].topics[1].substr(26, 40).toLowerCase()
-        //         var addr = results[4][i].address.toLowerCase()
-        //         var hash = results[4][i].transactionHash.toLowerCase()
-        //         var block = results[4][i].blockNumber
-        //         var transactionID = results[4][i].logIndex
+        for (var i = 0; i < results[4].length; i ++) {
+            try {
+                var amt = Number.parseInt(hexToBn(results[4][i].data.substr(2, 64)))
+                var swapMaker = '0x' + results[4][i].topics[1].substr(26, 40).toLowerCase()
+                var addr = results[4][i].address.toLowerCase()
+                var hash = results[4][i].transactionHash.toLowerCase()
+                var block = results[4][i].blockNumber
+                var transactionID = results[4][i].logIndex
 
-        //         if (block < lastestBlock || (block == lastestBlock && transactionID <= lastTransactionID)) continue
-        //         if (block > tmpLastBlock || (block == tmpLastBlock && transactionID > tmpLastTrans)) {
-        //             tmpLastBlock = block
-        //             tmpLastTrans = transactionID
-        //         }
+                if (block < lastestBlock || (block == lastestBlock && transactionID <= lastTransactionID)) continue
+                if (block > tmpLastBlock || (block == tmpLastBlock && transactionID > tmpLastTrans)) {
+                    tmpLastBlock = block
+                    tmpLastTrans = transactionID
+                }
 
-        //         var resBlock
+                var resBlock
 
-        //         if (!blocksData[block]) {
-        //             resBlock = await web3s[0].eth.getBlock(block)
-        //             blocksData[block] = {timestamp: resBlock.timestamp}
-        //         } else {
-        //             resBlock = blocksData[block]
-        //         }
+                if (!blocksData[block]) {
+                    resBlock = await web3s[0].eth.getBlock(block)
+                    blocksData[block] = {timestamp: resBlock.timestamp}
+                } else {
+                    resBlock = blocksData[block]
+                }
 
-        //         await knex(tokenLiveTableName).insert({
-        //             tokenAddress: addr,
-        //             swapPrice: tokensData[addr].lastPrice * (0.9995 + Math.random() * 0.001),
-        //             swapAmount: amt / 10 ** tokensData[addr].tokenDecimals,
-        //             swapMaker: swapMaker,
-        //             swapTransactionHash: hash,
-        //             swapAt: convertTimestampToString(resBlock.timestamp * 1000, true)
-        //         })
-        //     } catch (err) {
+                await knex(tokenLiveTableName).insert({
+                    tokenAddress: addr,
+                    swapPrice: tokensData[addr].lastPrice * (0.9995 + Math.random() * 0.001),
+                    swapAmount: amt / 10 ** tokensData[addr].tokenDecimals,
+                    swapMaker: swapMaker,
+                    swapTransactionHash: hash,
+                    swapAt: convertTimestampToString(resBlock.timestamp * 1000, true)
+                })
+            } catch (err) {
 
-        //     }
-        // }
+            }
+        }
 
         lastTransactionID = tmpLastTrans
         lastestBlock = tmpLastBlock
@@ -1241,12 +1249,15 @@ async function updatePriceChanges() {
         myLogger.log(err)
     }
 
-    setTimeout(updatePriceChanges, 20000)
+    setTimeout(updatePriceChanges, 60000)
 }
 
-// updatePriceChanges()
+updatePriceChanges()
 
 getTokenAndPairData()
 .then(res => {
-    init()
+    getLastBlock()
+    .then(res1 => {
+        init()
+    })
 })

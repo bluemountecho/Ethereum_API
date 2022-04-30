@@ -1244,7 +1244,7 @@ async function updatePriceChanges() {
     setTimeout(updatePriceChanges, 20000)
 }
 
-updatePriceChanges()
+// updatePriceChanges()
 
 getTokenAndPairData()
 .then(res => {

@@ -638,11 +638,11 @@ async function init() {
                 toBlock: blockNumber,
                 topics: ['0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67']
             }),
-            web3s[5].eth.getPastLogs({
-                fromBlock: lastBlockNumber,
-                toBlock: blockNumber,
-                topics: ['0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef']
-            }),
+            // web3s[5].eth.getPastLogs({
+            //     fromBlock: lastBlockNumber,
+            //     toBlock: blockNumber,
+            //     topics: ['0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef']
+            // }),
         ])
 
         for (var i = lastBlockNumber; i < blockNumber + (curBlock > blockNumber ? 1 : 0); i ++) {
@@ -1091,42 +1091,42 @@ async function init() {
             await Promise.all(funcs)
         }
 
-        for (var i = 0; i < results[4].length; i ++) {
-            try {
-                var amt = Number.parseInt(hexToBn(results[4][i].data.substr(2, 64)))
-                var swapMaker = '0x' + results[4][i].topics[1].substr(26, 40).toLowerCase()
-                var addr = results[4][i].address.toLowerCase()
-                var hash = results[4][i].transactionHash.toLowerCase()
-                var block = results[4][i].blockNumber
-                var transactionID = results[4][i].logIndex
+        // for (var i = 0; i < results[4].length; i ++) {
+        //     try {
+        //         var amt = Number.parseInt(hexToBn(results[4][i].data.substr(2, 64)))
+        //         var swapMaker = '0x' + results[4][i].topics[1].substr(26, 40).toLowerCase()
+        //         var addr = results[4][i].address.toLowerCase()
+        //         var hash = results[4][i].transactionHash.toLowerCase()
+        //         var block = results[4][i].blockNumber
+        //         var transactionID = results[4][i].logIndex
 
-                if (block < lastestBlock || (block == lastestBlock && transactionID <= lastTransactionID)) continue
-                if (block > tmpLastBlock || (block == tmpLastBlock && transactionID > tmpLastTrans)) {
-                    tmpLastBlock = block
-                    tmpLastTrans = transactionID
-                }
+        //         if (block < lastestBlock || (block == lastestBlock && transactionID <= lastTransactionID)) continue
+        //         if (block > tmpLastBlock || (block == tmpLastBlock && transactionID > tmpLastTrans)) {
+        //             tmpLastBlock = block
+        //             tmpLastTrans = transactionID
+        //         }
 
-                var resBlock
+        //         var resBlock
 
-                if (!blocksData[block]) {
-                    resBlock = await web3s[0].eth.getBlock(block)
-                    blocksData[block] = {timestamp: resBlock.timestamp}
-                } else {
-                    resBlock = blocksData[block]
-                }
+        //         if (!blocksData[block]) {
+        //             resBlock = await web3s[0].eth.getBlock(block)
+        //             blocksData[block] = {timestamp: resBlock.timestamp}
+        //         } else {
+        //             resBlock = blocksData[block]
+        //         }
 
-                await knex(tokenLiveTableName).insert({
-                    tokenAddress: addr,
-                    swapPrice: tokensData[addr].lastPrice * (0.9995 + Math.random() * 0.001),
-                    swapAmount: amt / 10 ** tokensData[addr].tokenDecimals,
-                    swapMaker: swapMaker,
-                    swapTransactionHash: hash,
-                    swapAt: convertTimestampToString(resBlock.timestamp * 1000, true)
-                })
-            } catch (err) {
+        //         await knex(tokenLiveTableName).insert({
+        //             tokenAddress: addr,
+        //             swapPrice: tokensData[addr].lastPrice * (0.9995 + Math.random() * 0.001),
+        //             swapAmount: amt / 10 ** tokensData[addr].tokenDecimals,
+        //             swapMaker: swapMaker,
+        //             swapTransactionHash: hash,
+        //             swapAt: convertTimestampToString(resBlock.timestamp * 1000, true)
+        //         })
+        //     } catch (err) {
 
-            }
-        }
+        //     }
+        // }
 
         lastTransactionID = tmpLastTrans
         lastestBlock = tmpLastBlock

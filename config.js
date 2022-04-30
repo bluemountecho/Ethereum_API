@@ -216,7 +216,7 @@ module.exports.bsc = {
     'PROXYCOUNT': 68,
     'USD_ADDRESS': "0xe9e7cea3dedca5984780bafc599bd69add087d56",
     'ETH_ADDRESS': "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c",
-    'lastBlockNumber': 17370838,
+    'lastBlockNumber': 17371188,
     'ETH_DECIMAL': 18,
     'ETH_ID': 2,
 }

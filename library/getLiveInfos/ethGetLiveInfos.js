@@ -1241,7 +1241,7 @@ async function updatePriceChanges() {
         myLogger.log(err)
     }
 
-    setTimeout(updatePriceChanges, 1000)
+    setTimeout(updatePriceChanges, 20000)
 }
 
 updatePriceChanges()

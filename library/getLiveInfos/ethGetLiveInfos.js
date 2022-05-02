@@ -890,7 +890,7 @@ async function init() {
                         myLogger.log(err)
                     }
                 } catch (err) {
-                    
+                    console.log(err)
                 }
             }
 

@@ -686,6 +686,8 @@ async function init() {
             }
         }
 
+        console.log(coinsResult.length)
+
         // myLogger.log('==================================================')
         // myLogger.log('lastBlockNumber: ' + lastBlockNumber)
         // myLogger.log('UNISWAP V2 PAIR CREATED: ' + results[0].length)
@@ -744,6 +746,8 @@ async function init() {
 
             await Promise.all(funcs)
         }
+
+        console.log(results[0].length)
 
         for (var i = 0; i < results[1].length; i += proxyCnt) {
             async function getOneV2Swap(result, web3) {
@@ -899,6 +903,8 @@ async function init() {
             await Promise.all(funcs)
         }
 
+        console.log(results[1].length)
+
         for (var i = 0; i < results[2].length; i += proxyCnt) {
             async function getOneV3Pair(result, web3) {
                 try {
@@ -950,6 +956,8 @@ async function init() {
 
             await Promise.all(funcs)
         }
+
+        console.log(results[2].length)
 
         for (var i = 0; i < results[3].length; i += proxyCnt) {
             async function getOneV3Swap(result, web3) {
@@ -1101,6 +1109,8 @@ async function init() {
             await Promise.all(funcs)
         }
 
+        console.log(results[3].length)
+
         for (var i = 0; i < results[4].length; i ++) {
             try {
                 var amt = Number.parseInt(hexToBn(results[4][i].data.substr(2, 64)))
@@ -1137,6 +1147,8 @@ async function init() {
 
             }
         }
+
+        console.log(results[4].length)
 
         lastTransactionID = tmpLastTrans
         lastestBlock = tmpLastBlock

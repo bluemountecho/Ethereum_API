@@ -1249,15 +1249,15 @@ async function updatePriceChanges() {
         myLogger.log(err)
     }
 
-    setTimeout(updatePriceChanges, 60000)
+    setTimeout(updatePriceChanges, 10000)
 }
 
-// updatePriceChanges()
+updatePriceChanges()
 
 getTokenAndPairData()
 .then(res => {
-    // getLastBlock()
-    // .then(res1 => {
+    getLastBlock()
+    .then(res1 => {
         init()
-    // })
+    })
 })

@@ -1266,7 +1266,6 @@ async function getOneTokenScanInfos(tokenAddress, proxy) {
 
     // var res = await getURL('https://etherscan.io/token/' + tokenAddress + '#balances', proxy)
 
-    myLogger.log(res)
     var dom = new JSDOM(res)
     // var totalSupply = 0
     
@@ -1316,58 +1315,58 @@ async function getOneTokenScanInfos(tokenAddress, proxy) {
     // } catch (err) {
     // }
     
-    // res = await axios.request({
-    //     url: 'https://etherscan.io/token/generic-tokenholders2?m=normal&p=1&a=' + tokenAddress,
-    //     method: 'GET',
-    //     headers:{
-    //         'Access-Control-Allow-Origin': '*',
-    //     },
-    //     proxy: 'http://38.91.57.43:3128',
-    //     // reconnect: {
-    //     //     auto: true,
-    //     //     delay: 5000, // ms
-    //     //     maxAttempts: 5,
-    //     //     onTimeout: false
-    //     // },
-    //     // keepAlive: true,
-    //     // timeout: 200000,
-    //     // withCredentials: false,
-    //     // httpsAgent: new HttpsProxyAgent('https://' + proxy)
-    // })
+    res = await axios.request({
+        url: 'https://etherscan.io/token/generic-tokenholders2?m=normal&p=1&a=' + tokenAddress,
+        method: 'GET',
+        headers:{
+            'Access-Control-Allow-Origin': '*',
+        },
+        proxy: 'http://38.91.57.43:3128',
+        // reconnect: {
+        //     auto: true,
+        //     delay: 5000, // ms
+        //     maxAttempts: 5,
+        //     onTimeout: false
+        // },
+        // keepAlive: true,
+        // timeout: 200000,
+        // withCredentials: false,
+        // httpsAgent: new HttpsProxyAgent('https://' + proxy)
+    })
 
-    // res = await getURL('https://etherscan.io/token/generic-tokenholders2?m=normal&p=1&a=' + tokenAddress, proxy)    
-    // dom = new JSDOM(res)
+    res = await getURL('https://etherscan.io/token/generic-tokenholders2?m=normal&p=1&a=' + tokenAddress, proxy)    
+    dom = new JSDOM(res)
 
-    // var rows = dom.window.document.querySelectorAll('tbody tr')
-    // var holders = []
+    var rows = dom.window.document.querySelectorAll('tbody tr')
+    var holders = []
 
-    // for (var j = 0; j < rows.length; j ++) {
-    //     try {
-    //         var amount = rows[j].childNodes[2].textContent.replace(/,/g, '').replace(/ /g, '')
-    //         var address = j
-    //         var elem = rows[j].childNodes[1].querySelector('span[data-toggle="tooltip"]')
+    for (var j = 0; j < rows.length; j ++) {
+        try {
+            var amount = rows[j].childNodes[2].textContent.replace(/,/g, '').replace(/ /g, '')
+            var address = j
+            var elem = rows[j].childNodes[1].querySelector('span[data-toggle="tooltip"]')
 
-    //         if (elem == null) {
-    //             address = rows[j].childNodes[1].querySelector('a').textContent
-    //         } else {
-    //             var tmp = elem.getAttribute('title').split('(')
-    //             address = tmp[tmp.length - 1].split(')')[0]
-    //         }
+            if (elem == null) {
+                address = rows[j].childNodes[1].querySelector('a').textContent
+            } else {
+                var tmp = elem.getAttribute('title').split('(')
+                address = tmp[tmp.length - 1].split(')')[0]
+            }
 
-    //         holders.push({
-    //             address: address,
-    //             amount: amount
-    //         })
-    //     } catch (err) {
+            holders.push({
+                address: address,
+                amount: amount
+            })
+        } catch (err) {
 
-    //     }
-    // }
+        }
+    }
 
     await knex(tokensTableName).where('tokenAddress', tokenAddress).update({
         // totalSupply: totalSupply,
         totalHolders: totalHolders,
         // links: JSON.stringify(links),
-        // holders: JSON.stringify(holders)
+        holders: JSON.stringify(holders)
     })
 
     // await knex(tokensTableName).insert({
@@ -1413,11 +1412,11 @@ async function getTokenScanInfos() {
     //     myLogger.log(i)
     // }
 
-    for (var i = 0; i < tokens.length; i += 10) {
+    for (var i = 0; i < tokens.length; i += 5) {
         myLogger.log(i)
         var funcs = []
 
-        for (var j = i; j < i + 10 && j < tokens.length; j ++) {
+        for (var j = i; j < i + 5 && j < tokens.length; j ++) {
             funcs.push(getOneTokenScanInfos(tokens[j].tokenAddress, config.PROXY[j - i]))
             // await getOneTokenScanInfos(tokens[j].tokenAddress, config.PROXY[j - i])
         }
@@ -1899,7 +1898,7 @@ async function init() {
 
     // await getUSDPrice()
     // await removeDuplicate()
-    await createTables()
+    // await createTables()
 }
 
 init()

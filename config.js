@@ -536,7 +536,7 @@ module.exports.metis = {
 
 module.exports.heco = {
     'web3Providers': [
-        'https://http-mainnet-node.huobichain.com',
+        'https://http-mainnet.hecochain.com/',
     ],
     'endPointType': 1,
     'FROMBLOCK': 0,

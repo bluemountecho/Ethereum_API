@@ -112,4 +112,11 @@ router.get('/coins', function(req, res, next) {
   })
 });
 
+router.get('/all_change_tokens', function(req, res, next) {
+  etherMainnetFuncs.getAllChangeTokens(req.network)
+  .then((data) => {
+    res.send(JSON.stringify(data))
+  })
+});
+
 module.exports = router;

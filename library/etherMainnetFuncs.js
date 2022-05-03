@@ -1083,3 +1083,15 @@ module.exports.getAllCoinsList = async function getAllCoinsList(page = 0, order 
 
     return res
 }
+
+module.exports.getAllChangeTokens = async function getAllChangeTokens(network) {
+    var changesTableName = network + '_changes'
+    var data = []
+    var rows = await knex(changesTableName).select('*')
+
+    for (var i = 0; i < rows.length; i ++) {
+        data.push(rows[i].tokenAddress)
+    }
+
+    return data
+}

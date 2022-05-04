@@ -1346,7 +1346,7 @@ async function getTokenScanInfos(network) {
 async function getAllScanInfos() {
     var funcs = []
 
-    for (var i = 0; i < 1; i ++) {
+    for (var i = 0; i < config.networks.length; i ++) {
         await knex(config.networks[i] + '_tokens').delete()
 
         funcs.push(getTokenScanInfos(config.networks[i]))

@@ -283,8 +283,7 @@ async function getURL(url, proxy, network = '') {
         'url': url,
         'method': "GET",
         'headers': network == 'bsc' ? {
-            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36',
-            'cookie': 'bscscan_cookieconsent=True; __stripe_mid=eda84153-cc8a-4d88-8ac4-93708519f28573f07e; _ga_0JZ9C3M56S=GS1.1.1643550258.1.1.1643550327.0; bscscan_userid=CharlesMiller; bscscan_pwd=4792:Qdxb:7xaiYPmsbzWEbHtu5CaZUpH2VE4vmDNouq/EEiepXiU=; bscscan_autologin=True; amp_fef1e8=82983145-731b-44bd-a14d-0951d7f20e72R...1g0f7ojag.1g0f7ojh9.d.5.i; ASP.NET_SessionId=c5mthhgcplqsgbaduydmwpjs; _gid=GA1.2.1514779430.1651573041; __cflb=0H28vyb6xVveKGjdV3CYUMgiti5JgVsqkZwhWDyXaig; _ga=GA1.2.936820121.1637802154; _ga_PQY6J2Q8EP=GS1.1.1651637769.51.1.1651637820.0; cf_chl_2=bfd1328cf103cef; cf_chl_prog=x12; cf_clearance=FKtrz62Jr5oR2XX_aFTRDa7lqZUJtkSGP8sRXfR_ReM-1651643423-0-250; __cf_bm=NmrGWpW7PffJhdJyybtfGTaoRRI9.6w3.FXh6VdHIPo-1651643426-0-Ac9hfb27XqUvkIjKVByv6s42fBKIOCwNBAJbm4ywqsO+b9USs7ndX6S9uDLzyGflnCwioTnIEN/37ZZSI7JNVqFuiJ3QCGcDlnR+To6W4aYZlZ87mwPkFvN8q+V/kc64Lg=='
+            'user-agent': 'f_clearance=u8hYbTClFexQe50xgx8AMYZSeKPF9c8lE6wRcW2IG5U-1651644091-0-250; ASP.NET_SessionId=uwhn2rk2h1k5yxo4ylrf415f; __cflb=02DiuJNoxEYARvg2sN4zbncfn2GL25UpfgiXJQ9o28LgU; _gid=GA1.2.2037784143.1651651310; __cf_bm=pcqCg5laibh_HLAgl5YRnZBcVq0uxSWRZSU6rdlsn0k-1651644108-0-AZuKa1dTVrv44eqWEJ6c47qLvdRQbUPq3G+omIi2A3twEc2L08PtXgZ2D8c/61vjihQYwC8w441tOYnxLi1r7Yu7UxpntAyOnhU/n8Xvk+n1YjXWO33V10AIklI1GTXbFg==; _ga_PQY6J2Q8EP=GS1.1.1651651305.1.1.1651651342.0; _ga=GA1.2.639158328.1651651309'
         } : {},
         // 'proxy': 'http://' + proxy
     }, function (error, response, body) {

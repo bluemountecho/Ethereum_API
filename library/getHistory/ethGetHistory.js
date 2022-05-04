@@ -284,10 +284,14 @@ async function getURL(url, proxy) {
         'method': "GET",
         // 'proxy': 'http://' + proxy
     }, function (error, response, body) {
-        myLogger.log(response.statusCode)
-        if (!error && response.statusCode == 200) {
-            defer.resolve(body)
-        } else {
+        try {
+            myLogger.log(response.statusCode)
+            if (!error && response && response.statusCode == 200) {
+                defer.resolve(body)
+            } else {
+                defer.reject('')
+            }
+        } catch (err) {
             defer.reject('')
         }
     })

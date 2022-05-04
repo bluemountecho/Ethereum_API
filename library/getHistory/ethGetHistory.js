@@ -221,20 +221,17 @@ if (config[chainName].endPointType == 1) {
     }
 }
 
-myLogger.log('GET WEB3S FINISHED!')
-myLogger.log(web3s[0]._provider)
-
 const knex = require('knex')({
     client: 'mysql',
     connection: {
         host : '127.0.0.1',
         port : 3306,
-        user : 'admin_root',
-        password : 'bOPTDZXP8Xvdf9I1',
-        database : 'admin_ethereum_api'
-        // user : 'root',
-        // password : '',
-        // database : 'ethereum_api'
+        // user : 'admin_root',
+        // password : 'bOPTDZXP8Xvdf9I1',
+        // database : 'admin_ethereum_api'
+        user : 'root',
+        password : '',
+        database : 'ethereum_api'
     }
 })
 
@@ -1226,65 +1223,11 @@ async function getTokenCoingeckoInfos() {
     myLogger.log('Getting Token Coingecko Info Finished!!!')
 }
 
-async function getOneTokenScanInfos(tokenAddress, proxy) {   
-    var res = await axios.request({
-        url: 'http://etherscan.io/token/' + tokenAddress + '#balances',
-        method: 'GET',
-        headers:{
-            // 'Access-Control-Allow-Origin': '*',
-            "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
-            "accept-encoding": "gzip, deflate, br",
-            // "accept-language": "en-US,en;q=0.9,ko;q=0.8",
-            // "cache-control": "no-cache",
-            "cookie": "ASP.NET_SessionId=5bqfqkqjggnz11k1se3hd1x4; __cflb=02DiuFnsSsHWYH8WqVXaqGvd6BSBaXQLU6DhpiyVYBHdW",
-            // "pragma": "no-cache",
-            // "referer": "https://etherscan.io/search?f=0&q=wbtc",
-            // "sec-ch-ua": '" Not A;Brand";v="99", "Chromium";v="100", "Google Chrome";v="100"',
-            // "sec-ch-ua-mobile": "?0",
-            // "sec-ch-ua-platform": "Windows",
-            // "sec-fetch-dest": "document",
-            // "sec-fetch-mode": "navigate",
-            // "sec-fetch-site": "same-origin",
-            // "sec-fetch-user": "?1",
-            // "upgrade-insecure-requests": 1,
-            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36",
-        },
-        // proxy: 'http://38.91.57.43:3128',
-        // reconnect: {
-        //     auto: true,
-        //     delay: 5000, // ms
-        //     maxAttempts: 5,
-        //     onTimeout: false
-        // },
-        // keepAlive: true,
-        // timeout: 200000,
-        // withCredentials: false,
-        // agent: new HttpsProxyAgent('http://' + proxy)
-    })
-
-    // var res = await axios.fetchPage('https://etherscan.io/token/' + tokenAddress + '#balances', proxy)
-
-    // var res = await getURL('https://etherscan.io/token/' + tokenAddress + '#balances', proxy)
-
+async function getOneTokenScanInfos(network, tokenAddress, proxy) {
+    var res
+    // var res = await getURL(config[network].ExplorerSite + '/token/' + tokenAddress + '#balances', proxy)
     var dom = new JSDOM(res)
-    // var totalSupply = 0
-    
-    // try {
-    //     totalSupply = dom.window.document.querySelector('span[title="Maximum Total Supply"]').parentElement.nextElementSibling.firstElementChild.getAttribute('title').replace(/,/g, '').replace(/ /g, '')
-    // } catch (err) {
-
-    // }
-
     var totalHolders = 0
-    
-    try {
-        totalHolders = dom.window.document.querySelector('#sparkholderscontainer').previousElementSibling.textContent.split('(')[0].replace(/,/g, '').replace(/ /g, '').replace(new RegExp('\n', 'g'), '')
-    } catch (err) {
-
-    }
-
-    myLogger.log(tokenAddress, proxy, totalHolders)
-
     // var links = {}
 
     // try {
@@ -1314,28 +1257,15 @@ async function getOneTokenScanInfos(tokenAddress, proxy) {
     //     }
     // } catch (err) {
     // }
-    
-    res = await axios.request({
-        url: 'https://etherscan.io/token/generic-tokenholders2?m=normal&p=1&a=' + tokenAddress,
-        method: 'GET',
-        headers:{
-            'Access-Control-Allow-Origin': '*',
-        },
-        proxy: 'http://38.91.57.43:3128',
-        // reconnect: {
-        //     auto: true,
-        //     delay: 5000, // ms
-        //     maxAttempts: 5,
-        //     onTimeout: false
-        // },
-        // keepAlive: true,
-        // timeout: 200000,
-        // withCredentials: false,
-        // httpsAgent: new HttpsProxyAgent('https://' + proxy)
-    })
 
-    res = await getURL('https://etherscan.io/token/generic-tokenholders2?m=normal&p=1&a=' + tokenAddress, proxy)    
+    res = await getURL(config[network].ExplorerSite + '/token/generic-tokenholders2?m=normal&p=1&a=' + tokenAddress, proxy)    
     dom = new JSDOM(res)
+
+    try {
+        totalHolders = parseInt(dom.window.document.querySelector('p').textContent.split('total of')[1].replace(/,/, ''))
+    } catch (err) {
+
+    }
 
     var rows = dom.window.document.querySelectorAll('tbody tr')
     var holders = []
@@ -1362,48 +1292,18 @@ async function getOneTokenScanInfos(tokenAddress, proxy) {
         }
     }
 
-    await knex(tokensTableName).where('tokenAddress', tokenAddress).update({
-        // totalSupply: totalSupply,
+    await knex(network + '_tokens').where('tokenAddress', tokenAddress).insert({
+        tokenAddress: tokenAddress,
         totalHolders: totalHolders,
         // links: JSON.stringify(links),
         holders: JSON.stringify(holders)
     })
-
-    // await knex(tokensTableName).insert({
-    //     tokenAddress: tokenAddress,
-    //     totalSupply: totalSupply,
-    //     totalHolders: totalHolders,
-    //     links: JSON.stringify(links),
-    //     holders: JSON.stringify(holders)
-    // })
 }
 
-async function getTokenScanInfos() {
-    // var tokens = await knex(tokensTableName)
-    //     .orderBy('createdAt', 'asc')
-    //     .select('*')
-    // var vis = []
-    // var res = await axios.get('http://stjepan:stjepan@51.83.184.35:8888/eth/all_tokens')
+async function getTokenScanInfos(network) {
+    var tokens = (await axios.get('http://vdfhg4y4g%28%23%25%2Ag:U%23GT%2AGy98TH89y87gS4%2A%28%23TG%2AEG8%26%28%2A%23YTGEH@51.83.184.35:8888/' + network + '/all_change_tokens')).data
 
-    // for (var i = 0; i < tokens.length; i ++) {
-    //     vis[tokens[i].tokenAddress] = true
-    // }
-
-    // myLogger.log(res.data.data)
-
-    // for (var i = 0; i < res.data.data.length; i ++) {
-    //     if (!vis[res.data.data[i].address]) {
-    //         await knex(tokensTableName).insert({
-    //             tokenAddress: res.data.data[i].address
-    //         })
-    //     }
-    // }
-
-    tokens = await knex(changesTableName).select('*')
-
-    // var tokens = (await axios.get('http://stjepan:stjepan@51.83.184.35:8888/eth/all_tokens')).data.data
-
-    myLogger.log(tokens.length)
+    myLogger.log(network, tokens.length)
 
     // for (var i = 0; i < tokens.length; i ++) {
     //     await knex(tokensTableName).insert({
@@ -1413,12 +1313,10 @@ async function getTokenScanInfos() {
     // }
 
     for (var i = 0; i < tokens.length; i += 5) {
-        myLogger.log(i)
         var funcs = []
 
         for (var j = i; j < i + 5 && j < tokens.length; j ++) {
-            funcs.push(getOneTokenScanInfos(tokens[j].tokenAddress, config.PROXY[j - i]))
-            // await getOneTokenScanInfos(tokens[j].tokenAddress, config.PROXY[j - i])
+            funcs.push(getOneTokenScanInfos(network, tokens[j], config.PROXY[j - i]))
         }
 
         try {
@@ -1431,6 +1329,20 @@ async function getTokenScanInfos() {
     }
 
     myLogger.log('Getting Token Scan Infos Finished!')
+}
+
+async function getAllScanInfos() {
+    var funcs = []
+
+    for (var i = 0; i < config.networks.length; i ++) {
+        await knex(config.networks[i] + '_tokens').delete()
+
+        funcs.push(getTokenScanInfos(config.networks[i]))
+    }
+
+    await Promise.all(funcs)
+
+    setTimeout(getAllScanInfos, 1000)
 }
 
 async function addMissedTokens() {
@@ -1899,6 +1811,7 @@ async function init() {
     // await getUSDPrice()
     // await removeDuplicate()
     // await createTables()
+    getAllScanInfos()
 }
 
 init()

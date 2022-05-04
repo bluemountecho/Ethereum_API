@@ -219,6 +219,7 @@ module.exports.bsc = {
     'lastBlockNumber': 17371188,
     'ETH_DECIMAL': 18,
     'ETH_ID': 2,
+    'ExplorerSite': 'https://bscscan.com',
 }
 
 module.exports.eth = {
@@ -261,6 +262,7 @@ module.exports.eth = {
     'ETH_ADDRESS': "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
     'ETH_DECIMAL': 18,
     'ETH_ID': 1,
+    'ExplorerSite': 'https://etherscan.io',
 }
 
 module.exports.polygon = {
@@ -323,6 +325,7 @@ module.exports.polygon = {
     'lastBlockNumber': 27645453,
     'ETH_DECIMAL': 18,
     'ETH_ID': 3,
+    'ExplorerSite': 'https://polygonscan.com',
 }
 
 module.exports.arbitrum = {
@@ -351,6 +354,7 @@ module.exports.arbitrum = {
     'lastBlockNumber': 10677889,
     'ETH_DECIMAL': 18,
     'ETH_ID': 4,
+    'ExplorerSite': 'https://arbiscan.io',
 }
 
 module.exports.optimism = {
@@ -379,6 +383,7 @@ module.exports.optimism = {
     'lastBlockNumber': 6614604,
     'ETH_DECIMAL': 18,
     'ETH_ID': 5,
+    'ExplorerSite': 'https://optimistic.etherscan.io',
 }
 
 module.exports.avalanche = {
@@ -398,6 +403,7 @@ module.exports.avalanche = {
     'lastBlockNumber': 13974561,
     'ETH_DECIMAL': 18,
     'ETH_ID': 6,
+    'ExplorerSite': 'https://snowtrace.io/',
 }
 
 module.exports.fantom = {
@@ -417,6 +423,7 @@ module.exports.fantom = {
     'lastBlockNumber': 37085724,
     'ETH_DECIMAL': 18,
     'ETH_ID': 7,
+    'ExplorerSite': 'https://ftmscan.com',
 }
 
 module.exports.harmony = {
@@ -436,6 +443,7 @@ module.exports.harmony = {
     'lastBlockNumber': 25810999,
     'ETH_DECIMAL': 18,
     'ETH_ID': 8,
+    'ExplorerSite': 'https://explorer.harmony.one',
 }
 
 module.exports.cronos = {
@@ -455,6 +463,7 @@ module.exports.cronos = {
     'lastBlockNumber': 2519790,
     'ETH_DECIMAL': 18,
     'ETH_ID': 9,
+    'ExplorerSite': 'https://cronoscan.com',
 }
 
 module.exports.aurora = {
@@ -475,6 +484,7 @@ module.exports.aurora = {
     'lastBlockNumber': 64421204,
     'ETH_DECIMAL': 18,
     'ETH_ID': 10,
+    'ExplorerSite': 'https://aurorascan.dev',
 }
 
 module.exports.moonbeam = {
@@ -494,6 +504,7 @@ module.exports.moonbeam = {
     'lastBlockNumber': 909680,
     'ETH_DECIMAL': 18,
     'ETH_ID': 11,
+    'ExplorerSite': 'https://moonbeam.moonscan.io/',
 }
 
 module.exports.moonriver = {
@@ -513,6 +524,7 @@ module.exports.moonriver = {
     'lastBlockNumber': 1752981,
     'ETH_DECIMAL': 18,
     'ETH_ID': 12,
+    'ExplorerSite': 'https://moonriver.moonscan.io',
 }
 
 module.exports.metis = {
@@ -532,6 +544,7 @@ module.exports.metis = {
     'lastBlockNumber': 2451181,
     'ETH_DECIMAL': 18,
     'ETH_ID': 13,
+    'ExplorerSite': 'https://andromeda-explorer.metis.io',
 }
 
 module.exports.heco = {
@@ -551,6 +564,7 @@ module.exports.heco = {
     'lastBlockNumber': 14535050,
     'ETH_DECIMAL': 18,
     'ETH_ID': 14,
+    'ExplorerSite': 'https://hecoinfo.com',
 }
 
 module.exports.okc = {
@@ -570,6 +584,7 @@ module.exports.okc = {
     'lastBlockNumber': 10620644,
     'ETH_DECIMAL': 18,
     'ETH_ID': 15,
+    'ExplorerSite': 'https://www.oklink.com/en/okc',
 }
 
 module.exports.kcc = {
@@ -589,6 +604,7 @@ module.exports.kcc = {
     'lastBlockNumber': 9512069,
     'ETH_DECIMAL': 18,
     'ETH_ID': 16,
+    'ExplorerSite': 'https://explorer.kcc.io/en',
 }
 
 module.exports.velas = {
@@ -608,6 +624,7 @@ module.exports.velas = {
     'lastBlockNumber': 33839501,
     'ETH_DECIMAL': 18,
     'ETH_ID': 17,
+    'ExplorerSite': 'https://evmexplorer.velas.com',
 }
 
 module.exports.celo = {
@@ -627,6 +644,7 @@ module.exports.celo = {
     'lastBlockNumber': 12700052,
     'ETH_DECIMAL': 18,
     'ETH_ID': 18,
+    'ExplorerSite': 'https://explorer.celo.org',
 }
 
 module.exports.xdai = {
@@ -646,6 +664,7 @@ module.exports.xdai = {
     'lastBlockNumber': 21856467,
     'ETH_DECIMAL': 18,
     'ETH_ID': 19,
+    'ExplorerSite': 'https://blockscout.com/xdai/mainnet',
 }
 
 module.exports.smartbch = {
@@ -665,6 +684,7 @@ module.exports.smartbch = {
     'lastBlockNumber': 4221407,
     'ETH_DECIMAL': 18,
     'ETH_ID': 20,
+    'ExplorerSite': 'https://www.smartscan.cash',
 }
 
 module.exports.hsc = {
@@ -684,6 +704,7 @@ module.exports.hsc = {
     'lastBlockNumber': 10440719,
     'ETH_DECIMAL': 18,
     'ETH_ID': 21,
+    'ExplorerSite': 'https://hooscan.com',
 }
 
 module.exports.boba = {
@@ -703,6 +724,7 @@ module.exports.boba = {
     'lastBlockNumber': 526934,
     'ETH_DECIMAL': 18,
     'ETH_ID': 22,
+    'ExplorerSite': 'https://blockexplorer.boba.network',
 }
 
 module.exports.fuse = {
@@ -722,6 +744,7 @@ module.exports.fuse = {
     'lastBlockNumber': 16733019,
     'ETH_DECIMAL': 18,
     'ETH_ID': 23,
+    'ExplorerSite': 'https://explorer.fuse.io',
 }
 
 module.exports.emerald = {
@@ -741,6 +764,7 @@ module.exports.emerald = {
     'lastBlockNumber': 1212351,
     'ETH_DECIMAL': 18,
     'ETH_ID': 24,
+    'ExplorerSite': 'https://explorer.emerald.oasis.dev',
 }
 
 module.exports.kardia = {
@@ -760,6 +784,7 @@ module.exports.kardia = {
     'lastBlockNumber': 7857215,
     'ETH_DECIMAL': 18,
     'ETH_ID': 25,
+    'ExplorerSite': 'https://explorer.kardiachain.io',
 }
 
 module.exports.iotex = {
@@ -779,6 +804,7 @@ module.exports.iotex = {
     'lastBlockNumber': 17089072,
     'ETH_DECIMAL': 18,
     'ETH_ID': 26,
+    'ExplorerSite': 'https://iotexscout.io',
 }
 
 module.exports.wan = {
@@ -798,6 +824,7 @@ module.exports.wan = {
     'lastBlockNumber': 20328560,
     'ETH_DECIMAL': 18,
     'ETH_ID': 27,
+    'ExplorerSite': 'https://www.wanscan.org',
 }
 
 module.exports.zyx = {
@@ -817,6 +844,7 @@ module.exports.zyx = {
     'lastBlockNumber': 5182010,
     'ETH_DECIMAL': 18,
     'ETH_ID': 28,
+    'ExplorerSite': 'https://zyxscan.com',
 }
 
 module.exports.elastos = {
@@ -836,6 +864,7 @@ module.exports.elastos = {
     'lastBlockNumber': 12222093,
     'ETH_DECIMAL': 18,
     'ETH_ID': 29,
+    'ExplorerSite': 'https://eth.elastos.io',
 }
 
 module.exports.polis = {
@@ -855,4 +884,5 @@ module.exports.polis = {
     'lastBlockNumber': 3888936,
     'ETH_DECIMAL': 18,
     'ETH_ID': 30,
+    'ExplorerSite': 'https://explorer.polis.tech',
 }

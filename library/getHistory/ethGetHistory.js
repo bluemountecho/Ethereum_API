@@ -289,7 +289,7 @@ async function getURL(url, proxy, network = '') {
         // 'proxy': 'http://' + proxy
     }, function (error, response, body) {
         try {
-            myLogger.log(response.statusCode)
+            myLogger.log(network, response.statusCode)
             if (!error && response && response.statusCode == 200) {
                 defer.resolve(body)
             } else {

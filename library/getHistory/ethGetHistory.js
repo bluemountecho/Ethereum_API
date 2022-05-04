@@ -276,12 +276,16 @@ var TOBLOCK = config[chainName].TOBLOCK
 const USD_ADDRESS = config[chainName].USD_ADDRESS
 const ETH_ADDRESS = config[chainName].ETH_ADDRESS
 
-async function getURL(url, proxy) {
+async function getURL(url, proxy, network = '') {
     var defer = Q.defer()
 
     request({
         'url': url,
         'method': "GET",
+        'headers': network == 'bsc' ? {
+            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36',
+            'cookie': 'bscscan_cookieconsent=True; __stripe_mid=eda84153-cc8a-4d88-8ac4-93708519f28573f07e; _ga_0JZ9C3M56S=GS1.1.1643550258.1.1.1643550327.0; bscscan_userid=CharlesMiller; bscscan_pwd=4792:Qdxb:7xaiYPmsbzWEbHtu5CaZUpH2VE4vmDNouq/EEiepXiU=; bscscan_autologin=True; amp_fef1e8=82983145-731b-44bd-a14d-0951d7f20e72R...1g0f7ojag.1g0f7ojh9.d.5.i; ASP.NET_SessionId=c5mthhgcplqsgbaduydmwpjs; _gid=GA1.2.1514779430.1651573041; __cflb=0H28vyb6xVveKGjdV3CYUMgiti5JgVsqkZwhWDyXaig; _ga=GA1.2.936820121.1637802154; _ga_PQY6J2Q8EP=GS1.1.1651637769.51.1.1651637820.0; cf_chl_2=bfd1328cf103cef; cf_chl_prog=x12; cf_clearance=FKtrz62Jr5oR2XX_aFTRDa7lqZUJtkSGP8sRXfR_ReM-1651643423-0-250; __cf_bm=NmrGWpW7PffJhdJyybtfGTaoRRI9.6w3.FXh6VdHIPo-1651643426-0-Ac9hfb27XqUvkIjKVByv6s42fBKIOCwNBAJbm4ywqsO+b9USs7ndX6S9uDLzyGflnCwioTnIEN/37ZZSI7JNVqFuiJ3QCGcDlnR+To6W4aYZlZ87mwPkFvN8q+V/kc64Lg=='
+        } : {},
         // 'proxy': 'http://' + proxy
     }, function (error, response, body) {
         try {
@@ -1263,7 +1267,7 @@ async function getOneTokenScanInfos(network, tokenAddress, proxy) {
         // } catch (err) {
         // }
 
-        res = await getURL(config[network].ExplorerSite + '/token/generic-tokenholders2?m=normal&p=1&a=' + tokenAddress, proxy)    
+        res = await getURL(config[network].ExplorerSite + '/token/generic-tokenholders2?m=normal&p=1&a=' + tokenAddress, proxy, network)    
         dom = new JSDOM(res)
 
         try {
@@ -1320,10 +1324,10 @@ async function getTokenScanInfos(network) {
     //     myLogger.log(i)
     // }
 
-    for (var i = 0; i < tokens.length; i += 5) {
+    for (var i = 0; i < tokens.length; i += 1) {
         var funcs = []
 
-        for (var j = i; j < i + 5 && j < tokens.length; j ++) {
+        for (var j = i; j < i + 1 && j < tokens.length; j ++) {
             funcs.push(getOneTokenScanInfos(network, tokens[j], config.PROXY[j - i]))
         }
 
@@ -1333,7 +1337,7 @@ async function getTokenScanInfos(network) {
             myLogger.log(err)
         }
 
-        await delay(2000)
+        await delay(1000)
     }
 
     myLogger.log('Getting Token Scan Infos Finished!')
@@ -1342,7 +1346,7 @@ async function getTokenScanInfos(network) {
 async function getAllScanInfos() {
     var funcs = []
 
-    for (var i = 0; i < config.networks.length; i ++) {
+    for (var i = 0; i < 1; i ++) {
         await knex(config.networks[i] + '_tokens').delete()
 
         funcs.push(getTokenScanInfos(config.networks[i]))

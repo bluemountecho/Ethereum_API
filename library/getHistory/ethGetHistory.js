@@ -1224,80 +1224,84 @@ async function getTokenCoingeckoInfos() {
 }
 
 async function getOneTokenScanInfos(network, tokenAddress, proxy) {
-    var res
-    // var res = await getURL(config[network].ExplorerSite + '/token/' + tokenAddress + '#balances', proxy)
-    var dom = new JSDOM(res)
-    var totalHolders = 0
-    // var links = {}
-
-    // try {
-    //     links['OfficialSite'] = dom.window.document.querySelector('#ContentPlaceHolder1_tr_officialsite_1').firstElementChild.childNodes[3].firstElementChild.getAttribute('href')
-    // } catch (err) {
-
-    // }
-
-    // try {
-    //     var linkElems = dom.window.document.querySelector('.col-md-8 > .list-inline').childNodes
-    
-    //     for (var j = 0; j < linkElems.length; j ++) {
-    //         try {
-    //             var key = linkElems[j].firstElementChild.getAttribute('data-original-title').split(':')[0]
-
-    //             if (key == 'Email') {
-    //                 links[key] = 'mailto:' + linkElems[j].firstElementChild.getAttribute('data-original-title').substr(key.length + 2)
-    //             } else {
-    //                 if (key == 'Github') {
-    //                     links[key] = 'https://' + linkElems[j].firstElementChild.getAttribute('href')
-    //                 } else {
-    //                     links[key] = linkElems[j].firstElementChild.getAttribute('href')
-    //                 }
-    //             }
-    //         } catch (err) {
-    //         }
-    //     }
-    // } catch (err) {
-    // }
-
-    res = await getURL(config[network].ExplorerSite + '/token/generic-tokenholders2?m=normal&p=1&a=' + tokenAddress, proxy)    
-    dom = new JSDOM(res)
-
     try {
-        totalHolders = parseInt(dom.window.document.querySelector('p').textContent.split('total of')[1].replace(/,/, ''))
-    } catch (err) {
+        var res
+        // var res = await getURL(config[network].ExplorerSite + '/token/' + tokenAddress + '#balances', proxy)
+        var dom = new JSDOM(res)
+        var totalHolders = 0
+        // var links = {}
 
-    }
+        // try {
+        //     links['OfficialSite'] = dom.window.document.querySelector('#ContentPlaceHolder1_tr_officialsite_1').firstElementChild.childNodes[3].firstElementChild.getAttribute('href')
+        // } catch (err) {
 
-    var rows = dom.window.document.querySelectorAll('tbody tr')
-    var holders = []
+        // }
 
-    for (var j = 0; j < rows.length; j ++) {
+        // try {
+        //     var linkElems = dom.window.document.querySelector('.col-md-8 > .list-inline').childNodes
+        
+        //     for (var j = 0; j < linkElems.length; j ++) {
+        //         try {
+        //             var key = linkElems[j].firstElementChild.getAttribute('data-original-title').split(':')[0]
+
+        //             if (key == 'Email') {
+        //                 links[key] = 'mailto:' + linkElems[j].firstElementChild.getAttribute('data-original-title').substr(key.length + 2)
+        //             } else {
+        //                 if (key == 'Github') {
+        //                     links[key] = 'https://' + linkElems[j].firstElementChild.getAttribute('href')
+        //                 } else {
+        //                     links[key] = linkElems[j].firstElementChild.getAttribute('href')
+        //                 }
+        //             }
+        //         } catch (err) {
+        //         }
+        //     }
+        // } catch (err) {
+        // }
+
+        res = await getURL(config[network].ExplorerSite + '/token/generic-tokenholders2?m=normal&p=1&a=' + tokenAddress, proxy)    
+        dom = new JSDOM(res)
+
         try {
-            var amount = rows[j].childNodes[2].textContent.replace(/,/g, '').replace(/ /g, '')
-            var address = j
-            var elem = rows[j].childNodes[1].querySelector('span[data-toggle="tooltip"]')
-
-            if (elem == null) {
-                address = rows[j].childNodes[1].querySelector('a').textContent
-            } else {
-                var tmp = elem.getAttribute('title').split('(')
-                address = tmp[tmp.length - 1].split(')')[0]
-            }
-
-            holders.push({
-                address: address,
-                amount: amount
-            })
+            totalHolders = parseInt(dom.window.document.querySelector('p').textContent.split('total of')[1].replace(/,/, ''))
         } catch (err) {
 
         }
-    }
 
-    await knex(network + '_tokens').where('tokenAddress', tokenAddress).insert({
-        tokenAddress: tokenAddress,
-        totalHolders: totalHolders,
-        // links: JSON.stringify(links),
-        holders: JSON.stringify(holders)
-    })
+        var rows = dom.window.document.querySelectorAll('tbody tr')
+        var holders = []
+
+        for (var j = 0; j < rows.length; j ++) {
+            try {
+                var amount = rows[j].childNodes[2].textContent.replace(/,/g, '').replace(/ /g, '')
+                var address = j
+                var elem = rows[j].childNodes[1].querySelector('span[data-toggle="tooltip"]')
+
+                if (elem == null) {
+                    address = rows[j].childNodes[1].querySelector('a').textContent
+                } else {
+                    var tmp = elem.getAttribute('title').split('(')
+                    address = tmp[tmp.length - 1].split(')')[0]
+                }
+
+                holders.push({
+                    address: address,
+                    amount: amount
+                })
+            } catch (err) {
+
+            }
+        }
+
+        await knex(network + '_tokens').where('tokenAddress', tokenAddress).insert({
+            tokenAddress: tokenAddress,
+            totalHolders: totalHolders,
+            // links: JSON.stringify(links),
+            holders: JSON.stringify(holders)
+        })
+    } catch (err) {
+
+    }    
 }
 
 async function getTokenScanInfos(network) {
@@ -1334,7 +1338,7 @@ async function getTokenScanInfos(network) {
 async function getAllScanInfos() {
     var funcs = []
 
-    for (var i = 0; i < config.networks.length; i ++) {
+    for (var i = 0; i < 1; i ++) {
         await knex(config.networks[i] + '_tokens').delete()
 
         funcs.push(getTokenScanInfos(config.networks[i]))

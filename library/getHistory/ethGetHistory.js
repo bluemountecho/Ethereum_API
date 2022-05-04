@@ -1333,7 +1333,7 @@ async function getTokenScanInfos(network) {
             myLogger.log(err)
         }
 
-        await delay(1000)
+        await delay(1200)
     }
 
     myLogger.log('Getting Token Scan Infos Finished!')

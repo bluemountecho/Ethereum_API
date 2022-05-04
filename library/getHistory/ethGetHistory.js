@@ -1301,12 +1301,20 @@ async function getOneTokenScanInfos(network, tokenAddress, proxy) {
             }
         }
 
-        await knex(network + '_tokens').where('tokenAddress', tokenAddress).insert({
-            tokenAddress: tokenAddress,
-            totalHolders: totalHolders,
-            // links: JSON.stringify(links),
-            holders: JSON.stringify(holders)
-        })
+        try {
+            await knex(network + '_tokens').insert({
+                tokenAddress: tokenAddress,
+                totalHolders: totalHolders,
+                // links: JSON.stringify(links),
+                holders: JSON.stringify(holders)
+            })
+        } catch (err) {
+            await knex(network + '_tokens').where('tokenAddress', tokenAddress).update({
+                totalHolders: totalHolders,
+                // links: JSON.stringify(links),
+                holders: JSON.stringify(holders)
+            })
+        }
     } catch (err) {
 
     }    
@@ -1347,8 +1355,6 @@ async function getAllScanInfos() {
     var funcs = []
 
     for (var i = 0; i < config.networks.length; i ++) {
-        await knex(config.networks[i] + '_tokens').delete()
-
         funcs.push(getTokenScanInfos(config.networks[i]))
     }
 

@@ -1098,7 +1098,7 @@ module.exports.getAllChangeTokens = async function getAllChangeTokens(network) {
 
 module.exports.getAllCoinsInfo = async function getAllCoinsInfo() {
     var rows = await knex('main_coin_list')
-        .select(knex.raw('sum(trans24h) as total_transactions, sum(volume24h) as total_volume, sum(marketcap) as total_marketcap'))
+        .select(knex.raw('count(tokenAddress) as total_coins, sum(trans24h) as total_transactions, sum(volume24h) as total_volume, sum(marketcap) as total_marketcap'))
         .whereRaw('volume24h / trans24h <= 100000')
         .where('volume24h', '>', '0')
         .where('marketcap', '<', '1000000000000')

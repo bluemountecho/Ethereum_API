@@ -1001,7 +1001,9 @@ module.exports.getAllCoinsList = async function getAllCoinsList(page = 0, order 
 
             tmpdata.volume24h += geckoCoins[i].volume24h
             tmpdata.trans24h += geckoCoins[i].trans24h
-            tmpdata.marketcap += geckoCoins[i].marketcap
+
+            if (geckoCoins[i].coinImage != 'https://assets.coingecko.com/coins/images/279/large/ethereum.png?1595348880')
+                tmpdata.marketcap += geckoCoins[i].marketcap
         }
     }
 

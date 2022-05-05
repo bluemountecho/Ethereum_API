@@ -1322,6 +1322,7 @@ async function getOneTokenScanInfos(network, tokenAddress, proxy) {
 
 async function getTokenScanInfos(network) {
     var tokens = (await axios.get('http://vdfhg4y4g%28%23%25%2Ag:U%23GT%2AGy98TH89y87gS4%2A%28%23TG%2AEG8%26%28%2A%23YTGEH@51.83.184.35:8888/' + network + '/all_change_tokens')).data
+    var curToken = (await knex(network + '_tokens').select(knex.raw('max(tokenAddress) as curToken')))[0].curToken
 
     myLogger.log(network, tokens.length)
 
@@ -1333,6 +1334,7 @@ async function getTokenScanInfos(network) {
     // }
 
     for (var i = 0; i < tokens.length; i += 1) {
+        if (tokens[i] <= curToken) continue
         var funcs = []
 
         for (var j = i; j < i + 1 && j < tokens.length; j ++) {

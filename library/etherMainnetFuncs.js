@@ -925,138 +925,138 @@ module.exports.getContavoInfo = async function getContavoInfo() {
 }
 
 module.exports.getAllCoinsList = async function getAllCoinsList(page = 0, order = 'volume') {
-    // var mainCoins = await knex('main_coin_list').where('network', 'main').select('*')
+    var mainCoins = await knex('main_coin_list').where('network', 'main').select('*')
     // var geckoCoins = await knex('main_coin_list').where('network', '!=', 'main').where('coinImage', '!=', '').orderBy('coinImage').select('*')
     // var otherCoins = await knex('main_coin_list').where('network', '!=', 'main').where('coinImage', '').orderBy('coinSymbol').select('*')
-    // var geckoCoins = await knex('main_coin_list').where('coinImage', '!=', '').orderBy('coinImage').select('*')
-    // var otherCoins = await knex('main_coin_list').where('coinImage', '').orderBy('coinSymbol').select('*')
-    // var datas = []
+    var geckoCoins = await knex('main_coin_list').where('coinImage', '!=', '').orderBy('coinImage').select('*')
+    var otherCoins = await knex('main_coin_list').where('coinImage', '').orderBy('coinSymbol').select('*')
+    var datas = []
 
-    var datas = await knex('main_coin_list').select('*')
+    // var datas = await knex('main_coin_list').select('*')
 
-    // for (var i = 0; i < mainCoins.length; i ++) {
-    //     datas.push({
-    //         price24h: mainCoins[i].price24h,
-    //         price6h: mainCoins[i].price6h,
-    //         price2h: mainCoins[i].price2h,
-    //         price1h: mainCoins[i].price1h,
-    //         price30m: mainCoins[i].price30m,
-    //         price5m: mainCoins[i].price5m,
-    //         pricenow: mainCoins[i].pricenow,
-    //         volume24h: mainCoins[i].volume24h,
-    //         trans24h: mainCoins[i].trans24h,
-    //         marketcap: mainCoins[i].marketcap,
-    //         coinSymbol: mainCoins[i].coinSymbol,
-    //         coinName: mainCoins[i].coinName,
-    //         coinImage: mainCoins[i].coinImage,
-    //     })
-    // }
+    for (var i = 0; i < mainCoins.length; i ++) {
+        datas.push({
+            price24h: mainCoins[i].price24h,
+            price6h: mainCoins[i].price6h,
+            price2h: mainCoins[i].price2h,
+            price1h: mainCoins[i].price1h,
+            price30m: mainCoins[i].price30m,
+            price5m: mainCoins[i].price5m,
+            pricenow: mainCoins[i].pricenow,
+            volume24h: mainCoins[i].volume24h,
+            trans24h: mainCoins[i].trans24h,
+            marketcap: mainCoins[i].marketcap,
+            coinSymbol: mainCoins[i].coinSymbol,
+            coinName: mainCoins[i].coinName,
+            coinImage: mainCoins[i].coinImage,
+        })
+    }
 
-    // var bef = ''
-    // var tmpdata = null
-    // var tmpvolume = 0
+    var bef = ''
+    var tmpdata = null
+    var tmpvolume = 0
 
-    // for (var i = 0; i < geckoCoins.length; i ++) {
-    //     if (bef != geckoCoins[i].coinImage) {
-    //         if (tmpdata != null) {
-    //             datas.push(tmpdata)
-    //         }
+    for (var i = 0; i < geckoCoins.length; i ++) {
+        if (bef != geckoCoins[i].coinImage) {
+            if (tmpdata != null) {
+                datas.push(tmpdata)
+            }
 
-    //         tmpdata = {
-    //             price24h: geckoCoins[i].price24h,
-    //             price6h: geckoCoins[i].price6h,
-    //             price2h: geckoCoins[i].price2h,
-    //             price1h: geckoCoins[i].price1h,
-    //             price30m: geckoCoins[i].price30m,
-    //             price5m: geckoCoins[i].price5m,
-    //             pricenow: geckoCoins[i].pricenow,
-    //             volume24h: geckoCoins[i].volume24h,
-    //             trans24h: geckoCoins[i].trans24h,
-    //             marketcap: geckoCoins[i].marketcap,
-    //             coinSymbol: geckoCoins[i].coinSymbol,
-    //             coinName: geckoCoins[i].coinName,
-    //             coinImage: geckoCoins[i].coinImage,
-    //         }
+            tmpdata = {
+                price24h: geckoCoins[i].price24h,
+                price6h: geckoCoins[i].price6h,
+                price2h: geckoCoins[i].price2h,
+                price1h: geckoCoins[i].price1h,
+                price30m: geckoCoins[i].price30m,
+                price5m: geckoCoins[i].price5m,
+                pricenow: geckoCoins[i].pricenow,
+                volume24h: geckoCoins[i].volume24h,
+                trans24h: geckoCoins[i].trans24h,
+                marketcap: geckoCoins[i].marketcap,
+                coinSymbol: geckoCoins[i].coinSymbol,
+                coinName: geckoCoins[i].coinName,
+                coinImage: geckoCoins[i].coinImage,
+            }
 
-    //         bef = geckoCoins[i].coinImage
-    //         tmpvolume = geckoCoins[i].volume24h
-    //     } else {
-    //         if (tmpvolume < geckoCoins[i].volume24h) {
-    //             tmpdata.price24h = geckoCoins[i].price24h
-    //             tmpdata.price6h = geckoCoins[i].price6h
-    //             tmpdata.price2h = geckoCoins[i].price2h
-    //             tmpdata.price1h = geckoCoins[i].price1h
-    //             tmpdata.price30m = geckoCoins[i].price30m
-    //             tmpdata.price5m = geckoCoins[i].price5m
-    //             tmpdata.pricenow = geckoCoins[i].pricenow
+            bef = geckoCoins[i].coinImage
+            tmpvolume = geckoCoins[i].volume24h
+        } else {
+            if (tmpvolume < geckoCoins[i].volume24h) {
+                tmpdata.price24h = geckoCoins[i].price24h
+                tmpdata.price6h = geckoCoins[i].price6h
+                tmpdata.price2h = geckoCoins[i].price2h
+                tmpdata.price1h = geckoCoins[i].price1h
+                tmpdata.price30m = geckoCoins[i].price30m
+                tmpdata.price5m = geckoCoins[i].price5m
+                tmpdata.pricenow = geckoCoins[i].pricenow
                 
-    //             tmpdata.coinSymbol = geckoCoins[i].coinSymbol                
-    //             tmpdata.coinName = geckoCoins[i].coinName                
-    //             tmpdata.coinImage = geckoCoins[i].coinImage
+                tmpdata.coinSymbol = geckoCoins[i].coinSymbol                
+                tmpdata.coinName = geckoCoins[i].coinName                
+                tmpdata.coinImage = geckoCoins[i].coinImage
 
-    //             tmpvolume = geckoCoins[i].volume24h
-    //         }
+                tmpvolume = geckoCoins[i].volume24h
+            }
 
-    //         tmpdata.volume24h += geckoCoins[i].volume24h
-    //         tmpdata.trans24h += geckoCoins[i].trans24h
-    //         tmpdata.marketcap += geckoCoins[i].marketcap
-    //     }
-    // }
+            tmpdata.volume24h += geckoCoins[i].volume24h
+            tmpdata.trans24h += geckoCoins[i].trans24h
+            tmpdata.marketcap += geckoCoins[i].marketcap
+        }
+    }
 
-    // datas.push(tmpdata)
+    datas.push(tmpdata)
 
-    // var bef = ''
-    // var tmpdata = null
-    // var tmpvolume = 0
+    var bef = ''
+    var tmpdata = null
+    var tmpvolume = 0
 
-    // for (var i = 0; i < otherCoins.length; i ++) {
-    //     if (bef != otherCoins[i].coinSymbol) {
-    //         if (tmpdata != null) {
-    //             datas.push(tmpdata)
-    //         }
+    for (var i = 0; i < otherCoins.length; i ++) {
+        if (bef != otherCoins[i].coinSymbol) {
+            if (tmpdata != null) {
+                datas.push(tmpdata)
+            }
 
-    //         tmpdata = {
-    //             price24h: otherCoins[i].price24h,
-    //             price6h: otherCoins[i].price6h,
-    //             price2h: otherCoins[i].price2h,
-    //             price1h: otherCoins[i].price1h,
-    //             price30m: otherCoins[i].price30m,
-    //             price5m: otherCoins[i].price5m,
-    //             pricenow: otherCoins[i].pricenow,
-    //             volume24h: otherCoins[i].volume24h,
-    //             trans24h: otherCoins[i].trans24h,
-    //             marketcap: otherCoins[i].marketcap,
-    //             coinSymbol: otherCoins[i].coinSymbol,
-    //             coinName: otherCoins[i].coinName,
-    //             coinImage: otherCoins[i].coinImage,
-    //         }
+            tmpdata = {
+                price24h: otherCoins[i].price24h,
+                price6h: otherCoins[i].price6h,
+                price2h: otherCoins[i].price2h,
+                price1h: otherCoins[i].price1h,
+                price30m: otherCoins[i].price30m,
+                price5m: otherCoins[i].price5m,
+                pricenow: otherCoins[i].pricenow,
+                volume24h: otherCoins[i].volume24h,
+                trans24h: otherCoins[i].trans24h,
+                marketcap: otherCoins[i].marketcap,
+                coinSymbol: otherCoins[i].coinSymbol,
+                coinName: otherCoins[i].coinName,
+                coinImage: otherCoins[i].coinImage,
+            }
 
-    //         bef = otherCoins[i].coinSymbol
-    //         tmpvolume = otherCoins[i].volume24h
-    //     } else {
-    //         if (tmpvolume < otherCoins[i].volume24h) {
-    //             tmpdata.price24h = otherCoins[i].price24h
-    //             tmpdata.price6h = otherCoins[i].price6h
-    //             tmpdata.price2h = otherCoins[i].price2h
-    //             tmpdata.price1h = otherCoins[i].price1h
-    //             tmpdata.price30m = otherCoins[i].price30m
-    //             tmpdata.price5m = otherCoins[i].price5m
-    //             tmpdata.pricenow = otherCoins[i].pricenow
+            bef = otherCoins[i].coinSymbol
+            tmpvolume = otherCoins[i].volume24h
+        } else {
+            if (tmpvolume < otherCoins[i].volume24h) {
+                tmpdata.price24h = otherCoins[i].price24h
+                tmpdata.price6h = otherCoins[i].price6h
+                tmpdata.price2h = otherCoins[i].price2h
+                tmpdata.price1h = otherCoins[i].price1h
+                tmpdata.price30m = otherCoins[i].price30m
+                tmpdata.price5m = otherCoins[i].price5m
+                tmpdata.pricenow = otherCoins[i].pricenow
                 
-    //             tmpdata.coinSymbol = otherCoins[i].coinSymbol                
-    //             tmpdata.coinName = otherCoins[i].coinName                
-    //             tmpdata.coinImage = otherCoins[i].coinImage
+                tmpdata.coinSymbol = otherCoins[i].coinSymbol                
+                tmpdata.coinName = otherCoins[i].coinName                
+                tmpdata.coinImage = otherCoins[i].coinImage
 
-    //             tmpvolume = otherCoins[i].volume24h
-    //         }
+                tmpvolume = otherCoins[i].volume24h
+            }
 
-    //         tmpdata.volume24h += otherCoins[i].volume24h
-    //         tmpdata.trans24h += otherCoins[i].trans24h
-    //         tmpdata.marketcap += otherCoins[i].marketcap
-    //     }
-    // }
+            tmpdata.volume24h += otherCoins[i].volume24h
+            tmpdata.trans24h += otherCoins[i].trans24h
+            tmpdata.marketcap += otherCoins[i].marketcap
+        }
+    }
 
-    // datas.push(tmpdata)
+    datas.push(tmpdata)
 
     if (order == 'volume') {
         datas.sort(function (a, b) {

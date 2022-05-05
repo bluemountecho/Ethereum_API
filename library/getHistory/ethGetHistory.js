@@ -284,7 +284,7 @@ async function getURL(url, proxy, network = '') {
         'method': "GET",
         'headers': network == 'bsc' ? {
             'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36',
-            'cookie': 'cf_clearance=u8hYbTClFexQe50xgx8AMYZSeKPF9c8lE6wRcW2IG5U-1651644091-0-250; ASP.NET_SessionId=uwhn2rk2h1k5yxo4ylrf415f; __cflb=02DiuJNoxEYARvg2sN4zbncfn2GL25UpfgiXJQ9o28LgU; _gid=GA1.2.2037784143.1651651310; _ga=GA1.2.639158328.1651651309; _ga_PQY6J2Q8EP=GS1.1.1651651305.1.1.1651651719.0; __cf_bm=TBTpACDBxW6ySujeZW1ympGo5FVMZYO4dbgd9sWQD.M-1651645075-0-AaC8S8h9VszI7XGmGbvVO6yGS81x5+v4jo7V65hA1g9HZi+hDk0c86JBtoXr0qhCgH7bZqaoh0sLci7F7/clu0+6DRFG9YOqwsubXPW3W2/IrHUWoebMQQoBUJf4DPIx0g=='
+            'cookie': 'ASP.NET_SessionId=uwhn2rk2h1k5yxo4ylrf415f; __cflb=02DiuJNoxEYARvg2sN4zbncfn2GL25UpfgiXJQ9o28LgU; _gid=GA1.2.2037784143.1651651310; _ga=GA1.2.639158328.1651651309; _ga_PQY6J2Q8EP=GS1.1.1651651305.1.1.1651651719.0; cf_chl_rc_i=44; cf_chl_2=2ce1dabdcf48b99; cf_chl_prog=x14; cf_clearance=muvVO5KYFzyhT7Is13t86e7Z7VRu37ozwLj3cwjaUk4-1651720684-0-250; __cf_bm=bOPYzKQYe7aWv3Rjp2LWCQxGKs8bJ9S7K_7M205x44M-1651720693-0-AbzxCwwuXMsvIu6M+TFdN+YqS/GscI+XeE9mH08WEucis7ygYuSd5QARwotu+g6WEpQrApwF5WBzgvubCZEKllELvEoNlNXldhtKJsFSQoHspfYhfi5PWxDyxWXFmHErRw=='
         } : {},
         // 'proxy': 'http://' + proxy
     }, function (error, response, body) {

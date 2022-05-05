@@ -1034,8 +1034,10 @@ module.exports.getAllCoinsList = async function getAllCoinsList(page = 0, order 
                 tmpdata.pricenow = otherCoins[i].pricenow
                 
                 tmpdata.coinSymbol = otherCoins[i].coinSymbol                
-                tmpdata.coinName = otherCoins[i].coinName                
-                tmpdata.coinImage = otherCoins[i].coinImage
+                tmpdata.coinName = otherCoins[i].coinName
+
+                if (coinImage != '')
+                    tmpdata.coinImage = otherCoins[i].coinImage
 
                 tmpvolume = otherCoins[i].volume24h
             }
@@ -1043,8 +1045,13 @@ module.exports.getAllCoinsList = async function getAllCoinsList(page = 0, order 
             tmpdata.volume24h += otherCoins[i].volume24h
             tmpdata.trans24h += otherCoins[i].trans24h
 
-            if (otherCoins[i].coinSymbol != 'ETH')
+            if (otherCoins[i].coinSymbol == 'ETH') {
+                if (tmpdata.marketcap < otherCoins[i].marketCap) {
+                    tmpdata.marketcap = otherCoins[i].marketcap
+                }
+            } else {
                 tmpdata.marketcap += otherCoins[i].marketcap
+            }
         }
     }
 

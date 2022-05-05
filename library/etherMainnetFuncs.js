@@ -988,7 +988,7 @@ module.exports.getAllCoinsList = async function getAllCoinsList(page = 0, order 
     //     }
     // }
 
-    // datas.push(tmpdata)
+    datas.push(tmpdata)
 
     var bef = ''
     var tmpdata = null
@@ -1042,7 +1042,9 @@ module.exports.getAllCoinsList = async function getAllCoinsList(page = 0, order 
 
             tmpdata.volume24h += otherCoins[i].volume24h
             tmpdata.trans24h += otherCoins[i].trans24h
-            tmpdata.marketcap += otherCoins[i].marketcap
+
+            if (otherCoins[i].coinSymbol != 'ETH')
+                tmpdata.marketcap += otherCoins[i].marketcap
         }
     }
 

@@ -925,7 +925,7 @@ module.exports.getContavoInfo = async function getContavoInfo() {
 }
 
 module.exports.getAllCoinsList = async function getAllCoinsList(page = 0, order = 'volume') {
-    var mainCoins = await knex('main_coin_list').where('network', 'main').select('*')
+    // var mainCoins = await knex('main_coin_list').where('network', 'main').select('*')
     // var geckoCoins = await knex('main_coin_list').where('network', '!=', 'main').where('coinImage', '!=', '').orderBy('coinImage').select('*')
     // var otherCoins = await knex('main_coin_list').where('network', '!=', 'main').where('coinImage', '').orderBy('coinSymbol').select('*')
     var geckoCoins = await knex('main_coin_list').where('coinImage', '!=', '').orderBy('coinImage').select('*')
@@ -934,23 +934,23 @@ module.exports.getAllCoinsList = async function getAllCoinsList(page = 0, order 
 
     // var datas = await knex('main_coin_list').select('*')
 
-    for (var i = 0; i < mainCoins.length; i ++) {
-        datas.push({
-            price24h: mainCoins[i].price24h,
-            price6h: mainCoins[i].price6h,
-            price2h: mainCoins[i].price2h,
-            price1h: mainCoins[i].price1h,
-            price30m: mainCoins[i].price30m,
-            price5m: mainCoins[i].price5m,
-            pricenow: mainCoins[i].pricenow,
-            volume24h: mainCoins[i].volume24h,
-            trans24h: mainCoins[i].trans24h,
-            marketcap: mainCoins[i].marketcap,
-            coinSymbol: mainCoins[i].coinSymbol,
-            coinName: mainCoins[i].coinName,
-            coinImage: mainCoins[i].coinImage,
-        })
-    }
+    // for (var i = 0; i < mainCoins.length; i ++) {
+    //     datas.push({
+    //         price24h: mainCoins[i].price24h,
+    //         price6h: mainCoins[i].price6h,
+    //         price2h: mainCoins[i].price2h,
+    //         price1h: mainCoins[i].price1h,
+    //         price30m: mainCoins[i].price30m,
+    //         price5m: mainCoins[i].price5m,
+    //         pricenow: mainCoins[i].pricenow,
+    //         volume24h: mainCoins[i].volume24h,
+    //         trans24h: mainCoins[i].trans24h,
+    //         marketcap: mainCoins[i].marketcap,
+    //         coinSymbol: mainCoins[i].coinSymbol,
+    //         coinName: mainCoins[i].coinName,
+    //         coinImage: mainCoins[i].coinImage,
+    //     })
+    // }
 
     var bef = ''
     var tmpdata = null
@@ -1102,6 +1102,8 @@ module.exports.getAllCoinsInfo = async function getAllCoinsInfo() {
         .whereRaw('volume24h / trans24h <= 100000')
         .where('volume24h', '>', '0')
         .where('marketcap', '<', '1000000000000')
+
+    rows[0].total_networks = config.networks.length
 
     return rows[0]
 }

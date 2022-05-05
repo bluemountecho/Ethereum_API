@@ -960,6 +960,7 @@ module.exports.getAllCoinsList = async function getAllCoinsList(page = 0, order 
         if (geckoCoins[i].volume24h < 0) continue
         if (geckoCoins[i].pricenow >= 100000) continue
         if (geckoCoins[i].pricenow <= 0.0000000000000001) continue
+        if (geckoCoins[i].coinSymbol == '') continue
 
         if (bef != geckoCoins[i].coinImage) {
             if (tmpdata != null) {
@@ -1019,6 +1020,7 @@ module.exports.getAllCoinsList = async function getAllCoinsList(page = 0, order 
         if (otherCoins[i].volume24h < 0) continue
         if (otherCoins[i].pricenow >= 100000) continue
         if (otherCoins[i].pricenow <= 0.0000000000000001) continue
+        if (otherCoins[i].coinSymbol == '') continue
 
         if (bef != otherCoins[i].coinSymbol) {
             if (tmpdata != null) {

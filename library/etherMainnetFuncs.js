@@ -1036,7 +1036,7 @@ module.exports.getAllCoinsList = async function getAllCoinsList(page = 0, order 
                 tmpdata.coinSymbol = otherCoins[i].coinSymbol                
                 tmpdata.coinName = otherCoins[i].coinName
 
-                if (coinImage != '')
+                if (otherCoins[i].coinImage != '')
                     tmpdata.coinImage = otherCoins[i].coinImage
 
                 tmpvolume = otherCoins[i].volume24h

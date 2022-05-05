@@ -106,13 +106,18 @@ router.get('/coins', function(req, res, next) {
     return
   }
 
-  etherMainnetFuncs.getAllCoinsList(req.query.page ? req.query.page : 0, req.query.orderby ? req.query.orderby : 'volume')
+  etherMainnetFuncs.getAllCoinsList(req.query.page ? req.query.page : 0, req.query.orderby ? req.query.orderby : 'marketcap')
   .then((data) => {
     res.send(JSON.stringify(data))
   })
 });
 
 router.get('/all_coins_info', function(req, res, next) {
+  if (req.network != 'all') {
+    res.send('')
+    return
+  }
+  
   etherMainnetFuncs.getAllCoinsInfo()
   .then((data) => {
     res.send(JSON.stringify(data))

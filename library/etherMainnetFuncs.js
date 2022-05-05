@@ -957,6 +957,8 @@ module.exports.getAllCoinsList = async function getAllCoinsList(page = 0, order 
     var tmpvolume = 0
 
     for (var i = 0; i < geckoCoins.length; i ++) {
+        if (geckoCoins[i].volume24h < 0) continue
+
         if (bef != geckoCoins[i].coinImage) {
             if (tmpdata != null) {
                 datas.push(tmpdata)
@@ -1010,6 +1012,8 @@ module.exports.getAllCoinsList = async function getAllCoinsList(page = 0, order 
     var tmpvolume = 0
 
     for (var i = 0; i < otherCoins.length; i ++) {
+        if (otherCoins[i].volume24h < 0) continue
+
         if (bef != otherCoins[i].coinSymbol) {
             if (tmpdata != null) {
                 datas.push(tmpdata)

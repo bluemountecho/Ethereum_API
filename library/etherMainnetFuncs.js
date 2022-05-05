@@ -1077,8 +1077,8 @@ module.exports.getAllCoinsList = async function getAllCoinsList(page = 0, order 
     } else if (order == 'marketcap') {
         
         datas.sort(function (a, b) {
-            if (a.marketcap / a.volume24h < 10000 && b.marketcap / b.volume24h >= 10000) return -1
-            if (a.marketcap / a.volume24h >= 10000 && b.marketcap / b.volume24h < 10000) return 1
+            if (a.marketcap / a.volume24h < 1000 && b.marketcap / b.volume24h >= 1000) return -1
+            if (a.marketcap / a.volume24h >= 1000 && b.marketcap / b.volume24h < 1000) return 1
             if (a.marketcap > b.marketcap) return -1
             if (a.marketcap < b.marketcap) return 1
             return 0

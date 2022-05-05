@@ -1095,3 +1095,11 @@ module.exports.getAllChangeTokens = async function getAllChangeTokens(network) {
 
     return data
 }
+
+module.exports.getAllCoinsInfo = async function getAllCoinsInfo() {
+    var rows = await knex('main_coin_list')
+        .select(knex.raw('sum(trans24h) as total_transactions, sum(volume24h) as total_volume, sum(marketcap) as total_marketcap'))
+        .whereRaw('volume24h / trans24h <= 100000')
+
+    return rows[0]
+}

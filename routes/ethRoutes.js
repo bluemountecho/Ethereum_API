@@ -112,6 +112,13 @@ router.get('/coins', function(req, res, next) {
   })
 });
 
+router.get('/all_coins_info', function(req, res, next) {
+  etherMainnetFuncs.getAllCoinsInfo()
+  .then((data) => {
+    res.send(JSON.stringify(data))
+  })
+});
+
 router.get('/all_change_tokens', function(req, res, next) {
   etherMainnetFuncs.getAllChangeTokens(req.network)
   .then((data) => {

@@ -995,7 +995,7 @@ module.exports.getAllCoinsList = async function getAllCoinsList(page = 0, order 
     var tmpvolume = 0
 
     for (var i = 0; i < otherCoins.length; i ++) {
-        if (otherCoins[i].volume24h < 0) continue
+        if (otherCoins[i].volume24h < 10000) continue
         if (otherCoins[i].pricenow >= 100000) continue
         if (otherCoins[i].pricenow <= 0.0000000000000001) continue
         if (otherCoins[i].coinSymbol == '') continue
@@ -1045,10 +1045,8 @@ module.exports.getAllCoinsList = async function getAllCoinsList(page = 0, order 
             tmpdata.volume24h += otherCoins[i].volume24h
             tmpdata.trans24h += otherCoins[i].trans24h
 
-            if (otherCoins[i].coinSymbol == 'ETH') {
-                if (tmpdata.marketcap < otherCoins[i].marketCap) {
-                    tmpdata.marketcap = otherCoins[i].marketcap
-                }
+            if (otherCoins[i].network == 'main') {
+                tmpdata.marketcap = otherCoins[i].marketcap
             } else {
                 tmpdata.marketcap += otherCoins[i].marketcap
             }

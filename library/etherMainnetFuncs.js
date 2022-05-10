@@ -1063,8 +1063,8 @@ module.exports.getAllCoinsList = async function getAllCoinsList(page = 0, order 
         })
     } else if (order == 'marketcap') {        
         datas.sort(function (a, b) {
-            if (a.marketcap / 10000.0 * a.trans24h / 100.0 * a.volume24h / 10000.0 > b.marketcap / 10000.0 * b.trans24h / 100.0 * b.volume24h / 10000.0) return -1
-            if (a.marketcap / 10000.0 * a.trans24h / 100.0 * a.volume24h / 10000.0 < b.marketcap / 10000.0 * b.trans24h / 100.0 * b.volume24h / 10000.0) return 1
+            if (a.marketcap / 1000.0 * a.trans24h / 1000.0 * a.volume24h / 1000.0 > b.marketcap / 1000.0 * b.trans24h / 1000.0 * b.volume24h / 1000.0) return -1
+            if (a.marketcap / 1000.0 * a.trans24h / 1000.0 * a.volume24h / 1000.0 < b.marketcap / 1000.0 * b.trans24h / 1000.0 * b.volume24h / 1000.0) return 1
             // if (a.trans24h >= 1000 && b.trans24h < 1000) return -1
             // if (a.trans24h < 1000 && b.trans24h >= 1000) return 1
             // if (a.marketcap / a.volume24h < 10000 && b.marketcap / b.volume24h >= 10000) return -1

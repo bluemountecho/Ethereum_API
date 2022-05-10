@@ -1067,8 +1067,8 @@ module.exports.getAllCoinsList = async function getAllCoinsList(page = 0, order 
             if (a.trans24h < 1000 && b.trans24h >= 1000) return 1
             if (a.marketcap / a.volume24h < 10000 && b.marketcap / b.volume24h >= 10000) return -1
             if (a.marketcap / a.volume24h >= 10000 && b.marketcap / b.volume24h < 10000) return 1
-            if (a.marketcap / 1000.0 * a.trans24h / 10000.0 * a.volume24h / 1000.0 > b.marketcap / 1000.0 * b.trans24h / 10000.0 * b.volume24h / 1000.0) return -1
-            if (a.marketcap / 1000.0 * a.trans24h / 10000.0 * a.volume24h / 1000.0 < b.marketcap / 1000.0 * b.trans24h / 10000.0 * b.volume24h / 1000.0) return 1
+            if (a.marketcap / 1000.0 * a.trans24h / 1000.0 * a.volume24h / 1000.0 > b.marketcap / 1000.0 * b.trans24h / 1000.0 * b.volume24h / 1000.0) return -1
+            if (a.marketcap / 1000.0 * a.trans24h / 1000.0 * a.volume24h / 1000.0 < b.marketcap / 1000.0 * b.trans24h / 1000.0 * b.volume24h / 1000.0) return 1
             // if (a.marketcap > b.marketcap) return -1
             // if (a.marketcap < b.marketcap) return 1
             return 0

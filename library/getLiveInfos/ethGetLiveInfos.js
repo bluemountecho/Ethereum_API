@@ -653,8 +653,6 @@ async function init() {
             }),
         ])
 
-        console.log(lastBlockNumber, blockNumber)
-
         for (var i = lastBlockNumber; i < blockNumber + (curBlock > blockNumber ? 1 : 0); i ++) {
             coinsFuncs.push(web3s[(6 + i) % proxyCnt].eth.getBlock(i, true))
         }
@@ -685,8 +683,6 @@ async function init() {
                 })
             }
         }
-
-        console.log(coinsResult.length)
 
         // myLogger.log('==================================================')
         // myLogger.log('lastBlockNumber: ' + lastBlockNumber)
@@ -746,8 +742,6 @@ async function init() {
 
             await Promise.all(funcs)
         }
-
-        console.log(results[0].length)
 
         for (var i = 0; i < results[1].length; i += proxyCnt) {
             async function getOneV2Swap(result, web3) {
@@ -903,8 +897,6 @@ async function init() {
             await Promise.all(funcs)
         }
 
-        console.log(results[1].length)
-
         for (var i = 0; i < results[2].length; i += proxyCnt) {
             async function getOneV3Pair(result, web3) {
                 try {
@@ -956,8 +948,6 @@ async function init() {
 
             await Promise.all(funcs)
         }
-
-        console.log(results[2].length)
 
         for (var i = 0; i < results[3].length; i += proxyCnt) {
             async function getOneV3Swap(result, web3) {
@@ -1109,8 +1099,6 @@ async function init() {
             await Promise.all(funcs)
         }
 
-        console.log(results[3].length)
-
         for (var i = 0; i < results[4].length; i ++) {
             try {
                 var amt = Number.parseInt(hexToBn(results[4][i].data.substr(2, 64)))
@@ -1147,8 +1135,6 @@ async function init() {
 
             }
         }
-
-        console.log(results[4].length)
 
         lastTransactionID = tmpLastTrans
         lastestBlock = tmpLastBlock

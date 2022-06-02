@@ -343,9 +343,9 @@ async function getCoinGeckoInfo() {
 }
 
 async function init() {
-    // getCoinsList()
+    getCoinsList()
     // getCoinGeckoInfo()
-    getTotalSupply()
+    // getTotalSupply()
 }
 
 init()

@@ -264,23 +264,24 @@ async function getTotalSupply() {
         for (var i = 0; i < config.networks.length; i ++) {
             var changesTableName = config.networks[i] + '_changes'
             var tokensTableName = config.networks[i] + '_tokens'
-            var tmpWeb3s = web3s[config.networks[i]]
-
             var tokens = await knex(changesTableName).join(tokensTableName, tokensTableName + '.tokenAddress', '=', changesTableName + '.tokenAddress').select('*')
 
-            for (var j = 0; j < tokens.length; j += tmpWeb3s.length) {
+            for (var j = 0; j < tokens.length; j += web3s[config.networks[i]].length) {
                 try {
                     var funcs = []
+                    var contracts = []
 
-                    for (var k = 0; j + k < tokens.length && k < tmpWeb3s.length; k ++) {
-                        var contract = new tmpWeb3s[k].eth.Contract(minERC20ABI, tokens[j + k].tokenAddress)
+                    for (var k = 0; j + k < tokens.length && k < web3s[config.networks[i]].length; k ++) {
+                        contracts[k] = new web3s[config.networks[i]][k].eth.Contract(minERC20ABI, tokens[j + k].tokenAddress)
 
-                        funcs.push(contract.methods.totalSupply().call())
+                        funcs.push(contracts[k].methods.totalSupply().call())
                     }
 
                     var res = await Promise.all(funcs)
 
-                    for (var k = 0; j + k < tokens.length && k < tmpWeb3s.length; k ++) {
+                    delete contracts
+
+                    for (var k = 0; j + k < tokens.length && k < web3s[config.networks[i]].length; k ++) {
                         await knex(tokensTableName).where('tokenAddress', tokens[j + k].tokenAddress).update({'totalSupply': res[k] / 10 ** tokens[j + k].tokenDecimals})
                     }
                 } catch (err) {

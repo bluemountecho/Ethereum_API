@@ -252,6 +252,11 @@ async function getCoinsList() {
     myLogger.log(convertTimestampToString(new Date().getTime(), true) + ' getCoinList')
 
     setTimeout(getCoinsList, 1000)
+    
+    const used = process.memoryUsage();
+    for (let key in used) {
+        myLogger.log(`${key} ${Math.round(used[key] / 1024 / 1024 * 100) / 100} MB`);
+    }
 }
 
 async function getTotalSupply() {
@@ -304,6 +309,11 @@ async function getTotalSupply() {
     }
 
     setTimeout(getTotalSupply, 1000)
+    
+    const used = process.memoryUsage();
+    for (let key in used) {
+        myLogger.log(`${key} ${Math.round(used[key] / 1024 / 1024 * 100) / 100} MB`);
+    }
 }
 
 async function getCoinGeckoInfo() {
@@ -340,6 +350,11 @@ async function getCoinGeckoInfo() {
     }
 
     setTimeout(getCoinGeckoInfo, 3600000 * 10)
+    
+    const used = process.memoryUsage();
+    for (let key in used) {
+        myLogger.log(`${key} ${Math.round(used[key] / 1024 / 1024 * 100) / 100} MB`);
+    }
 }
 
 async function init() {

@@ -3,8 +3,8 @@ const config = require('../../config')
 const utf8 = require('utf8')
 const { Console } = require("console");
 const myLogger = new Console({
-  stdout: fs.createWriteStream("update.txt"),
-  stderr: fs.createWriteStream("update.txt"),
+  stdout: fs.createWriteStream("update1.txt"),
+  stderr: fs.createWriteStream("update1.txt"),
 });
 const axios = require('axios')
 const Web3 = require('web3');

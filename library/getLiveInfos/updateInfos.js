@@ -8,7 +8,6 @@ const myLogger = new Console({
 });
 const axios = require('axios')
 const Web3 = require('web3');
-const sizeof = require('object-sizeof')
 
 var web3s = []
 
@@ -20,7 +19,7 @@ for (var i = 0; i < config.networks.length; i ++) {
 
     if (config[chainName].endPointType == 1) {
         for (var ii = 0; ii < proxyCnt; ii ++) {
-            web3s[chainName].push(new Web3(new Web3.providers.HttpProvider(config[chainName].web3Providers[0], {
+            web3s[chainName][ii] = (new Web3(new Web3.providers.HttpProvider(config[chainName].web3Providers[0], {
                 // Enable auto reconnection
                 reconnect: {
                     auto: true,
@@ -262,7 +261,8 @@ async function getCoinsList() {
 
 async function getTotalSupply() {
     try {
-        for (var i = 0; i < config.networks.length; i ++) {
+        // for (var i = 0; i < config.networks.length; i ++) {
+        for (var i = 0; i < 1; i ++) {
             var changesTableName = config.networks[i] + '_changes'
             var tokensTableName = config.networks[i] + '_tokens'
             var tokens = await knex(changesTableName).join(tokensTableName, tokensTableName + '.tokenAddress', '=', changesTableName + '.tokenAddress').select('*')
@@ -290,7 +290,6 @@ async function getTotalSupply() {
                 }
 
                 await delay(200)
-                myLogger.log("Web3s Size: ", sizeof(web3s))
             }
         }
 

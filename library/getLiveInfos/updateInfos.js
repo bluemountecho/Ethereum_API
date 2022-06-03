@@ -264,13 +264,11 @@ async function getCoinsList() {
 async function getTotalSupply() {
     try {
         createWeb3s()
-        // for (var i = 0; i < config.networks.length; i ++) {
-        for (var i = 3; i < 4; i ++) {
+        for (var i = 0; i < config.networks.length; i ++) {
+        // for (var i = 3; i < 4; i ++) {
             var changesTableName = config.networks[i] + '_changes'
             var tokensTableName = config.networks[i] + '_tokens'
             var tokens = await knex(changesTableName).join(tokensTableName, tokensTableName + '.tokenAddress', '=', changesTableName + '.tokenAddress').select('*')
-
-            console.log(tokens.length)
 
             for (var j = 0; j < tokens.length; j += web3s[config.networks[i]].length) {
                 try {
@@ -295,23 +293,22 @@ async function getTotalSupply() {
                 }
 
                 await delay(200)
-                console.log(j)
             }
         }
 
-        // var rows = await knex('main_coins').select('*')
+        var rows = await knex('main_coins').select('*')
 
-        // for (var i = 0; i < rows.length; i ++) {
-        //     var res = await axios.get('https://api.coingecko.com/api/v3/coins/' + config.coinMap[rows[i].coin_id])
-        //     var info = res.data
+        for (var i = 0; i < rows.length; i ++) {
+            var res = await axios.get('https://api.coingecko.com/api/v3/coins/' + config.coinMap[rows[i].coin_id])
+            var info = res.data
 
-        //     await knex('main_coins').where('coin_id', rows[i].coin_id).update({
-        //         coin_total_supply: info.market_data.market_cap.usd,
-        //         coin_geckoInfo: utf8.encode(JSON.stringify(info))
-        //     })
+            await knex('main_coins').where('coin_id', rows[i].coin_id).update({
+                coin_total_supply: info.market_data.market_cap.usd,
+                coin_geckoInfo: utf8.encode(JSON.stringify(info))
+            })
 
-        //     await delay(1200)
-        // }
+            await delay(1200)
+        }
     } catch (err) {
 
     }

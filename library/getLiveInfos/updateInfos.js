@@ -11,61 +11,63 @@ const Web3 = require('web3');
 
 var web3s = []
 
-for (var i = 0; i < config.networks.length; i ++) {
-    const chainName = config.networks[i]
-    const proxyCnt = config[chainName].PROXYCOUNT
-
-    web3s[chainName] = []
-
-    if (config[chainName].endPointType == 1) {
-        for (var ii = 0; ii < proxyCnt; ii ++) {
-            web3s[chainName][ii] = (new Web3(new Web3.providers.HttpProvider(config[chainName].web3Providers[0], {
-                // Enable auto reconnection
-                reconnect: {
-                    auto: true,
-                    delay: 5000, // ms
-                    maxAttempts: 5,
-                    onTimeout: false
-                },
-                keepAlive: true,
-                timeout: 20000,
-                headers: [{name: 'Access-Control-Allow-Origin', value: '*'}],
-                withCredentials: false,
-                agent: {
-                    // httpsAgent: new HttpsProxyAgent('https://' + config.PROXY[ii]),
-                    baseUrl: 'http://' + config.PROXY[ii]
-                }
-                // agent: {
-                //     // http: new HttpsProxyAgent('http://' + config.PROXY[ii]),
-                //     http: http.Agent('http://' + config.PROXY[ii]),
-                //     baseUrl: 'http://' + config.PROXY[ii]
-                // }
-            })))
-        }
-    } else {
-        for (var ii = 0; ii < proxyCnt; ii ++) {
-            web3s[chainName].push(new Web3(new Web3.providers.HttpProvider(config[chainName].web3Providers[ii], {
-                // Enable auto reconnection
-                reconnect: {
-                    auto: true,
-                    delay: 5000, // ms
-                    maxAttempts: 5,
-                    onTimeout: false
-                },
-                keepAlive: true,
-                timeout: 20000,
-                headers: [{name: 'Access-Control-Allow-Origin', value: '*'}],
-                withCredentials: false,
-                agent: {
-                    // httpsAgent: new HttpsProxyAgent('https://' + config.PROXY[ii]),
-                    baseUrl: 'http://' + config.PROXY[ii]
-                }
-                // agent: {
-                //     // http: new HttpsProxyAgent('http://' + config.PROXY[ii]),
-                //     http: http.Agent('http://' + config.PROXY[ii]),
-                //     baseUrl: 'http://' + config.PROXY[ii]
-                // }
-            })))
+function createWeb3s() {
+    for (var i = 0; i < config.networks.length; i ++) {
+        const chainName = config.networks[i]
+        const proxyCnt = config[chainName].PROXYCOUNT
+    
+        web3s[chainName] = []
+    
+        if (config[chainName].endPointType == 1) {
+            for (var ii = 0; ii < proxyCnt; ii ++) {
+                web3s[chainName][ii] = (new Web3(new Web3.providers.HttpProvider(config[chainName].web3Providers[0], {
+                    // Enable auto reconnection
+                    reconnect: {
+                        auto: true,
+                        delay: 5000, // ms
+                        maxAttempts: 5,
+                        onTimeout: false
+                    },
+                    keepAlive: true,
+                    timeout: 20000,
+                    headers: [{name: 'Access-Control-Allow-Origin', value: '*'}],
+                    withCredentials: false,
+                    agent: {
+                        // httpsAgent: new HttpsProxyAgent('https://' + config.PROXY[ii]),
+                        baseUrl: 'http://' + config.PROXY[ii]
+                    }
+                    // agent: {
+                    //     // http: new HttpsProxyAgent('http://' + config.PROXY[ii]),
+                    //     http: http.Agent('http://' + config.PROXY[ii]),
+                    //     baseUrl: 'http://' + config.PROXY[ii]
+                    // }
+                })))
+            }
+        } else {
+            for (var ii = 0; ii < proxyCnt; ii ++) {
+                web3s[chainName].push(new Web3(new Web3.providers.HttpProvider(config[chainName].web3Providers[ii], {
+                    // Enable auto reconnection
+                    reconnect: {
+                        auto: true,
+                        delay: 5000, // ms
+                        maxAttempts: 5,
+                        onTimeout: false
+                    },
+                    keepAlive: true,
+                    timeout: 20000,
+                    headers: [{name: 'Access-Control-Allow-Origin', value: '*'}],
+                    withCredentials: false,
+                    agent: {
+                        // httpsAgent: new HttpsProxyAgent('https://' + config.PROXY[ii]),
+                        baseUrl: 'http://' + config.PROXY[ii]
+                    }
+                    // agent: {
+                    //     // http: new HttpsProxyAgent('http://' + config.PROXY[ii]),
+                    //     http: http.Agent('http://' + config.PROXY[ii]),
+                    //     baseUrl: 'http://' + config.PROXY[ii]
+                    // }
+                })))
+            }
         }
     }
 }
@@ -261,11 +263,14 @@ async function getCoinsList() {
 
 async function getTotalSupply() {
     try {
+        createWeb3s()
         // for (var i = 0; i < config.networks.length; i ++) {
         for (var i = 0; i < 1; i ++) {
             var changesTableName = config.networks[i] + '_changes'
             var tokensTableName = config.networks[i] + '_tokens'
             var tokens = await knex(changesTableName).join(tokensTableName, tokensTableName + '.tokenAddress', '=', changesTableName + '.tokenAddress').select('*')
+
+            console.log(tokens.length)
 
             for (var j = 0; j < tokens.length; j += web3s[config.networks[i]].length) {
                 try {
@@ -291,6 +296,7 @@ async function getTotalSupply() {
                 }
 
                 await delay(200)
+                console.log(j)
             }
         }
 

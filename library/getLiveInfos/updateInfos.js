@@ -8,6 +8,7 @@ const myLogger = new Console({
 });
 const axios = require('axios')
 const Web3 = require('web3');
+const sizeof = require('object-sizeof')
 
 var web3s = []
 
@@ -289,6 +290,7 @@ async function getTotalSupply() {
                 }
 
                 await delay(200)
+                myLogger.log("Web3s Size: ", sizeof(web3s))
             }
         }
 
@@ -312,9 +314,11 @@ async function getTotalSupply() {
     setTimeout(getTotalSupply, 1000)
     
     const used = process.memoryUsage();
+    myLogger.log("=========================")
     for (let key in used) {
         myLogger.log(`${key} ${Math.round(used[key] / 1024 / 1024 * 100) / 100} MB`);
     }
+    myLogger.log("=========================")
 }
 
 async function getCoinGeckoInfo() {

@@ -265,7 +265,7 @@ async function getTotalSupply() {
     try {
         createWeb3s()
         // for (var i = 0; i < config.networks.length; i ++) {
-        for (var i = 0; i < 1; i ++) {
+        for (var i = 3; i < 4; i ++) {
             var changesTableName = config.networks[i] + '_changes'
             var tokensTableName = config.networks[i] + '_tokens'
             var tokens = await knex(changesTableName).join(tokensTableName, tokensTableName + '.tokenAddress', '=', changesTableName + '.tokenAddress').select('*')

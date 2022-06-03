@@ -299,19 +299,19 @@ async function getTotalSupply() {
             }
         }
 
-        var rows = await knex('main_coins').select('*')
+        // var rows = await knex('main_coins').select('*')
 
-        for (var i = 0; i < rows.length; i ++) {
-            var res = await axios.get('https://api.coingecko.com/api/v3/coins/' + config.coinMap[rows[i].coin_id])
-            var info = res.data
+        // for (var i = 0; i < rows.length; i ++) {
+        //     var res = await axios.get('https://api.coingecko.com/api/v3/coins/' + config.coinMap[rows[i].coin_id])
+        //     var info = res.data
 
-            await knex('main_coins').where('coin_id', rows[i].coin_id).update({
-                coin_total_supply: info.market_data.market_cap.usd,
-                coin_geckoInfo: utf8.encode(JSON.stringify(info))
-            })
+        //     await knex('main_coins').where('coin_id', rows[i].coin_id).update({
+        //         coin_total_supply: info.market_data.market_cap.usd,
+        //         coin_geckoInfo: utf8.encode(JSON.stringify(info))
+        //     })
 
-            await delay(1200)
-        }
+        //     await delay(1200)
+        // }
     } catch (err) {
 
     }

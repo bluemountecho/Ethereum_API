@@ -1018,7 +1018,7 @@ module.exports.getAllCoinsList = async function getAllCoinsList(page = 0, order 
                 marketcap: otherCoins[i].marketcap,
                 coinSymbol: otherCoins[i].coinSymbol,
                 coinName: otherCoins[i].coinName,
-                coinImage: otherCoins[i].coinImage,
+                coinImage: otherCoins[i].localImage,
             }
 
             bef = otherCoins[i].coinSymbol
@@ -1034,10 +1034,10 @@ module.exports.getAllCoinsList = async function getAllCoinsList(page = 0, order 
                 tmpdata.pricenow = otherCoins[i].pricenow
                 
                 tmpdata.coinSymbol = otherCoins[i].coinSymbol                
-                tmpdata.coinName = otherCoins[i].coinName
+                tmpdata.coinName = otherCoins[i].localImage
 
-                if (otherCoins[i].coinImage != '')
-                    tmpdata.coinImage = otherCoins[i].coinImage
+                if (otherCoins[i].localImage != '')
+                    tmpdata.coinImage = otherCoins[i].localImage
 
                 tmpvolume = otherCoins[i].volume24h
             }

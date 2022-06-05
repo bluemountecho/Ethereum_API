@@ -7,6 +7,8 @@ const myLogger = new Console({
   stderr: fs.createWriteStream("log.txt"),
 });
 
+const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
+
 const knex = require('knex')({
     client: 'mysql',
     connection: {
@@ -37,15 +39,18 @@ var download = function(uri, filename, callback){
 async function downloadAllFiles() {
   var rows = await knex('main_coin_list').select('*')
 
-  for (var i = 0; i < rows.length; i ++) {
-    var img = rows[i].coinImage
+  for (var i = 0; i < 1; i ++) {
+    var arr = rows[i].coinImage.split
+    var img = 'http://51.83.184.35:8888/images/' + arr[5] + '_' + arr[6] + '_' + arr[7].split('?')[0]
 
-    await knex('main_coin_list')
-      .where('network', rows[i].network)
-      .where('tokenAddress', rows[i].tokenAddress)
-      .update({
-        geckoImage: img
-      })
+    myLogger.log(img)
+
+    // await knex('main_coin_list')
+    //   .where('network', rows[i].network)
+    //   .where('tokenAddress', rows[i].tokenAddress)
+    //   .update({
+    //     geckoImage: img
+    //   })
     // var arr = rows[0].coinImage.split('/')
 
     // myLogger.log(arr)

@@ -44,6 +44,8 @@ async function downloadAllFiles() {
   })
 
   for (var i = 0; i < rows.length; i ++) {
+    if (rows[i].coinImage == null || rows[i].coinImage == '') continue
+    
     var arr = rows[i].coinImage.split('/')
     var img = ''
 

@@ -37,10 +37,18 @@ var download = function(uri, filename, callback){
 async function downloadAllFiles() {
   var rows = await knex('main_coin_list').select('*')
 
-  for (var i = 0; i < 1; i ++) {
-    var arr = rows[0].coinImage.split('/')
+  for (var i = 0; i < rows.length; i ++) {
+    var img = rows[i].coinImage
 
-    myLogger.log(arr)
+    await knex('main_coin_list')
+      .where('network', rows[i].network)
+      .where('tokenAddress', rows[i].tokenAddress)
+      .update({
+        geckoImage: img
+      })
+    // var arr = rows[0].coinImage.split('/')
+
+    // myLogger.log(arr)
   }
 }
 

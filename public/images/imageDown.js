@@ -30,9 +30,9 @@ var download = function(uri, filename, callback){
   });
 };
 
-download('https://www.google.com/images/srpr/logo3w.png', 'google.png', function(){
-  console.log('done');
-});
+// download('https://www.google.com/images/srpr/logo3w.png', 'google.png', function(){
+//   console.log('done');
+// });
 
 async function downloadAllFiles() {
   var rows = await knex('main_coin_list').select('*')
@@ -44,4 +44,4 @@ async function downloadAllFiles() {
   }
 }
 
-// downloadAllFiles()
+downloadAllFiles()

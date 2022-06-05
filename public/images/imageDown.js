@@ -1,6 +1,12 @@
 var fs = require('fs'),
     request = require('request');
 
+const { Console } = require("console");
+const myLogger = new Console({
+  stdout: fs.createWriteStream("log.txt"),
+  stderr: fs.createWriteStream("log.txt"),
+});
+
 const knex = require('knex')({
     client: 'mysql',
     connection: {
@@ -24,6 +30,14 @@ var download = function(uri, filename, callback){
   });
 };
 
-download('https://www.google.com/images/srpr/logo3w.png', 'google.png', function(){
-  console.log('done');
-});
+// download('https://www.google.com/images/srpr/logo3w.png', 'google.png', function(){
+//   console.log('done');
+// });
+
+async function downloadAllFiles() {
+  var rows = await knex('main_coin_list').select('*')
+
+  myLogger.log(rows)
+}
+
+downloadAllFiles()

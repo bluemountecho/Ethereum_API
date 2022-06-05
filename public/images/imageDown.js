@@ -45,7 +45,13 @@ async function downloadAllFiles() {
 
   for (var i = 0; i < rows.length; i ++) {
     var arr = rows[i].coinImage.split('/')
-    var img = arr[5] + '_' + arr[6] + '_' + arr[7].split('?')[0]
+    var img = ''
+
+    for (var j = 5; j < arr.length - 1; j ++) {
+      img += arr[j] + '_'
+    }
+
+    img += arr[arr.length - 1].split('?')[0]
 
     myLogger.log(img)
 

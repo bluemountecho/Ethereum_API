@@ -37,7 +37,11 @@ var download = function(uri, filename, callback){
 async function downloadAllFiles() {
   var rows = await knex('main_coin_list').select('*')
 
-  myLogger.log(rows)
+  for (var i = 0; i < 1; i ++) {
+    var arr = rows[0].coinImage.split('/')
+
+    myLogger.log(arr)
+  }
 }
 
 downloadAllFiles()

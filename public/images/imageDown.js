@@ -25,8 +25,8 @@ const knex = require('knex')({
 
 var download = function(uri, filename, callback){
   request.head(uri, function(err, res, body){
-    console.log('content-type:', res.headers['content-type']);
-    console.log('content-length:', res.headers['content-length']);
+    // console.log('content-type:', res.headers['content-type']);
+    // console.log('content-length:', res.headers['content-length']);
 
     request(uri).pipe(fs.createWriteStream(filename)).on('close', callback);
   });
@@ -43,7 +43,7 @@ async function downloadAllFiles() {
     localImage: ''
   })
 
-  for (var i = 0; i < 1; i ++) {
+  for (var i = 0; i < rows.length; i ++) {
     var arr = rows[i].coinImage.split('/')
     var img = arr[5] + '_' + arr[6] + '_' + arr[7].split('?')[0]
 
@@ -61,6 +61,8 @@ async function downloadAllFiles() {
 
     await delay(1000)
   }
+
+  myLogger.log('Finished')
 }
 
 downloadAllFiles()

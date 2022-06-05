@@ -3,4 +3,6 @@
 yarn-error.log
 library/getHistory/log.txt
 /database
+/public/images/*.png
+/public/images/*.jpg
 *.txt

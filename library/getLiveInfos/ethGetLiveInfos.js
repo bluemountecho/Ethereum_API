@@ -860,10 +860,14 @@ async function init() {
                     if (tmpToken == USD_ADDRESS) tmpPrice = 1
 
                     if (tokensData[tmpToken]) {
-                        tokensData[tmpToken].lastPrice = tmpPrice
-                        await knex(tokensTableName).where('tokenAddress', tmpToken).update({
-                            lastPrice: tmpPrice
-                        })
+                        if ((tmpToken == ETH_ADDRESS && tmpBaseToken == USD_ADDRESS) || tmpToken != ETH_ADDRESS) {
+                            tokensData[tmpToken].lastPrice = tmpPrice
+                            await knex(tokensTableName).where('tokenAddress', tmpToken).update({
+                                lastPrice: tmpPrice
+                            })
+                        } else {
+                            tmpPrice = tokensData[tmpToken].lastPrice
+                        }
                     }
 
                     var data = {

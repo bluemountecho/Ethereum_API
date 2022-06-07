@@ -849,6 +849,11 @@ async function init() {
 
                     tokensData[USD_ADDRESS].lastPrice = 1
 
+                    if ((pairsData[pairAddress].token0Address == ETH_ADDRESS || pairsData[pairAddress].token1Address == ETH_ADDRESS) &&
+                    (pairsData[pairAddress].token0Address != USD_ADDRESS && pairsData[pairAddress].token1Address != USD_ADDRESS)) {
+                        pairsData[pairAddress].baseToken = pairsData[pairAddress].token0Address == ETH_ADDRESS ? 0 : 1
+                    }
+
                     var tmpToken = pairsData[pairAddress].baseToken == 1 ? pairsData[pairAddress].token0Address : pairsData[pairAddress].token1Address
                     var tmpBaseToken = pairsData[pairAddress].baseToken == 0 ? pairsData[pairAddress].token0Address : pairsData[pairAddress].token1Address
                     var tmpPrice = 0
@@ -1057,6 +1062,11 @@ async function init() {
 
                     tokensData[USD_ADDRESS].lastPrice = 1
 
+                    if ((pairsData[pairAddress].token0Address == ETH_ADDRESS || pairsData[pairAddress].token1Address == ETH_ADDRESS) &&
+                    (pairsData[pairAddress].token0Address != USD_ADDRESS && pairsData[pairAddress].token1Address != USD_ADDRESS)) {
+                        pairsData[pairAddress].baseToken = pairsData[pairAddress].token0Address == ETH_ADDRESS ? 0 : 1
+                    }
+
                     var tmpToken = pairsData[pairAddress].baseToken == 1 ? pairsData[pairAddress].token0Address : pairsData[pairAddress].token1Address
                     var tmpBaseToken = pairsData[pairAddress].baseToken == 0 ? pairsData[pairAddress].token0Address : pairsData[pairAddress].token1Address
                     var tmpPrice = 0
@@ -1068,10 +1078,14 @@ async function init() {
                     if (tmpToken == USD_ADDRESS) tmpPrice = 1
 
                     if (tokensData[tmpToken]) {
-                        tokensData[tmpToken].lastPrice = tmpPrice
-                        await knex(tokensTableName).where('tokenAddress', tmpToken).update({
-                            lastPrice: tmpPrice
-                        })
+                        if ((tmpToken == ETH_ADDRESS && tmpBaseToken == USD_ADDRESS) || tmpToken != ETH_ADDRESS) {
+                            tokensData[tmpToken].lastPrice = tmpPrice
+                            await knex(tokensTableName).where('tokenAddress', tmpToken).update({
+                                lastPrice: tmpPrice
+                            })
+                        } else {
+                            tmpPrice = tokensData[tmpToken].lastPrice
+                        }
                     }
 
                     var data = {

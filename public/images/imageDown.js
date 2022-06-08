@@ -55,8 +55,6 @@ async function downloadAllFiles() {
 
     img += arr[arr.length - 1].split('?')[0]
 
-    myLogger.log(img)
-
     await knex('main_coin_list')
       .where('network', rows[i].network)
       .where('tokenAddress', rows[i].tokenAddress)

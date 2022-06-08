@@ -988,8 +988,6 @@ module.exports.getAllCoinsList = async function getAllCoinsList(page = 0, order 
     //     }
     // }
 
-    datas.push(tmpdata)
-
     var bef = ''
     var tmpdata = null
     var tmpvolume = 0

@@ -170,6 +170,20 @@ async function getCoinsList() {
                     if (rows[j].trans24h * 400000 <= rows[j].volume24h) continue
         
                     visChanges[rows[j].tokenAddress] = true
+
+                    var coinImage = (rows[j].coingeckoInfos && rows[j].coingeckoInfos != '') ? JSON.parse(rows[j].coingeckoInfos).image.large : ''
+                    var arr = coinImage.split('/')
+                    var img = ''
+
+                    for (var j = 5; j < arr.length - 1; j ++) {
+                        img += arr[j] + '_'
+                    }
+
+                    if (arr.length) {
+                        img += arr[arr.length - 1].split('?')[0]
+                    } else {
+                        img = ''
+                    }
         
                     if (visList[rows[j].tokenAddress]) {
                         await knex('main_coin_list').update({
@@ -188,7 +202,8 @@ async function getCoinsList() {
                             marketcap: rows[j].totalSupply * rows[j].lastPrice,
                             coinName: rows[j].tokenName,
                             coinSymbol: rows[j].tokenSymbol,
-                            coinImage: (rows[j].coingeckoInfos && rows[j].coingeckoInfos != '') ? JSON.parse(rows[j].coingeckoInfos).image.large : '',
+                            coinImage: coinImage,
+                            localImage: 'http://51.83.184.35:8888/images/' + img
                         }).where("tokenAddress", rows[j].tokenAddress).where('network', config.networks[i])
                     } else {
                         await knex('main_coin_list').insert({
@@ -207,7 +222,8 @@ async function getCoinsList() {
                             marketcap: rows[j].totalSupply * rows[j].lastPrice,
                             coinName: rows[j].tokenName,
                             coinSymbol: rows[j].tokenSymbol,
-                            coinImage: (rows[j].coingeckoInfos && rows[j].coingeckoInfos != '') ? JSON.parse(rows[j].coingeckoInfos).image.large : '',
+                            coinImage: coinImage,
+                            localImage: 'http://51.83.184.35:8888/images/' + img
                         })
                     }
                 }
@@ -218,7 +234,7 @@ async function getCoinsList() {
                     await knex('main_coin_list').where('tokenAddress', token).where('network', config.networks[i]).delete()
                 }
             } catch (err) {
-
+                myLogger.log(err)
             }
         }
     
@@ -292,7 +308,7 @@ async function getTotalSupply() {
 
                 }
 
-                await delay(200)
+                await delay(1000)
             }
         }
 
@@ -314,13 +330,6 @@ async function getTotalSupply() {
     }
 
     setTimeout(getTotalSupply, 1000)
-    
-    const used = process.memoryUsage();
-    myLogger.log("=========================")
-    for (let key in used) {
-        myLogger.log(`${key} ${Math.round(used[key] / 1024 / 1024 * 100) / 100} MB`);
-    }
-    myLogger.log("=========================")
 }
 
 async function getCoinGeckoInfo() {
@@ -357,17 +366,12 @@ async function getCoinGeckoInfo() {
     }
 
     setTimeout(getCoinGeckoInfo, 3600000 * 10)
-    
-    const used = process.memoryUsage();
-    for (let key in used) {
-        myLogger.log(`${key} ${Math.round(used[key] / 1024 / 1024 * 100) / 100} MB`);
-    }
 }
 
 async function init() {
-    // getCoinsList()
+    getCoinsList()
     // getCoinGeckoInfo()
-    getTotalSupply()
+    // getTotalSupply()
 }
 
 init()

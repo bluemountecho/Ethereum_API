@@ -3,8 +3,8 @@ const config = require('../../config')
 const utf8 = require('utf8')
 const { Console } = require("console");
 const myLogger = new Console({
-  stdout: fs.createWriteStream("update2.txt"),
-  stderr: fs.createWriteStream("update2.txt"),
+  stdout: fs.createWriteStream("update.txt"),
+  stderr: fs.createWriteStream("update.txt"),
 });
 const axios = require('axios')
 const Web3 = require('web3');
@@ -175,8 +175,8 @@ async function getCoinsList() {
                     var arr = coinImage.split('/')
                     var img = ''
 
-                    for (var j = 5; j < arr.length - 1; j ++) {
-                        img += arr[j] + '_'
+                    for (var k = 5; k < arr.length - 1; k ++) {
+                        img += arr[k] + '_'
                     }
 
                     if (arr.length) {
@@ -203,7 +203,7 @@ async function getCoinsList() {
                             coinName: rows[j].tokenName,
                             coinSymbol: rows[j].tokenSymbol,
                             coinImage: coinImage,
-                            localImage: 'http://51.83.184.35:8888/images/' + img
+                            localImage: img == '' ? '' : 'http://51.83.184.35:8888/images/' + img
                         }).where("tokenAddress", rows[j].tokenAddress).where('network', config.networks[i])
                     } else {
                         await knex('main_coin_list').insert({
@@ -223,7 +223,7 @@ async function getCoinsList() {
                             coinName: rows[j].tokenName,
                             coinSymbol: rows[j].tokenSymbol,
                             coinImage: coinImage,
-                            localImage: 'http://51.83.184.35:8888/images/' + img
+                            localImage: img == '' ? '' : 'http://51.83.184.35:8888/images/' + img
                         })
                     }
                 }

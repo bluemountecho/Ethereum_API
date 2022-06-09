@@ -452,6 +452,8 @@ async function mmmmm() {
         }
 
         await knex('main_coin_list').insert({
+            tokenAddress: rows[i].coin_id,
+            network: 'main',
             coinName: coin[0].coin_name,
             coinSymbol: coin[0].coin_symbol,
             price24h: info[0].price24h * (0.9997 + Math.random() * 0.001),

@@ -204,6 +204,7 @@ async function getMainCoinsList() {
 async function getCoinsList() {
     try {
         for (var i = 0; i < config.networks.length; i ++) {
+            myLogger.log(config.networks[i])
             try {
                 var changesTableName = config.networks[i] + '_changes'
                 var tokensTableName = config.networks[i] + '_tokens'

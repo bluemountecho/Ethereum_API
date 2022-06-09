@@ -478,5 +478,5 @@ async function init() {
     getTotalSupply()
 }
 
-// init()
-mmmmm()
+init()
+// mmmmm()

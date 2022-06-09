@@ -145,6 +145,62 @@ function convertTimestampToString(timestamp, flag = false) {
     }
 }
 
+async function getMainCoinsList() {
+    try {
+        var rows = await knex('main_live').whereRaw('swapAt>=DATE_SUB(NOW(), INTERVAL 24 HOUR)').groupBy('coin_id').select(knex.raw('*, sum(swapAmountUSD) as volume, count(coin_id) as trans'))
+    
+        for (var i = 0; i < rows.length; i ++) {
+            var coin = await knex('main_coins').where('coin_id', rows[i].coin_id).select('*')
+            var info = await knex('main_coin_list').where('tokenAddress', coin[0].coin_token_address).where('network', coin[0].coin_net).select('*')
+    
+            if (info.length == 0) {
+                await knex('main_coin_list').insert({
+                    tokenAddress: rows[i].coin_id.toString(),
+                    network: 'main',
+                })
+            }
+
+            var coinImage = (coin[0].coin_geckoInfo && coin[0].coin_geckoInfo != '') ? JSON.parse(coin[0].coin_geckoInfo).image.large : ''
+            var arr = coinImage.split('/')
+            var img = ''
+
+            for (var k = 5; k < arr.length - 1; k ++) {
+                img += arr[k] + '_'
+            }
+
+            if (arr.length) {
+                img += arr[arr.length - 1].split('?')[0]
+            } else {
+                img = ''
+            }
+    
+            await knex('main_coin_list').where('tokenAddress', rows[i].coin_id.toString()).where('network', 'main').update({
+                trans24h: rows[i].trans,
+                volume24h: rows[i].volume,
+                coinName: coin[0].coin_name,
+                coinSymbol: coin[0].coin_symbol,
+                price24h: info[0].price24h * (0.9997 + Math.random() * 0.001),
+                price12h: info[0].price12h * (0.9997 + Math.random() * 0.001),
+                price6h: info[0].price6h * (0.9997 + Math.random() * 0.001),
+                price2h: info[0].price2h * (0.9997 + Math.random() * 0.001),
+                price1h: info[0].price1h * (0.9997 + Math.random() * 0.001),
+                price30m: info[0].price30m * (0.9997 + Math.random() * 0.001),
+                price5m: info[0].price5m * (0.9997 + Math.random() * 0.001),
+                pricenow: info[0].pricenow * (0.9997 + Math.random() * 0.001),
+                marketcap: coin[0].coin_total_supply * (0.98 + Math.random() * 0.02),
+                coinImage: coinImage,
+                localImage: img == '' ? '' : 'http://51.83.184.35:8888/images/' + img
+            })
+        }
+    } catch (err) {
+
+    }    
+
+    myLogger.log(convertTimestampToString(new Date().getTime(), true) + ' getMainCoinList')
+
+    setTimeout(getCoinsList, 1000)
+}
+
 async function getCoinsList() {
     try {
         for (var i = 0; i < config.networks.length; i ++) {
@@ -238,17 +294,34 @@ async function getCoinsList() {
             }
         }
     
-        var rows = await knex('main_live').whereRaw('swapAt>=DATE_SUB(NOW(), INTERVAL 24 HOUR)').groupBy('coin_id').select(knex.raw('*, sum(swapAmountUSD) as volume, count(coin_id) as trans'))
+        var rows = await knex('main_coins')
     
         for (var i = 0; i < rows.length; i ++) {
             var coin = await knex('main_coins').where('coin_id', rows[i].coin_id).select('*')
             var info = await knex('main_coin_list').where('tokenAddress', coin[0].coin_token_address).where('network', coin[0].coin_net).select('*')
     
-            if (info.length == 0) continue
+            if (info.length == 0) {
+                await knex('main_coin_list').insert({
+                    tokenAddress: rows[i].coin_id.toString(),
+                    network: 'main',
+                })
+            }
+
+            var coinImage = (coin[0].coin_geckoInfo && coin[0].coin_geckoInfo != '') ? JSON.parse(coin[0].coin_geckoInfo).image.large : ''
+            var arr = coinImage.split('/')
+            var img = ''
+
+            for (var k = 5; k < arr.length - 1; k ++) {
+                img += arr[k] + '_'
+            }
+
+            if (arr.length) {
+                img += arr[arr.length - 1].split('?')[0]
+            } else {
+                img = ''
+            }
     
             await knex('main_coin_list').where('tokenAddress', rows[i].coin_id.toString()).where('network', 'main').update({
-                trans24h: rows[i].trans,
-                volume24h: rows[i].volume,
                 coinName: coin[0].coin_name,
                 coinSymbol: coin[0].coin_symbol,
                 price24h: info[0].price24h * (0.9997 + Math.random() * 0.001),
@@ -260,7 +333,8 @@ async function getCoinsList() {
                 price5m: info[0].price5m * (0.9997 + Math.random() * 0.001),
                 pricenow: info[0].pricenow * (0.9997 + Math.random() * 0.001),
                 marketcap: coin[0].coin_total_supply * (0.98 + Math.random() * 0.02),
-                coinImage: (coin[0].coin_geckoInfo && coin[0].coin_geckoInfo != '') ? JSON.parse(coin[0].coin_geckoInfo).image.large : '',
+                coinImage: coinImage,
+                localImage: img == '' ? '' : 'http://51.83.184.35:8888/images/' + img
             })
         }
     } catch (err) {
@@ -370,8 +444,9 @@ async function getCoinGeckoInfo() {
 
 async function init() {
     getCoinsList()
-    // getCoinGeckoInfo()
-    // getTotalSupply()
+    getMainCoinsList()
+    getCoinGeckoInfo()
+    getTotalSupply()
 }
 
 init()

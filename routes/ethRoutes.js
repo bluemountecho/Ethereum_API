@@ -108,7 +108,7 @@ router.get('/coins', function(req, res, next) {
 
   etherMainnetFuncs.getAllCoinsList(req.query.page ? req.query.page : 0, req.query.orderby ? req.query.orderby : 'marketcap')
   .then((data) => {
-    res.send(JSON.stringify(data))
+    res.send(JSON.stringify(data, null, 4))
   })
 });
 

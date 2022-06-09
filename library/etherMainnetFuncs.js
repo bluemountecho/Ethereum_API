@@ -991,6 +991,7 @@ module.exports.getAllCoinsList = async function getAllCoinsList(page = 0, order 
     var bef = ''
     var tmpdata = null
     var tmpvolume = 0
+    var isMain = false
 
     for (var i = 0; i < otherCoins.length; i ++) {
         if (otherCoins[i].volume24h < 10000) continue
@@ -998,7 +999,7 @@ module.exports.getAllCoinsList = async function getAllCoinsList(page = 0, order 
         if (otherCoins[i].pricenow <= 0.0000000000000001) continue
         if (otherCoins[i].coinSymbol == '') continue
 
-        if (bef != otherCoins[i].coinSymbol) {
+        if (bef != otherCoins[i].coinSymbol.toLowerCase().replace(/ /, '')) {
             if (tmpdata != null) {
                 datas.push(tmpdata)
             }
@@ -1019,7 +1020,13 @@ module.exports.getAllCoinsList = async function getAllCoinsList(page = 0, order 
                 coinImage: otherCoins[i].localImage,
             }
 
-            bef = otherCoins[i].coinSymbol
+            if (otherCoins[i].network == 'main') {
+                isMain = true
+            } else {
+                isMain = false
+            }
+
+            bef = otherCoins[i].coinSymbol.toLowerCase().replace(/ /, '')
             tmpvolume = otherCoins[i].volume24h
         } else {
             if (tmpvolume < otherCoins[i].volume24h) {
@@ -1045,7 +1052,8 @@ module.exports.getAllCoinsList = async function getAllCoinsList(page = 0, order 
 
             if (otherCoins[i].network == 'main') {
                 tmpdata.marketcap = otherCoins[i].marketcap
-            } else {
+                isMain = true
+            } else if (isMain == false) {
                 tmpdata.marketcap += otherCoins[i].marketcap
             }
         }

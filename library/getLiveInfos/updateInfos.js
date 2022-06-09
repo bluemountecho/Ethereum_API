@@ -368,7 +368,7 @@ async function getTotalSupply() {
 
                 }
 
-                await delay(1000)
+                await delay(2000)
             }
         }
 

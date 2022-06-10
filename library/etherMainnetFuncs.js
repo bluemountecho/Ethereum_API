@@ -1030,6 +1030,7 @@ module.exports.getAllCoinsList = async function getAllCoinsList(page = 0, order 
             tmpvolume = otherCoins[i].volume24h
         } else {
             if (tmpvolume < otherCoins[i].volume24h) {
+                console.log(otherCoins[i])
                 tmpdata.price24h = otherCoins[i].price24h
                 tmpdata.price6h = otherCoins[i].price6h
                 tmpdata.price2h = otherCoins[i].price2h

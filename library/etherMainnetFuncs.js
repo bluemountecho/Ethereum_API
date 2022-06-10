@@ -1059,8 +1059,6 @@ module.exports.getAllCoinsList = async function getAllCoinsList(page = 0, order 
                 }
             }
         } catch (err) {
-            console.log(err)
-            console.log(otherCoins[i])
         }        
     }
 

@@ -994,70 +994,74 @@ module.exports.getAllCoinsList = async function getAllCoinsList(page = 0, order 
     var isMain = false
 
     for (var i = 0; i < otherCoins.length; i ++) {
-        if (otherCoins[i].volume24h < 10000) continue
-        if (otherCoins[i].pricenow >= 100000) continue
-        if (otherCoins[i].pricenow <= 0.0000000000000001) continue
-        if (otherCoins[i].coinSymbol == '') continue
+        try {
+            if (otherCoins[i].volume24h < 10000) continue
+            if (otherCoins[i].pricenow >= 100000) continue
+            if (otherCoins[i].pricenow <= 0.0000000000000001) continue
+            if (otherCoins[i].coinSymbol == '') continue
 
-        if (bef != otherCoins[i].coinSymbol.toLowerCase().replace(/ /, '')) {
-            if (tmpdata != null) {
-                datas.push(tmpdata)
-            }
+            if (bef != otherCoins[i].coinSymbol.toLowerCase().replace(/ /, '')) {
+                if (tmpdata != null) {
+                    datas.push(tmpdata)
+                }
 
-            tmpdata = {
-                price24h: otherCoins[i].price24h,
-                price6h: otherCoins[i].price6h,
-                price2h: otherCoins[i].price2h,
-                price1h: otherCoins[i].price1h,
-                price30m: otherCoins[i].price30m,
-                price5m: otherCoins[i].price5m,
-                pricenow: otherCoins[i].pricenow,
-                volume24h: otherCoins[i].volume24h,
-                trans24h: otherCoins[i].trans24h,
-                marketcap: otherCoins[i].marketcap,
-                coinSymbol: otherCoins[i].coinSymbol,
-                coinName: otherCoins[i].coinName,
-                coinImage: otherCoins[i].localImage,
-            }
+                tmpdata = {
+                    price24h: otherCoins[i].price24h,
+                    price6h: otherCoins[i].price6h,
+                    price2h: otherCoins[i].price2h,
+                    price1h: otherCoins[i].price1h,
+                    price30m: otherCoins[i].price30m,
+                    price5m: otherCoins[i].price5m,
+                    pricenow: otherCoins[i].pricenow,
+                    volume24h: otherCoins[i].volume24h,
+                    trans24h: otherCoins[i].trans24h,
+                    marketcap: otherCoins[i].marketcap,
+                    coinSymbol: otherCoins[i].coinSymbol,
+                    coinName: otherCoins[i].coinName,
+                    coinImage: otherCoins[i].localImage,
+                }
 
-            if (otherCoins[i].network == 'main') {
-                isMain = true
-            } else {
-                isMain = false
-            }
+                if (otherCoins[i].network == 'main') {
+                    isMain = true
+                } else {
+                    isMain = false
+                }
 
-            bef = otherCoins[i].coinSymbol.toLowerCase().replace(/ /, '')
-            tmpvolume = otherCoins[i].volume24h
-        } else {
-            if (tmpvolume < otherCoins[i].volume24h) {
-                console.log(otherCoins[i])
-                tmpdata.price24h = otherCoins[i].price24h
-                tmpdata.price6h = otherCoins[i].price6h
-                tmpdata.price2h = otherCoins[i].price2h
-                tmpdata.price1h = otherCoins[i].price1h
-                tmpdata.price30m = otherCoins[i].price30m
-                tmpdata.price5m = otherCoins[i].price5m
-                tmpdata.pricenow = otherCoins[i].pricenow
-                
-                tmpdata.coinSymbol = otherCoins[i].coinSymbol                
-                tmpdata.coinName = otherCoins[i].coinName
-
-                if (otherCoins[i].localImage != '')
-                    tmpdata.coinImage = otherCoins[i].localImage
-
+                bef = otherCoins[i].coinSymbol.toLowerCase().replace(/ /, '')
                 tmpvolume = otherCoins[i].volume24h
-            }
+            } else {
+                if (tmpvolume < otherCoins[i].volume24h) {
+                    tmpdata.price24h = otherCoins[i].price24h
+                    tmpdata.price6h = otherCoins[i].price6h
+                    tmpdata.price2h = otherCoins[i].price2h
+                    tmpdata.price1h = otherCoins[i].price1h
+                    tmpdata.price30m = otherCoins[i].price30m
+                    tmpdata.price5m = otherCoins[i].price5m
+                    tmpdata.pricenow = otherCoins[i].pricenow
+                    
+                    tmpdata.coinSymbol = otherCoins[i].coinSymbol                
+                    tmpdata.coinName = otherCoins[i].coinName
 
-            tmpdata.volume24h += otherCoins[i].volume24h
-            tmpdata.trans24h += otherCoins[i].trans24h
+                    if (otherCoins[i].localImage != '')
+                        tmpdata.coinImage = otherCoins[i].localImage
 
-            if (otherCoins[i].network == 'main') {
-                tmpdata.marketcap = otherCoins[i].marketcap
-                isMain = true
-            } else if (isMain == false) {
-                tmpdata.marketcap += otherCoins[i].marketcap
+                    tmpvolume = otherCoins[i].volume24h
+                }
+
+                tmpdata.volume24h += otherCoins[i].volume24h
+                tmpdata.trans24h += otherCoins[i].trans24h
+
+                if (otherCoins[i].network == 'main') {
+                    tmpdata.marketcap = otherCoins[i].marketcap
+                    isMain = true
+                } else if (isMain == false) {
+                    tmpdata.marketcap += otherCoins[i].marketcap
+                }
             }
-        }
+        } catch (err) {
+            console.log(err)
+            console.log(otherCoins[i])
+        }        
     }
 
     datas.push(tmpdata)

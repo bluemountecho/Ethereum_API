@@ -396,17 +396,8 @@ async function getTotalSupply() {
                     ( SELECT DISTINCT ( pairAddress ) FROM `' + liveTableName + '` ) AS A \
                     JOIN ' + pairsTableName + ' ON ' + pairsTableName + '.pairAddress = A.pairAddress \
                     JOIN ' + tokensTableName + ' ON ' + pairsTableName + '.token0Address = ' + tokensTableName + '.tokenAddress \
-            ')
-
-            myLogger.log('SELECT \
-                    ' + pairsTableName + '.pairAddress, \
-                    ' + pairsTableName + '.token0Address, \
-                    ' + tokensTableName + '.tokenDecimals \
-                FROM \
-                    ( SELECT DISTINCT ( pairAddress ) FROM `' + liveTableName + '` ) AS A \
-                    JOIN ' + pairsTableName + ' ON ' + pairsTableName + '.pairAddress = A.pairAddress \
-                    JOIN ' + tokensTableName + ' ON ' + pairsTableName + '.token0Address = ' + tokensTableName + '.tokenAddress \
-            ')
+            ')[0]
+            
             myLogger.log(config.networks[i], pairs.length)
 
             for (var j = 0; j < pairs.length; j += web3s[config.networks[i]].length) {

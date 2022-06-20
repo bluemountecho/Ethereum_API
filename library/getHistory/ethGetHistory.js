@@ -1808,7 +1808,7 @@ async function createTables() {
         try {
             await knex.raw('\
             ALTER TABLE `' + config.networks[i] + '_pairs`\
-                ADD COLUMN liquidity double NOT NULL DEFAULT 0\
+                ADD COLUMN liquidity double NOT NULL DEFAULT 0,\
                 ADD COLUMN updatedAt timestamp NULL DEFAULT NULL;\
             ')
         } catch (err) {

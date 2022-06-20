@@ -1790,25 +1790,26 @@ async function createTables() {
     for (var i = 0; i < config.networks.length; i ++) {
         if (config.networks[i] == 'eth') continue
 
-        try {
-            await knex.raw('\
-            CREATE TABLE `' + config.networks[i] + '_token_live` (\
-                `tokenAddress` varchar(255) DEFAULT NULL,\
-                `swapPrice` double DEFAULT NULL,\
-                `swapAmount` double DEFAULT NULL,\
-                `swapMaker` varchar(255) DEFAULT NULL,\
-                `swapTransactionHash` varchar(255) DEFAULT NULL,\
-                `swapAt` timestamp NULL DEFAULT NULL\
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 ROW_FORMAT=DYNAMIC;\
-            ')
-        } catch (err) {
-            console.log(err)
-        }
+        // try {
+        //     await knex.raw('\
+        //     CREATE TABLE `' + config.networks[i] + '_token_live` (\
+        //         `tokenAddress` varchar(255) DEFAULT NULL,\
+        //         `swapPrice` double DEFAULT NULL,\
+        //         `swapAmount` double DEFAULT NULL,\
+        //         `swapMaker` varchar(255) DEFAULT NULL,\
+        //         `swapTransactionHash` varchar(255) DEFAULT NULL,\
+        //         `swapAt` timestamp NULL DEFAULT NULL\
+        //     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 ROW_FORMAT=DYNAMIC;\
+        //     ')
+        // } catch (err) {
+        //     console.log(err)
+        // }
         
         try {
             await knex.raw('\
-            ALTER TABLE `' + config.networks[i] + '_token_live`\
-                ADD KEY `tokenAddress` (`tokenAddress`);\
+            ALTER TABLE `' + config.networks[i] + '_pairs`\
+                ADD COLUMN liquidity double NOT NULL DEFAULT 0;\
+                ADD COLUMN updatedAt timestamp NULL DEFAULT NULL,\
             ')
         } catch (err) {
             console.log(err)
@@ -1830,8 +1831,8 @@ async function init() {
 
     // await getUSDPrice()
     // await removeDuplicate()
-    // await createTables()
-    getAllScanInfos()
+    await createTables()
+    // getAllScanInfos()
 }
 
 init()

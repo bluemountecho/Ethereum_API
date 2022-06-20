@@ -339,29 +339,82 @@ async function getCoinsList() {
 async function getTotalSupply() {
     try {
         createWeb3s()
-        for (var i = 0; i < config.networks.length; i ++) {
-        // for (var i = 3; i < 4; i ++) {
-            var changesTableName = config.networks[i] + '_changes'
-            var tokensTableName = config.networks[i] + '_tokens'
-            var tokens = await knex(changesTableName).join(tokensTableName, tokensTableName + '.tokenAddress', '=', changesTableName + '.tokenAddress').select('*')
+        // for (var i = 0; i < config.networks.length; i ++) {
+        //     var changesTableName = config.networks[i] + '_changes'
+        //     var tokensTableName = config.networks[i] + '_tokens'
+        //     var tokens = await knex(changesTableName).join(tokensTableName, tokensTableName + '.tokenAddress', '=', changesTableName + '.tokenAddress').select('*')
 
-            for (var j = 0; j < tokens.length; j += web3s[config.networks[i]].length) {
+        //     for (var j = 0; j < tokens.length; j += web3s[config.networks[i]].length) {
+        //         try {
+        //             var funcs = []
+        //             var contracts = []
+
+        //             for (var k = 0; j + k < tokens.length && k < web3s[config.networks[i]].length; k ++) {
+        //                 contracts[k] = new web3s[config.networks[i]][k].eth.Contract(minERC20ABI, tokens[j + k].tokenAddress)
+
+        //                 funcs.push(contracts[k].methods.totalSupply().call())
+        //             }
+
+        //             var res = await Promise.all(funcs)
+
+        //             delete contracts
+
+        //             for (var k = 0; j + k < tokens.length && k < web3s[config.networks[i]].length; k ++) {
+        //                 await knex(tokensTableName).where('tokenAddress', tokens[j + k].tokenAddress).update({'totalSupply': res[k] / 10 ** tokens[j + k].tokenDecimals})
+        //             }
+        //         } catch (err) {
+
+        //         }
+
+        //         await delay(10000)
+        //     }
+        // }
+
+        // var rows = await knex('main_coins').select('*')
+
+        // for (var i = 0; i < rows.length; i ++) {
+        //     var res = await axios.get('https://api.coingecko.com/api/v3/coins/' + config.coinMap[rows[i].coin_id])
+        //     var info = res.data
+
+        //     await knex('main_coins').where('coin_id', rows[i].coin_id).update({
+        //         coin_total_supply: info.market_data.market_cap.usd,
+        //         coin_geckoInfo: utf8.encode(JSON.stringify(info))
+        //     })
+
+        //     await delay(1200)
+        // }
+
+        for (var i = 0; i < config.networks.length; i ++) {
+            var liveTableName = config.networks[i] + '_live'
+            var tokensTableName = config.networks[i] + '_tokens'
+            var pairsTableName = config.networks[i] + '_pairs'
+            var pairs = await knex.raw('SELECT \
+                    ' + pairsTableName + '.pairAddress, \
+                    ' + pairsTableName + '.token0Address, \
+                    ' + tokensTableName + '.tokenDecimals \
+                FROM \
+                    ( SELECT DISTINCT ( pairAddress ) FROM `' + liveTableName + '` ) AS A \
+                    JOIN ' + pairsTableName + ' ON ' + pairsTableName + '.pairAddress = A.pairAddress \
+                    JOIN ' + tokensTableName + ' ON ' + pairsTableName + '.token0Address = ' + tokensTableName + '.tokenAddress \
+            ')
+
+            for (var j = 0; j < pairs.length; j += web3s[config.networks[i]].length) {
                 try {
                     var funcs = []
                     var contracts = []
 
-                    for (var k = 0; j + k < tokens.length && k < web3s[config.networks[i]].length; k ++) {
-                        contracts[k] = new web3s[config.networks[i]][k].eth.Contract(minERC20ABI, tokens[j + k].tokenAddress)
+                    for (var k = 0; j + k < pairs.length && k < web3s[config.networks[i]].length; k ++) {
+                        contracts[k] = new web3s[config.networks[i]][k].eth.Contract(minERC20ABI, pairs[j + k].token0Address)
 
-                        funcs.push(contracts[k].methods.totalSupply().call())
+                        funcs.push(contracts[k].methods.balanceOf(pairs[j + k].pairAddress).call())
                     }
 
                     var res = await Promise.all(funcs)
 
                     delete contracts
 
-                    for (var k = 0; j + k < tokens.length && k < web3s[config.networks[i]].length; k ++) {
-                        await knex(tokensTableName).where('tokenAddress', tokens[j + k].tokenAddress).update({'totalSupply': res[k] / 10 ** tokens[j + k].tokenDecimals})
+                    for (var k = 0; j + k < pairs.length && k < web3s[config.networks[i]].length; k ++) {
+                        await knex(pairsTableName).where('pairAddress', pairs[j + k].pairAddress).update({'liquidity': res[k] / 10 ** pairs[j + k].tokenDecimals})
                     }
                 } catch (err) {
 
@@ -371,24 +424,12 @@ async function getTotalSupply() {
             }
         }
 
-        var rows = await knex('main_coins').select('*')
-
-        for (var i = 0; i < rows.length; i ++) {
-            var res = await axios.get('https://api.coingecko.com/api/v3/coins/' + config.coinMap[rows[i].coin_id])
-            var info = res.data
-
-            await knex('main_coins').where('coin_id', rows[i].coin_id).update({
-                coin_total_supply: info.market_data.market_cap.usd,
-                coin_geckoInfo: utf8.encode(JSON.stringify(info))
-            })
-
-            await delay(1200)
-        }
+        console.log("Getting Liquidity is finished")
     } catch (err) {
 
     }
 
-    setTimeout(getTotalSupply, 1000)
+    // setTimeout(getTotalSupply, 1000)
 }
 
 async function getCoinGeckoInfo() {
@@ -471,9 +512,9 @@ async function mmmmm() {
 }
 
 async function init() {
-    getCoinsList()
-    getMainCoinsList()
-    getCoinGeckoInfo()
+    // getCoinsList()
+    // getMainCoinsList()
+    // getCoinGeckoInfo()
     getTotalSupply()
 }
 

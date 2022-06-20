@@ -398,7 +398,10 @@ async function getTotalSupply() {
                     JOIN ' + tokensTableName + ' ON ' + pairsTableName + '.token0Address = ' + tokensTableName + '.tokenAddress \
             ')
 
+            myLogger.log(config.networks[i], pairs.length)
+
             for (var j = 0; j < pairs.length; j += web3s[config.networks[i]].length) {
+                myLogger.log(j)
                 try {
                     var funcs = []
                     var contracts = []

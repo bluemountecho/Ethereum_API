@@ -435,11 +435,11 @@ async function getTotalSupply() {
                 await delay(10000)
             }
         }
-
-        console.log("Getting Liquidity is finished")
     } catch (err) {
-
+        console.log(err)
     }
+
+    console.log("Getting Liquidity is finished")
 
     // setTimeout(getTotalSupply, 1000)
 }

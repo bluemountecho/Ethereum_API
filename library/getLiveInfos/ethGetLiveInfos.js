@@ -866,6 +866,9 @@ async function init() {
                     if (tmpToken == USD_ADDRESS) tmpPrice = 1
 
                     if (tokensData[tmpToken]) {
+                        if (tmpToken == ETH_ADDRESS) {
+                            myLogger.log(maxPairs[tmpToken], pairAddress, ((tmpToken == ETH_ADDRESS && tmpBaseToken == USD_ADDRESS) || tmpToken != ETH_ADDRESS) && (!maxPairs[tmpToken] || maxPairs[tmpToken].pairAddress == pairAddress))
+                        }
                         if (((tmpToken == ETH_ADDRESS && tmpBaseToken == USD_ADDRESS) || tmpToken != ETH_ADDRESS) && (!maxPairs[tmpToken] || maxPairs[tmpToken].pairAddress == pairAddress)) {
                             tokensData[tmpToken].lastPrice = tmpPrice
                             await knex(tokensTableName).where('tokenAddress', tmpToken).update({

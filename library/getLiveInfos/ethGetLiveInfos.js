@@ -1239,7 +1239,7 @@ async function updatePriceChanges() {
                     info[tokenAddress][transFields[j]] += 1
                 }
 
-                if (maxPairs[tokenAddress] && rows[i].pairAddress != maxPairs[tokenAddress].pairAddress) continue
+                // if (maxPairs[tokenAddress] && rows[i].pairAddress != maxPairs[tokenAddress].pairAddress) continue
                 
                 if (timeCur - rowTime >= times[j] * 60000 && info[tokenAddress][priceFields[j]] == 0) {
                     info[tokenAddress][priceFields[j]] = rows[i].swapPrice

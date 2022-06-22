@@ -866,7 +866,7 @@ async function init() {
                     if (tmpToken == USD_ADDRESS) tmpPrice = 1
 
                     if (tokensData[tmpToken]) {
-                        if (((tmpToken == ETH_ADDRESS && tmpBaseToken == USD_ADDRESS) || tmpToken != ETH_ADDRESS) && maxPairs[tmpToken].pairAddress == pairAddress) {
+                        if (((tmpToken == ETH_ADDRESS && tmpBaseToken == USD_ADDRESS) || tmpToken != ETH_ADDRESS || !maxPairs[tokenAddress]) && maxPairs[tmpToken].pairAddress == pairAddress) {
                             tokensData[tmpToken].lastPrice = tmpPrice
                             await knex(tokensTableName).where('tokenAddress', tmpToken).update({
                                 lastPrice: tmpPrice
@@ -1079,7 +1079,7 @@ async function init() {
                     if (tmpToken == USD_ADDRESS) tmpPrice = 1
 
                     if (tokensData[tmpToken]) {
-                        if (((tmpToken == ETH_ADDRESS && tmpBaseToken == USD_ADDRESS) || tmpToken != ETH_ADDRESS) && maxPairs[tmpToken].pairAddress == pairAddress) {
+                        if (((tmpToken == ETH_ADDRESS && tmpBaseToken == USD_ADDRESS) || tmpToken != ETH_ADDRESS || !maxPairs[tokenAddress]) && maxPairs[tmpToken].pairAddress == pairAddress) {
                             tokensData[tmpToken].lastPrice = tmpPrice
                             await knex(tokensTableName).where('tokenAddress', tmpToken).update({
                                 lastPrice: tmpPrice
@@ -1220,7 +1220,7 @@ async function updatePriceChanges() {
         for (var i = 0; i < rows.length; i ++) {
             var tokenAddress = rows[i].tokenAddress
 
-            if (rows[i].pairAddress != maxPairs[tokenAddress].pairAddress) continue
+            if (maxPairs[tokenAddress] && rows[i].pairAddress != maxPairs[tokenAddress].pairAddress) continue
 
             if (!info[tokenAddress]) {
                 info[tokenAddress] = {

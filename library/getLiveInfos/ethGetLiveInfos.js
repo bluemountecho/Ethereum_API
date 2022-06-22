@@ -1289,11 +1289,13 @@ async function getMaxPairs() {
 
         for (var i = 0; i < rows.length; i ++) {
             if (rows[i].liquidity == 0) continue
+            
+            var flag = true
 
-            var tmpToken = rows[i].baseToken == 1 ? rows[i].token0Address : rows[i].token1Address
-            var tmpBaseToken = rows[i].baseToken == 0 ? rows[i].token0Address : rows[i].token1Address
+            if (rows[i].token0Address != ETH_ADDRESS && rows[i].token1Address != ETH_ADDRESS) flag = false
+            else if (rows[i].token0Address == USD_ADDRESS || rows[i].token1Address == USD_ADDRESS) flag = false
 
-            if (!((tmpToken == ETH_ADDRESS && tmpBaseToken == USD_ADDRESS) || tmpToken != ETH_ADDRESS)) continue
+            if (flag) continue
 
             var liquidity = tokensData[rows[i].token0Address].lastPrice * rows[i].liquidity
 

@@ -1788,7 +1788,7 @@ async function createTables() {
     // }
 
     for (var i = 0; i < config.networks.length; i ++) {
-        if (config.networks[i] == 'eth') continue
+        // if (config.networks[i] == 'eth') continue
 
         // try {
         //     await knex.raw('\

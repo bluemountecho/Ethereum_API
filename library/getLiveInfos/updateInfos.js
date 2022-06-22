@@ -385,6 +385,7 @@ async function getTotalSupply() {
         }
 
         for (var i = 0; i < config.networks.length; i ++) {
+            if (config.networks[i] != 'eth') continue
             var liveTableName = config.networks[i] + '_live'
             var tokensTableName = config.networks[i] + '_tokens'
             var pairsTableName = config.networks[i] + '_pairs'
@@ -512,9 +513,9 @@ async function mmmmm() {
 }
 
 async function init() {
-    getCoinsList()
-    getMainCoinsList()
-    getCoinGeckoInfo()
+    // getCoinsList()
+    // getMainCoinsList()
+    // getCoinGeckoInfo()
     getTotalSupply()
 }
 

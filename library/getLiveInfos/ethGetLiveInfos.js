@@ -1220,6 +1220,8 @@ async function updatePriceChanges() {
         for (var i = 0; i < rows.length; i ++) {
             var tokenAddress = rows[i].tokenAddress
 
+            if (rows[i].pairAddress != maxPairs[tokenAddress].pairAddress) continue
+
             if (!info[tokenAddress]) {
                 info[tokenAddress] = {
                     transToday: 0,

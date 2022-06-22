@@ -339,50 +339,50 @@ async function getCoinsList() {
 async function getTotalSupply() {
     try {
         createWeb3s()
-        // for (var i = 0; i < config.networks.length; i ++) {
-        //     var changesTableName = config.networks[i] + '_changes'
-        //     var tokensTableName = config.networks[i] + '_tokens'
-        //     var tokens = await knex(changesTableName).join(tokensTableName, tokensTableName + '.tokenAddress', '=', changesTableName + '.tokenAddress').select('*')
+        for (var i = 0; i < config.networks.length; i ++) {
+            var changesTableName = config.networks[i] + '_changes'
+            var tokensTableName = config.networks[i] + '_tokens'
+            var tokens = await knex(changesTableName).join(tokensTableName, tokensTableName + '.tokenAddress', '=', changesTableName + '.tokenAddress').select('*')
 
-        //     for (var j = 0; j < tokens.length; j += web3s[config.networks[i]].length) {
-        //         try {
-        //             var funcs = []
-        //             var contracts = []
+            for (var j = 0; j < tokens.length; j += web3s[config.networks[i]].length) {
+                try {
+                    var funcs = []
+                    var contracts = []
 
-        //             for (var k = 0; j + k < tokens.length && k < web3s[config.networks[i]].length; k ++) {
-        //                 contracts[k] = new web3s[config.networks[i]][k].eth.Contract(minERC20ABI, tokens[j + k].tokenAddress)
+                    for (var k = 0; j + k < tokens.length && k < web3s[config.networks[i]].length; k ++) {
+                        contracts[k] = new web3s[config.networks[i]][k].eth.Contract(minERC20ABI, tokens[j + k].tokenAddress)
 
-        //                 funcs.push(contracts[k].methods.totalSupply().call())
-        //             }
+                        funcs.push(contracts[k].methods.totalSupply().call())
+                    }
 
-        //             var res = await Promise.all(funcs)
+                    var res = await Promise.all(funcs)
 
-        //             delete contracts
+                    delete contracts
 
-        //             for (var k = 0; j + k < tokens.length && k < web3s[config.networks[i]].length; k ++) {
-        //                 await knex(tokensTableName).where('tokenAddress', tokens[j + k].tokenAddress).update({'totalSupply': res[k] / 10 ** tokens[j + k].tokenDecimals})
-        //             }
-        //         } catch (err) {
+                    for (var k = 0; j + k < tokens.length && k < web3s[config.networks[i]].length; k ++) {
+                        await knex(tokensTableName).where('tokenAddress', tokens[j + k].tokenAddress).update({'totalSupply': res[k] / 10 ** tokens[j + k].tokenDecimals})
+                    }
+                } catch (err) {
 
-        //         }
+                }
 
-        //         await delay(10000)
-        //     }
-        // }
+                await delay(10000)
+            }
+        }
 
-        // var rows = await knex('main_coins').select('*')
+        var rows = await knex('main_coins').select('*')
 
-        // for (var i = 0; i < rows.length; i ++) {
-        //     var res = await axios.get('https://api.coingecko.com/api/v3/coins/' + config.coinMap[rows[i].coin_id])
-        //     var info = res.data
+        for (var i = 0; i < rows.length; i ++) {
+            var res = await axios.get('https://api.coingecko.com/api/v3/coins/' + config.coinMap[rows[i].coin_id])
+            var info = res.data
 
-        //     await knex('main_coins').where('coin_id', rows[i].coin_id).update({
-        //         coin_total_supply: info.market_data.market_cap.usd,
-        //         coin_geckoInfo: utf8.encode(JSON.stringify(info))
-        //     })
+            await knex('main_coins').where('coin_id', rows[i].coin_id).update({
+                coin_total_supply: info.market_data.market_cap.usd,
+                coin_geckoInfo: utf8.encode(JSON.stringify(info))
+            })
 
-        //     await delay(1200)
-        // }
+            await delay(1200)
+        }
 
         for (var i = 0; i < config.networks.length; i ++) {
             if (config.networks[i] != 'eth') continue
@@ -516,9 +516,9 @@ async function mmmmm() {
 }
 
 async function init() {
-    // getCoinsList()
-    // getMainCoinsList()
-    // getCoinGeckoInfo()
+    getCoinsList()
+    getMainCoinsList()
+    getCoinGeckoInfo()
     getTotalSupply()
 }
 

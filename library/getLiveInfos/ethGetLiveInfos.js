@@ -258,6 +258,7 @@ function convertTimestampToString(timestamp, flag = false) {
 
 var tokensData = []
 var pairsData = []
+var maxPairs = []
 var blocksData = []
 var lastBlockNumber = config[chainName].lastBlockNumber
 var lastTransactionID = -1
@@ -865,7 +866,7 @@ async function init() {
                     if (tmpToken == USD_ADDRESS) tmpPrice = 1
 
                     if (tokensData[tmpToken]) {
-                        if ((tmpToken == ETH_ADDRESS && tmpBaseToken == USD_ADDRESS) || tmpToken != ETH_ADDRESS) {
+                        if (((tmpToken == ETH_ADDRESS && tmpBaseToken == USD_ADDRESS) || tmpToken != ETH_ADDRESS) && maxPairs[tmpToken].pairAddress == pairAddress) {
                             tokensData[tmpToken].lastPrice = tmpPrice
                             await knex(tokensTableName).where('tokenAddress', tmpToken).update({
                                 lastPrice: tmpPrice
@@ -1078,7 +1079,7 @@ async function init() {
                     if (tmpToken == USD_ADDRESS) tmpPrice = 1
 
                     if (tokensData[tmpToken]) {
-                        if ((tmpToken == ETH_ADDRESS && tmpBaseToken == USD_ADDRESS) || tmpToken != ETH_ADDRESS) {
+                        if (((tmpToken == ETH_ADDRESS && tmpBaseToken == USD_ADDRESS) || tmpToken != ETH_ADDRESS) && maxPairs[tmpToken].pairAddress == pairAddress) {
                             tokensData[tmpToken].lastPrice = tmpPrice
                             await knex(tokensTableName).where('tokenAddress', tmpToken).update({
                                 lastPrice: tmpPrice
@@ -1274,12 +1275,42 @@ async function updatePriceChanges() {
     setTimeout(updatePriceChanges, 10000)
 }
 
-updatePriceChanges()
+async function getMaxPairs() {
+    try {
+        var rows = await knex(pairsTableName).select('*')
 
-getTokenAndPairData()
-.then(res => {
-    getLastBlock()
-    .then(res1 => {
-        init()
-    })
-})
+        for (var i = 0; i < rows.length; i ++) {
+            if (rows[i].liquidity == 0) continue
+
+            var liquidity = tokensData[rows[i].token0Address].lastPrice * rows[i].liquidity
+
+            if (!maxPairs[rows[i].token0Address] || liquidity > maxPairs[rows[i].token0Address].liquidity) {
+                maxPairs[rows[i].token0Address] = {
+                    pairAddress: rows[i].pairAddress,
+                    liquidity: liquidity
+                }
+            }
+
+            if (!maxPairs[rows[i].token1Address] || liquidity > maxPairs[rows[i].token1Address].liquidity) {
+                maxPairs[rows[i].token1Address] = {
+                    pairAddress: rows[i].pairAddress,
+                    liquidity: liquidity
+                }
+            }
+        }
+    } catch (err) {
+        myLogger.log(err)
+    }
+
+    setTimeout(getMaxPairs, 4 * 3600 * 1000)
+}
+
+async function startFunc() {
+    await getTokenAndPairData()
+    getMaxPairs()
+    await getLastBlock()
+    await init()
+    updatePriceChanges()
+}
+
+startFunc()

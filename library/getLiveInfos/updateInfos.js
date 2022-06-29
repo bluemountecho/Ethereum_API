@@ -193,7 +193,7 @@ async function getMainCoinsList() {
 
     myLogger.log(convertTimestampToString(new Date().getTime(), true) + ' getMainCoinList')
 
-    setTimeout(getCoinsList, 1000)
+    setTimeout(getMainCoinsList, 1000)
 }
 
 async function getCoinsList() {
@@ -289,44 +289,44 @@ async function getCoinsList() {
             }
         }
     
-        var rows = await knex('main_coins')
+        // var rows = await knex('main_coins')
     
-        for (var i = 0; i < rows.length; i ++) {
-            var coin = await knex('main_coins').where('coin_id', rows[i].coin_id).select('*')
-            var info = await knex('main_coin_list').where('tokenAddress', coin[0].coin_token_address).where('network', coin[0].coin_net).select('*')
+        // for (var i = 0; i < rows.length; i ++) {
+        //     var coin = await knex('main_coins').where('coin_id', rows[i].coin_id).select('*')
+        //     var info = await knex('main_coin_list').where('tokenAddress', coin[0].coin_token_address).where('network', coin[0].coin_net).select('*')
     
-            if (info.length == 0) continue
+        //     if (info.length == 0) continue
 
-            var coinImage = (coin[0].coin_geckoInfo && coin[0].coin_geckoInfo != '') ? JSON.parse(coin[0].coin_geckoInfo).image.large : ''
-            var arr = coinImage.split('/')
-            var img = ''
+        //     var coinImage = (coin[0].coin_geckoInfo && coin[0].coin_geckoInfo != '') ? JSON.parse(coin[0].coin_geckoInfo).image.large : ''
+        //     var arr = coinImage.split('/')
+        //     var img = ''
 
-            for (var k = 5; k < arr.length - 1; k ++) {
-                img += arr[k] + '_'
-            }
+        //     for (var k = 5; k < arr.length - 1; k ++) {
+        //         img += arr[k] + '_'
+        //     }
 
-            if (arr.length) {
-                img += arr[arr.length - 1].split('?')[0]
-            } else {
-                img = ''
-            }
+        //     if (arr.length) {
+        //         img += arr[arr.length - 1].split('?')[0]
+        //     } else {
+        //         img = ''
+        //     }
     
-            await knex('main_coin_list').where('tokenAddress', rows[i].coin_id.toString()).where('network', 'main').update({
-                coinName: coin[0].coin_name,
-                coinSymbol: coin[0].coin_symbol,
-                price24h: info[0].price24h * (0.9997 + Math.random() * 0.001),
-                price12h: info[0].price12h * (0.9997 + Math.random() * 0.001),
-                price6h: info[0].price6h * (0.9997 + Math.random() * 0.001),
-                price2h: info[0].price2h * (0.9997 + Math.random() * 0.001),
-                price1h: info[0].price1h * (0.9997 + Math.random() * 0.001),
-                price30m: info[0].price30m * (0.9997 + Math.random() * 0.001),
-                price5m: info[0].price5m * (0.9997 + Math.random() * 0.001),
-                pricenow: info[0].pricenow * (0.9997 + Math.random() * 0.001),
-                marketcap: coin[0].coin_total_supply * (0.98 + Math.random() * 0.02),
-                coinImage: coinImage,
-                localImage: img == '' ? '' : 'http://51.83.184.35:8888/images/' + img
-            })
-        }
+        //     await knex('main_coin_list').where('tokenAddress', rows[i].coin_id.toString()).where('network', 'main').update({
+        //         coinName: coin[0].coin_name,
+        //         coinSymbol: coin[0].coin_symbol,
+        //         price24h: info[0].price24h * (0.9997 + Math.random() * 0.001),
+        //         price12h: info[0].price12h * (0.9997 + Math.random() * 0.001),
+        //         price6h: info[0].price6h * (0.9997 + Math.random() * 0.001),
+        //         price2h: info[0].price2h * (0.9997 + Math.random() * 0.001),
+        //         price1h: info[0].price1h * (0.9997 + Math.random() * 0.001),
+        //         price30m: info[0].price30m * (0.9997 + Math.random() * 0.001),
+        //         price5m: info[0].price5m * (0.9997 + Math.random() * 0.001),
+        //         pricenow: info[0].pricenow * (0.9997 + Math.random() * 0.001),
+        //         marketcap: coin[0].coin_total_supply * (0.98 + Math.random() * 0.02),
+        //         coinImage: coinImage,
+        //         localImage: img == '' ? '' : 'http://51.83.184.35:8888/images/' + img
+        //     })
+        // }
     } catch (err) {
 
     }    

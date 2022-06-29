@@ -600,7 +600,7 @@ async function writeTransactionHistoryFile(deleteDate, writeDate) {
         })
     }
 
-    await knex('main_daily').where('swapAt', '<', deleteDate + ' ' + '00:00:00').delete()
+    await knex('main_live').where('swapAt', '<', deleteDate + ' ' + '00:00:00').delete()
 
     // myLogger.log(writeDate + " WRITE TRANSACTION HISTORY FILE FINISHED!!!")
 }

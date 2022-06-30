@@ -777,7 +777,7 @@ async function init() {
                     var decimals = await getPairDecimals(pairAddress, tmpDate, web3)
                     var baseToken = tokensData[decimals[1]].createdAt < tokensData[decimals[2]].createdAt ? 0 : 1
                     var isBuy = 0
-                    // var transactionData = await web3.eth.getTransactionReceipt(transactionHash)
+                    var transactionData = await web3.eth.getTransactionReceipt(transactionHash)
                     var swapMaker = ""
                     var baseAddress = baseToken == 0 ? decimals[2] : decimals[1]
 
@@ -795,18 +795,18 @@ async function init() {
                         }
                     }
 
-                    // for (var j = 0; j < transactionData.logs.length; j ++) {
-                    //     if (transactionData.logs[j].logIndex == transactionID) break;
-                    //     if (transactionData.logs[j].topics[0] == '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef' && transactionData.logs[j].address.toLowerCase() == baseAddress) {
-                    //         if (isBuy) {
-                    //             swapMaker = transactionData.logs[j].topics[2].substr(26, 40)
-                    //         } else {
-                    //             swapMaker = transactionData.logs[j].topics[1].substr(26, 40)
-                    //         }
-                    //     }
-                    // }
+                    for (var j = 0; j < transactionData.logs.length; j ++) {
+                        if (transactionData.logs[j].logIndex == transactionID) break;
+                        if (transactionData.logs[j].topics[0] == '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef' && transactionData.logs[j].address.toLowerCase() == baseAddress) {
+                            if (isBuy) {
+                                swapMaker = transactionData.logs[j].topics[2].substr(26, 40)
+                            } else {
+                                swapMaker = transactionData.logs[j].topics[1].substr(26, 40)
+                            }
+                        }
+                    }
 
-                    // swapMaker = '0x' + swapMaker
+                    swapMaker = '0x' + swapMaker
 
                     // myLogger.log('-------------------------------------------')
                     // myLogger.log('V2 SWAP: ' + result.transactionHash)
@@ -990,7 +990,7 @@ async function init() {
                     var decimals = await getPairDecimals(pairAddress, tmpDate, web3)
                     var baseToken = tokensData[decimals[1]].createdAt < tokensData[decimals[2]].createdAt ? 0 : 1
                     var isBuy = 0
-                    // var transactionData = await web3.eth.getTransactionReceipt(transactionHash)
+                    var transactionData = await web3.eth.getTransactionReceipt(transactionHash)
                     var swapMaker = ""
                     var baseAddress = baseToken == 0 ? decimals[2] : decimals[1]
     
@@ -1008,18 +1008,18 @@ async function init() {
                         }
                     }
     
-                    // for (var j = 0; j < transactionData.logs.length; j ++) {
-                    //     if (transactionData.logs[j].logIndex == transactionID) break;
-                    //     if (transactionData.logs[j].topics[0] == '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef' && transactionData.logs[j].address.toLowerCase() == baseAddress) {
-                    //         if (isBuy) {
-                    //             swapMaker = transactionData.logs[j].topics[2].substr(26, 40)
-                    //         } else {
-                    //             swapMaker = transactionData.logs[j].topics[1].substr(26, 40)
-                    //         }
-                    //     }
-                    // }
+                    for (var j = 0; j < transactionData.logs.length; j ++) {
+                        if (transactionData.logs[j].logIndex == transactionID) break;
+                        if (transactionData.logs[j].topics[0] == '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef' && transactionData.logs[j].address.toLowerCase() == baseAddress) {
+                            if (isBuy) {
+                                swapMaker = transactionData.logs[j].topics[2].substr(26, 40)
+                            } else {
+                                swapMaker = transactionData.logs[j].topics[1].substr(26, 40)
+                            }
+                        }
+                    }
     
-                    // swapMaker = '0x' + swapMaker
+                    swapMaker = '0x' + swapMaker
     
                     // myLogger.log('-------------------------------------------')
                     // myLogger.log('V3 SWAP: ' + result.transactionHash)
@@ -1319,7 +1319,7 @@ async function startFunc() {
     getMaxPairs()
     await getLastBlock()
     await init()
-    // updatePriceChanges()
+    updatePriceChanges()
 }
 
 startFunc()

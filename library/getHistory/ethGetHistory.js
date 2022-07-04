@@ -1839,7 +1839,8 @@ async function init() {
     for (var i = 0; i < rows.length; i ++) {
         await knex('main_coin_list').insert({
             tokenAddress: rows[i].coin_id,
-            network: 'main'
+            network: 'main',
+            localImage: ''
         })
     }
 }

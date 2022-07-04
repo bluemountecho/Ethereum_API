@@ -1831,8 +1831,17 @@ async function init() {
 
     // await getUSDPrice()
     // await removeDuplicate()
-    await createTables()
+    // await createTables()
     // getAllScanInfos()
+
+    var rows = await knex('main_coins').select('*')
+
+    for (var i = 0; i < rows.length; i ++) {
+        await knex('main_coin_list').insert({
+            tokenAddress: rows[i].coin_id,
+            network: 'main'
+        })
+    }
 }
 
 init()

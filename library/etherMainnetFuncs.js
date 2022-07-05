@@ -1016,9 +1016,12 @@ module.exports.getAllCoinsList = async function getAllCoinsList(page = 0, order 
                     volume24h: otherCoins[i].volume24h,
                     trans24h: otherCoins[i].trans24h,
                     marketcap: otherCoins[i].marketcap,
+                    circulating_marketcap: 0,
                     coinSymbol: otherCoins[i].coinSymbol,
                     coinName: otherCoins[i].coinName,
                     coinImage: otherCoins[i].localImage,
+                    iscoin: false,
+
                 }
 
                 if (otherCoins[i].network == 'main') {
@@ -1026,7 +1029,6 @@ module.exports.getAllCoinsList = async function getAllCoinsList(page = 0, order 
                     tmpdata.iscoin = true
                 } else {
                     isMain = false
-                    tmpdata.iscoin = false
                 }
 
                 bef = otherCoins[i].coinSymbol.toLowerCase().replace(/ /, '')

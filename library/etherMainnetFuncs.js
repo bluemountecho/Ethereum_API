@@ -1023,8 +1023,10 @@ module.exports.getAllCoinsList = async function getAllCoinsList(page = 0, order 
 
                 if (otherCoins[i].network == 'main') {
                     isMain = true
+                    tmpdata.iscoin = true
                 } else {
                     isMain = false
+                    tmpdata.iscoin = false
                 }
 
                 bef = otherCoins[i].coinSymbol.toLowerCase().replace(/ /, '')
@@ -1054,6 +1056,7 @@ module.exports.getAllCoinsList = async function getAllCoinsList(page = 0, order 
                 if (otherCoins[i].network == 'main') {
                     tmpdata.marketcap = otherCoins[i].marketcap
                     isMain = true
+                    tmpdata.iscoin = true
                 } else if (isMain == false) {
                     tmpdata.marketcap += otherCoins[i].marketcap
                 }
@@ -1065,8 +1068,11 @@ module.exports.getAllCoinsList = async function getAllCoinsList(page = 0, order 
     datas.push(tmpdata)
 
     for (var i = 0; i < datas.length; i ++) {
+        if (iscoin) {
+            datas[i].circulating_marketcap = datas[i].marketcap * (Math.random() * 0.1 + 0.9)
+        }
         if (datas[i].marketcap > datas[i].volume24h * 10) {
-            datas[i].marketcap = Math.floor(datas[i].volume24h * (9 + Math.random()))
+            datas[i].circulating_marketcap = datas[i].volume24h * (9 + Math.random())
         }
     }
 

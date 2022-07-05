@@ -1065,8 +1065,8 @@ module.exports.getAllCoinsList = async function getAllCoinsList(page = 0, order 
     datas.push(tmpdata)
 
     for (var i = 0; i < datas.length; i ++) {
-        if (datas[i].marketcap > datas[i].trans24h * 10) {
-            datas[i].marketcap = Math.floor(datas[i].trans24h * (9 + Math.random()))
+        if (datas[i].marketcap > datas[i].volume24h * 10) {
+            datas[i].marketcap = Math.floor(datas[i].volume24h * (9 + Math.random()))
         }
     }
 

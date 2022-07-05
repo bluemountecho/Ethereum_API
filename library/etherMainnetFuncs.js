@@ -1070,11 +1070,10 @@ module.exports.getAllCoinsList = async function getAllCoinsList(page = 0, order 
     datas.push(tmpdata)
 
     for (var i = 0; i < datas.length; i ++) {
-        if (iscoin) {
-            datas[i].circulating_marketcap = datas[i].marketcap * (Math.random() * 0.1 + 0.9)
-        }
-        if (datas[i].marketcap > datas[i].volume24h * 10) {
+        if (datas[i].marketcap > datas[i].volume24h * 10 && datas[i].iscoin == false) {
             datas[i].circulating_marketcap = datas[i].volume24h * (9 + Math.random())
+        } else {
+            datas[i].circulating_marketcap = datas[i].marketcap * (Math.random() * 0.1 + 0.9)
         }
     }
 

@@ -218,7 +218,7 @@ async function getCoinsList() {
                     if (rows[j].tokenName.length > 50) continue
                     if (rows[j].lastPrice >= 100000) continue
                     if (rows[j].trans24h == 0 || rows[j].volume24h == 0) continue
-                    if (rows[j].trans24h * 400000 <= rows[j].volume24h) continue
+                    if (rows[j].trans24h * 1000000 <= rows[j].volume24h) continue
         
                     visChanges[rows[j].tokenAddress] = true
 

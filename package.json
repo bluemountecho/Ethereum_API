@@ -29,6 +29,7 @@
     "debug": "~2.6.9",
     "dotenv": "^10.0.0",
     "ejs": "~2.6.1",
+    "evm-chains": "^0.2.0",
     "express": "~4.16.1",
     "express-basic-auth": "^1.2.1",
     "fs": "^0.0.1-security",

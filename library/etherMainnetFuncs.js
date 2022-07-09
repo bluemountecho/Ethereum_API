@@ -1073,7 +1073,8 @@ module.exports.getAllCoinsList = async function getAllCoinsList(page = 0, order 
         if (datas[i].marketcap > datas[i].volume24h * 10 && datas[i].iscoin == false) {
             datas[i].circulating_marketcap = datas[i].volume24h * (9 + Math.random())
         } else {
-            datas[i].circulating_marketcap = datas[i].marketcap * (Math.random() * 0.1 + 0.9)
+            datas[i].circulating_marketcap = datas[i].marketcap
+            datas[i].marketcap = datas[i].circulating_marketcap * (Math.random() * 0.04 + 1.1)
         }
     }
 

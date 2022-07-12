@@ -156,6 +156,8 @@ async function getMainCoinsList() {
             if (info.length == 0) continue
 
             var coinImage = (coin[0].coin_geckoInfo && coin[0].coin_geckoInfo != '') ? JSON.parse(coin[0].coin_geckoInfo).image.large : ''
+            var total_supply = (coin[0].coin_geckoInfo && coin[0].coin_geckoInfo != '') ? JSON.parse(coin[0].coin_geckoInfo).market_data.total_supply : 0
+            var circulating_supply = (coin[0].coin_geckoInfo && coin[0].coin_geckoInfo != '') ? JSON.parse(coin[0].coin_geckoInfo).market_data.circulating_supply : 0
             var arr = coinImage.split('/')
             var img = ''
 
@@ -182,7 +184,8 @@ async function getMainCoinsList() {
                 price30m: info[0].price30m * (0.9997 + Math.random() * 0.001),
                 price5m: info[0].price5m * (0.9997 + Math.random() * 0.001),
                 pricenow: info[0].pricenow * (0.9997 + Math.random() * 0.001),
-                marketcap: coin[0].coin_total_supply * (0.98 + Math.random() * 0.02),
+                marketcap: total_supply * info[0].pricenow * (0.98 + Math.random() * 0.002),
+                circulating_marketcap: circulating_supply * info[0].pricenow * (0.98 + Math.random() * 0.002),
                 coinImage: coinImage,
                 localImage: img == '' ? '' : 'http://51.83.184.35:8888/images/' + img
             })
@@ -433,7 +436,7 @@ async function getTotalSupply() {
 
     console.log("Getting Liquidity is finished")
 
-    // setTimeout(getTotalSupply, 1000)
+    setTimeout(getTotalSupply, 1000)
 }
 
 async function getCoinGeckoInfo() {

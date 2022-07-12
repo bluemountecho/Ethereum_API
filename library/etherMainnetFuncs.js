@@ -1027,6 +1027,8 @@ module.exports.getAllCoinsList = async function getAllCoinsList(page = 0, order 
                 if (otherCoins[i].network == 'main') {
                     isMain = true
                     tmpdata.iscoin = true
+                    tmpdata.marketcap = otherCoins[i].marketcap
+                    tmpdata.circulating_marketcap = otherCoins[i].circulating_marketcap
                 } else {
                     isMain = false
                 }

@@ -325,7 +325,7 @@ async function getTokenInfos(tokenAddress, web3) {
 }
 
 async function getPairDecimals(pairAddress, createdAt, web3) {
-    if (pairsData[pairAddress] && tokensData[pairsData[pairAddress].token0Address] && tokensData[pairsData[pairAddress].token1Address]) {
+    if (pairsData[pairAddress]) {
         return [pairsData[pairAddress].decimals, pairsData[pairAddress].token0Address, pairsData[pairAddress].token1Address]
     }
 
@@ -391,7 +391,11 @@ async function getPairDecimals(pairAddress, createdAt, web3) {
 
         return [res[1][0] - res[0][0], token0Address, token1Address]
     } catch (err) {
-        myLogger.log(pairAddress, token0Address, token1Address)
+        pairsData[pairAddress] = {
+            decimals: 0,
+            token0Address: token0Address,
+            token1Address: token1Address,
+        }
         myLogger.log(err)
     }
 
@@ -896,7 +900,6 @@ async function init() {
                         myLogger.log(err)
                     }
                 } catch (err) {
-                    myLogger.log(pairAddress, decimals)
                     console.log(err)
                 }
             }

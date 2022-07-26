@@ -325,7 +325,7 @@ async function getTokenInfos(tokenAddress, web3) {
 }
 
 async function getPairDecimals(pairAddress, createdAt, web3) {
-    if (pairsData[pairAddress] && tokensData[token0Address] && tokensData[token1Address]) {
+    if (pairsData[pairAddress] && tokensData[pairsData[pairAddress].token0Address] && tokensData[pairsData[pairAddress].token1Address]) {
         return [pairsData[pairAddress].decimals, pairsData[pairAddress].token0Address, pairsData[pairAddress].token1Address]
     }
 

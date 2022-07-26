@@ -775,7 +775,6 @@ async function init() {
 
                     var transactionHash = result.transactionHash
                     var decimals = await getPairDecimals(pairAddress, tmpDate, web3)
-                    myLogger.log(pairAddress, decimals)
                     var baseToken = tokensData[decimals[1]].createdAt < tokensData[decimals[2]].createdAt ? 0 : 1
                     var isBuy = 0
                     // var transactionData = await web3.eth.getTransactionReceipt(transactionHash)
@@ -897,6 +896,7 @@ async function init() {
                         myLogger.log(err)
                     }
                 } catch (err) {
+                    myLogger.log(pairAddress, decimals)
                     console.log(err)
                 }
             }

@@ -394,8 +394,9 @@ async function getPairDecimals(pairAddress, createdAt, web3) {
         pairsData[pairAddress] = {
             decimals: 0,
             token0Address: token0Address,
-            token1Address: token1Address,
+            token1Address: token1Address
         }
+        myLogger.log(pairAddress, token0Address, token1Address)
         myLogger.log(err)
     }
 
@@ -900,6 +901,7 @@ async function init() {
                         myLogger.log(err)
                     }
                 } catch (err) {
+                    myLogger.log(pairAddress, token0Address)
                     console.log(err)
                 }
             }

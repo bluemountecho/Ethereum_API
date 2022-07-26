@@ -901,7 +901,7 @@ async function init() {
                         myLogger.log(err)
                     }
                 } catch (err) {
-                    myLogger.log(pairAddress, token0Address)
+                    myLogger.log(pairAddress, decimals)
                     console.log(err)
                 }
             }

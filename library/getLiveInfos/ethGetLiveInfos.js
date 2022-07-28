@@ -413,13 +413,17 @@ async function getPairDecimals(pairAddress, createdAt, web3) {
                 createdAt: createdAt
             }
 
-            await knex(tokensTableName).insert({
-                tokenAddress: token0Address,
-                tokenDecimals: res[0][0],
-                tokenSymbol: utf8.encode(res[0][1]),
-                tokenName: utf8.encode(res[0][2]),
-                createdAt: createdAt
-            })
+            try {
+                await knex(tokensTableName).insert({
+                    tokenAddress: token0Address,
+                    tokenDecimals: res[0][0],
+                    tokenSymbol: utf8.encode(res[0][1]),
+                    tokenName: utf8.encode(res[0][2]),
+                    createdAt: createdAt
+                })
+            } catch (err) {
+
+            }
         }
 
         if (tokensData[token1Address]) {
@@ -437,14 +441,18 @@ async function getPairDecimals(pairAddress, createdAt, web3) {
                 lastPrice: 0,
                 createdAt: createdAt,
             }
-
-            await knex(tokensTableName).insert({
-                tokenAddress: token1Address,
-                tokenDecimals: res[1][0],
-                tokenSymbol: utf8.encode(res[1][1]),
-                tokenName: utf8.encode(res[1][2]),
-                createdAt: createdAt
-            })
+            
+            try {
+                await knex(tokensTableName).insert({
+                    tokenAddress: token1Address,
+                    tokenDecimals: res[1][0],
+                    tokenSymbol: utf8.encode(res[1][1]),
+                    tokenName: utf8.encode(res[1][2]),
+                    createdAt: createdAt
+                })
+            } catch (err) {
+                
+            }
         }
 
         return [res[1][0] - res[0][0], token0Address, token1Address]
@@ -676,8 +684,8 @@ async function init() {
         var blockNumber = await web3s[0].eth.getBlockNumber()
         var curBlock = blockNumber
 
-        if (curBlock > lastBlockNumber + 199) {
-            blockNumber = lastBlockNumber + 199
+        if (curBlock > lastBlockNumber + 99) {
+            blockNumber = lastBlockNumber + 99
         }
 
         var tmpLastTrans = lastTransactionID

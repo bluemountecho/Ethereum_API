@@ -689,8 +689,8 @@ async function init() {
         var blockNumber = await web3s[0].eth.getBlockNumber()
         var curBlock = blockNumber
 
-        if (curBlock > lastBlockNumber + 99) {
-            blockNumber = lastBlockNumber + 99
+        if (curBlock > lastBlockNumber + 199) {
+            blockNumber = lastBlockNumber + 199
         }
 
         var tmpLastTrans = lastTransactionID

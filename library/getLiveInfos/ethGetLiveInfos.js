@@ -725,36 +725,36 @@ async function init() {
             }),
         ])
 
-        for (var i = lastBlockNumber; i < blockNumber + (curBlock > blockNumber ? 1 : 0); i ++) {
-            coinsFuncs.push(web3s[(6 + i) % proxyCnt].eth.getBlock(i, true))
-        }
+        // for (var i = lastBlockNumber; i < blockNumber + (curBlock > blockNumber ? 1 : 0); i ++) {
+        //     coinsFuncs.push(web3s[(6 + i) % proxyCnt].eth.getBlock(i, true))
+        // }
 
-        var coinsResult = await Promise.all(coinsFuncs)
+        // var coinsResult = await Promise.all(coinsFuncs)
         
-        for (var i = 0; i < blockNumber + (curBlock > blockNumber ? 1 : 0) - lastBlockNumber; i ++) {
-            for (var j = 0; j < coinsResult[i].transactions.length; j ++) {
-                if (coinsResult[i].transactions[j].value == '0') continue
+        // for (var i = 0; i < blockNumber + (curBlock > blockNumber ? 1 : 0) - lastBlockNumber; i ++) {
+        //     for (var j = 0; j < coinsResult[i].transactions.length; j ++) {
+        //         if (coinsResult[i].transactions[j].value == '0') continue
 
-                var tmpAmount = Number.parseInt(coinsResult[i].transactions[j].value) / 10 ** ETH_DECIMAL
-                var tmpPrice
+        //         var tmpAmount = Number.parseInt(coinsResult[i].transactions[j].value) / 10 ** ETH_DECIMAL
+        //         var tmpPrice
 
-                if (chainName == 'aurora') {
-                    tmpPrice = tokensData[ETH_ADDRESS1].lastPrice * (0.9995 + Math.random() * 0.001)
-                } else {
-                    tmpPrice = tokensData[ETH_ADDRESS].lastPrice * (0.9995 + Math.random() * 0.001)
-                }
+        //         if (chainName == 'aurora') {
+        //             tmpPrice = tokensData[ETH_ADDRESS1].lastPrice * (0.9995 + Math.random() * 0.001)
+        //         } else {
+        //             tmpPrice = tokensData[ETH_ADDRESS].lastPrice * (0.9995 + Math.random() * 0.001)
+        //         }
 
-                await knex('main_live').insert({
-                    coin_id: ETH_ID,
-                    swapAt: convertTimestampToString(coinsResult[i].timestamp * 1000, true),
-                    swapAmount: tmpAmount,
-                    swapAmountUSD: tmpAmount * tmpPrice,
-                    swapPrice: tmpPrice,
-                    swapMaker: coinsResult[i].transactions[j].from.toLowerCase(),
-                    swapTransactionHash: coinsResult[i].transactions[j].hash
-                })
-            }
-        }
+        //         await knex('main_live').insert({
+        //             coin_id: ETH_ID,
+        //             swapAt: convertTimestampToString(coinsResult[i].timestamp * 1000, true),
+        //             swapAmount: tmpAmount,
+        //             swapAmountUSD: tmpAmount * tmpPrice,
+        //             swapPrice: tmpPrice,
+        //             swapMaker: coinsResult[i].transactions[j].from.toLowerCase(),
+        //             swapTransactionHash: coinsResult[i].transactions[j].hash
+        //         })
+        //     }
+        // }
 
         // myLogger.log('==================================================')
         // myLogger.log('lastBlockNumber: ' + lastBlockNumber)

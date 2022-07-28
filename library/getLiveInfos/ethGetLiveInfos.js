@@ -123,6 +123,51 @@ const minERC20ABI = [
     }
 ]
 
+const minERC20ABI1 = [
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "_name",
+        "outputs": [
+            {
+                "name": "",
+                "type": "string"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "_decimals",
+        "outputs": [
+            {
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "_symbol",
+        "outputs": [
+            {
+                "name": "",
+                "type": "string"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    }
+]
+
 const minDSTokenABI = [
     {
         "constant": true,
@@ -308,19 +353,32 @@ async function getTokenInfos(tokenAddress, web3) {
     
         return [decimals, symbol, name]
     } catch (err) {
-        const contract = new web3.eth.Contract(minDSTokenABI, tokenAddress)
-        var decimals, symbol, name
+        try {
+            const contract = new web3.eth.Contract(minDSTokenABI, tokenAddress)
+            var decimals, symbol, name
 
-        [decimals, symbol, name] = await Promise.all([
-            contract.methods.decimals().call(),
-            contract.methods.symbol().call(),
-            contract.methods.name().call()
-        ])
+            [decimals, symbol, name] = await Promise.all([
+                contract.methods.decimals().call(),
+                contract.methods.symbol().call(),
+                contract.methods.name().call()
+            ])
 
-        symbol = web3.utils.hexToUtf8(symbol)
-        name = web3.utils.hexToUtf8(name)
+            symbol = web3.utils.hexToUtf8(symbol)
+            name = web3.utils.hexToUtf8(name)
+        
+            return [decimals, symbol, name]
+        } catch (err) {
+            const contract = new web3.eth.Contract(minERC20ABI1, tokenAddress)
+            var decimals, symbol, name
     
-        return [decimals, symbol, name]
+            [decimals, symbol, name] = await Promise.all([
+                contract.methods.decimals().call(),
+                contract.methods.symbol().call(),
+                contract.methods.name().call()
+            ])
+        
+            return [decimals, symbol, name]
+        }        
     }    
 }
 

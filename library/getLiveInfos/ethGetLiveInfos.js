@@ -372,9 +372,9 @@ async function getTokenInfos(tokenAddress, web3) {
             var decimals, symbol, name
     
             [decimals, symbol, name] = await Promise.all([
-                contract.methods.decimals().call(),
-                contract.methods.symbol().call(),
-                contract.methods.name().call()
+                contract.methods._decimals().call(),
+                contract.methods._symbol().call(),
+                contract.methods._name().call()
             ])
         
             return [decimals, symbol, name]
@@ -449,11 +449,6 @@ async function getPairDecimals(pairAddress, createdAt, web3) {
 
         return [res[1][0] - res[0][0], token0Address, token1Address]
     } catch (err) {
-        pairsData[pairAddress] = {
-            decimals: 0,
-            token0Address: token0Address,
-            token1Address: token1Address
-        }
         myLogger.log(pairAddress, token0Address, token1Address)
         myLogger.log(err)
     }

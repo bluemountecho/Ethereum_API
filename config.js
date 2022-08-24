@@ -204,7 +204,7 @@ module.exports.coinMap = [
 
 module.exports.bsc = {
     'web3Providers': [
-        'https://bsc-dataseed1.binance.org/',
+        'https://bsc-dataseed.binance.org/',
     ],
     'endPointType': 1,
     'FROMBLOCK': 16180349,

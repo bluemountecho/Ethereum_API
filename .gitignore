@@ -6,3 +6,4 @@ library/getHistory/log.txt
 /public/images/*.png
 /public/images/*.jpg
 *.txt
+start.cmd

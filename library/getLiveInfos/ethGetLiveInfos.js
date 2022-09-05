@@ -32,23 +32,17 @@ if (config[chainName].endPointType == 1) {
             // Enable auto reconnection
             reconnect: {
                 auto: true,
-                delay: 5000, // ms
-                maxAttempts: 5,
+                delay: 50000, // ms
+                maxAttempts: 10,
                 onTimeout: false
             },
             keepAlive: true,
-            timeout: 20000,
+            timeout: 200000,
             headers: [{name: 'Access-Control-Allow-Origin', value: '*'}],
             withCredentials: false,
             agent: {
-                // httpsAgent: new HttpsProxyAgent('https://' + config.PROXY[ii]),
                 baseUrl: 'http://' + config.PROXY[ii]
             }
-            // agent: {
-            //     // http: new HttpsProxyAgent('http://' + config.PROXY[ii]),
-            //     http: http.Agent('http://' + config.PROXY[ii]),
-            //     baseUrl: 'http://' + config.PROXY[ii]
-            // }
         })))
     }
 } else {
@@ -57,23 +51,18 @@ if (config[chainName].endPointType == 1) {
             // Enable auto reconnection
             reconnect: {
                 auto: true,
-                delay: 5000, // ms
-                maxAttempts: 5,
+                delay: 50000, // ms
+                maxAttempts: 10,
                 onTimeout: false
             },
             keepAlive: true,
-            timeout: 20000,
+            timeout: 200000,
             headers: [{name: 'Access-Control-Allow-Origin', value: '*'}],
             withCredentials: false,
             agent: {
                 // httpsAgent: new HttpsProxyAgent('https://' + config.PROXY[ii]),
                 baseUrl: 'http://' + config.PROXY[ii]
             }
-            // agent: {
-            //     // http: new HttpsProxyAgent('http://' + config.PROXY[ii]),
-            //     http: http.Agent('http://' + config.PROXY[ii]),
-            //     baseUrl: 'http://' + config.PROXY[ii]
-            // }
         })))
     }
 }

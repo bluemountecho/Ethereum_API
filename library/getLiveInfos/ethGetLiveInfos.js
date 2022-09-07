@@ -739,7 +739,6 @@ async function init() {
                         toBlock: blockNumber,
                         topics: [topics[i]]
                     })
-                    console.log(results[i])
                     id ++
     
                     break

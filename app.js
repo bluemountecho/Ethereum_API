@@ -5,10 +5,12 @@ var http = require('http');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const basicAuth = require('express-basic-auth')
+var cors = require('cors')
 
 var ethRouter = require('./routes/ethRoutes');
 var app = express();
 
+app.use(cors())
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');

@@ -224,7 +224,7 @@ module.exports.bsc = {
     'TRANSACTIONV2': 200,
     'PAIRV1': 68000,
     'PAIRV2': 1000,
-    'PROXYCOUNT': 68,
+    'PROXYCOUNT': 100,
     'USD_ADDRESS': "0xe9e7cea3dedca5984780bafc599bd69add087d56",
     'ETH_ADDRESS': "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c",
     'lastBlockNumber': 17371188,

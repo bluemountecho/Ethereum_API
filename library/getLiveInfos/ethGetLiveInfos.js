@@ -685,34 +685,70 @@ async function init() {
         var tmpLastTrans = lastTransactionID
         var tmpLastBlock = lastestBlock
         var coinsFuncs = []
+        var results = []
+        var id = 0
 
-        var results = await Promise.all([
-            web3s[1].eth.getPastLogs({
-                fromBlock: lastBlockNumber,
-                toBlock: blockNumber,
-                topics: ['0x0d3648bd0f6ba80134a33ba9275ac585d9d315f0ad8355cddefde31afa28d0e9']
-            }),
-            web3s[2].eth.getPastLogs({
-                fromBlock: lastBlockNumber,
-                toBlock: blockNumber,
-                topics: ['0xd78ad95fa46c994b6551d0da85fc275fe613ce37657fb8d5e3d130840159d822']
-            }),
-            web3s[3].eth.getPastLogs({
-                fromBlock: lastBlockNumber,
-                toBlock: blockNumber,
-                topics: ['0x783cca1c0412dd0d695e784568c96da2e9c22ff989357a2e8b1d9b2b4e6b7118']
-            }),
-            web3s[4].eth.getPastLogs({
-                fromBlock: lastBlockNumber,
-                toBlock: blockNumber,
-                topics: ['0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67']
-            }),
-            web3s[5].eth.getPastLogs({
-                fromBlock: lastBlockNumber,
-                toBlock: blockNumber,
-                topics: ['0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef']
-            }),
-        ])
+        // var results = await Promise.all([
+            // web3s[1].eth.getPastLogs({
+            //     fromBlock: lastBlockNumber,
+            //     toBlock: blockNumber,
+            //     topics: [
+            //         [
+            //             '0x0d3648bd0f6ba80134a33ba9275ac585d9d315f0ad8355cddefde31afa28d0e9',
+            //             '0xd78ad95fa46c994b6551d0da85fc275fe613ce37657fb8d5e3d130840159d822',
+            //             '0x783cca1c0412dd0d695e784568c96da2e9c22ff989357a2e8b1d9b2b4e6b7118',
+            //             '0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67',
+            //             '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef',
+            //         ]
+            //     ]
+            // }),
+        //     web3s[2].eth.getPastLogs({
+        //         fromBlock: lastBlockNumber,
+        //         toBlock: blockNumber,
+        //         topics: ['0xd78ad95fa46c994b6551d0da85fc275fe613ce37657fb8d5e3d130840159d822']
+        //     }),
+        //     web3s[3].eth.getPastLogs({
+        //         fromBlock: lastBlockNumber,
+        //         toBlock: blockNumber,
+        //         topics: ['0x783cca1c0412dd0d695e784568c96da2e9c22ff989357a2e8b1d9b2b4e6b7118']
+        //     }),
+        //     web3s[4].eth.getPastLogs({
+        //         fromBlock: lastBlockNumber,
+        //         toBlock: blockNumber,
+        //         topics: ['0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67']
+        //     }),
+        //     web3s[5].eth.getPastLogs({
+        //         fromBlock: lastBlockNumber,
+        //         toBlock: blockNumber,
+        //         topics: ['0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef']
+        //     }),
+        // ])
+
+        while (true) {
+            try {
+                results = await web3s[id].eth.getPastLogs({
+                    fromBlock: lastBlockNumber,
+                    toBlock: blockNumber,
+                    topics: [
+                        [
+                            '0x0d3648bd0f6ba80134a33ba9275ac585d9d315f0ad8355cddefde31afa28d0e9',
+                            '0xd78ad95fa46c994b6551d0da85fc275fe613ce37657fb8d5e3d130840159d822',
+                            '0x783cca1c0412dd0d695e784568c96da2e9c22ff989357a2e8b1d9b2b4e6b7118',
+                            '0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67',
+                            '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef',
+                        ]
+                    ]
+                })[0]
+                id ++
+
+                break
+            } catch (err) {
+                console.log('ERROR(MAIN): ' + id)
+                id ++
+            }
+
+            if (id >= proxyCnt) id = 0
+        }
 
         // for (var i = lastBlockNumber; i < blockNumber + (curBlock > blockNumber ? 1 : 0); i ++) {
         //     coinsFuncs.push(web3s[(6 + i) % proxyCnt].eth.getBlock(i, true))

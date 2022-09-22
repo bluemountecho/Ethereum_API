@@ -1140,6 +1140,8 @@ module.exports.getNetworkStatus = async function getNetworkStatus() {
 
         var rows = await knex(`${config.networks[i]}_live`).select(knex.raw('max(swapAt) as swapAt'))
 
+        console.log(rows)
+
         datas[config.networks[i]] = rows
     }
 

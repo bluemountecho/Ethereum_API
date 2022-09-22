@@ -112,6 +112,18 @@ router.get('/coins', function(req, res, next) {
   })
 });
 
+router.get('/network_status', function(req, res, next) {
+  if (req.network != 'all') {
+    res.send('')
+    return
+  }
+
+  etherMainnetFuncs.getNetworkStatus()
+  .then((data) => {
+    res.send(JSON.stringify(data))
+  })
+});
+
 router.get('/all_coins_info', function(req, res, next) {
   if (req.network != 'all') {
     res.send('')

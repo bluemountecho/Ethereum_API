@@ -1131,3 +1131,15 @@ module.exports.getAllCoinsInfo = async function getAllCoinsInfo() {
 
     return rows[0]
 }
+
+module.exports.getNetworkStatus = async function getNetworkStatus() {
+    var datas = []
+
+    for (var i = 0; i < config.networks.length; i ++) {
+        var row = (await knex(`${config.networks[i]}_live`).select('max(swapAt) as swapAt'))[0]
+
+        datas[config.networks[i]] = row.swapAt
+    }
+
+    return datas
+}

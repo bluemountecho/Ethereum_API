@@ -675,8 +675,11 @@ async function getLastBlock() {
 
 async function init() {
     try {
+        var id = 0
         var blockNumber = await web3s[id ++].eth.getBlockNumber()
         var curBlock = blockNumber
+    
+        if (id >= proxyCnt) id = 0
 
         if (curBlock > lastBlockNumber + 99) {
             blockNumber = lastBlockNumber + 99
@@ -686,7 +689,6 @@ async function init() {
         var tmpLastBlock = lastestBlock
         var coinsFuncs = []
         var results = []
-        var id = 0
         const topics = [
             '0x0d3648bd0f6ba80134a33ba9275ac585d9d315f0ad8355cddefde31afa28d0e9',
             '0xd78ad95fa46c994b6551d0da85fc275fe613ce37657fb8d5e3d130840159d822',
@@ -1273,6 +1275,8 @@ async function init() {
         } else {
             resBlock = blocksData[lastBlockNumber]
         }
+    
+        if (id >= proxyCnt) id = 0
 
         var tmpDate1 = convertTimestampToString(resBlock.timestamp * 1000 - 7 * 86400 * 1000, true)
 
@@ -1282,6 +1286,8 @@ async function init() {
         } else {
             resBlock = blocksData[blockNumber]
         }
+    
+        if (id >= proxyCnt) id = 0
 
         var tmpDate2 = convertTimestampToString(resBlock.timestamp * 1000 - 7 * 86400 * 1000, true)
 
@@ -1300,6 +1306,8 @@ async function init() {
         myLogger.log(err)
     } finally {
         id ++
+    
+        if (id >= proxyCnt) id = 0
     }
 
     setTimeout(init, 1000)

@@ -675,7 +675,7 @@ async function getLastBlock() {
 
 async function init() {
     try {
-        var blockNumber = await web3s[0].eth.getBlockNumber()
+        var blockNumber = await web3s[id ++].eth.getBlockNumber()
         var curBlock = blockNumber
 
         if (curBlock > lastBlockNumber + 99) {
@@ -739,11 +739,11 @@ async function init() {
                         toBlock: blockNumber,
                         topics: [topics[i]]
                     })
-                    id ++
     
                     break
                 } catch (err) {
                     console.log('ERROR(MAIN): ' + id)
+                } finally {
                     id ++
                 }
     
@@ -839,6 +839,7 @@ async function init() {
             }
 
             await Promise.all(funcs)
+            await delay(200)
         }
 
         for (var i = 0; i < results[1].length; i += proxyCnt) {
@@ -1005,6 +1006,7 @@ async function init() {
             }
 
             await Promise.all(funcs)
+            await delay(200)
         }
 
         for (var i = 0; i < results[2].length; i += proxyCnt) {
@@ -1057,6 +1059,7 @@ async function init() {
             }
 
             await Promise.all(funcs)
+            await delay(200)
         }
 
         for (var i = 0; i < results[3].length; i += proxyCnt) {
@@ -1218,6 +1221,7 @@ async function init() {
             }
 
             await Promise.all(funcs)
+            await delay(200)
         }
 
         for (var i = 0; i < results[4].length; i ++) {
@@ -1238,7 +1242,7 @@ async function init() {
                 var resBlock
 
                 if (!blocksData[block]) {
-                    resBlock = await web3s[0].eth.getBlock(block)
+                    resBlock = await web3s[id].eth.getBlock(block)
                     blocksData[block] = {timestamp: resBlock.timestamp}
                 } else {
                     resBlock = blocksData[block]
@@ -1253,7 +1257,8 @@ async function init() {
                     swapAt: convertTimestampToString(resBlock.timestamp * 1000, true)
                 })
             } catch (err) {
-
+            } finally {
+                id ++
             }
         }
 
@@ -1263,7 +1268,7 @@ async function init() {
         var resBlock
 
         if (!blocksData[lastBlockNumber]) {
-            resBlock = await web3s[0].eth.getBlock(lastBlockNumber)
+            resBlock = await web3s[id ++].eth.getBlock(lastBlockNumber)
             blocksData[lastBlockNumber] = {timestamp: resBlock.timestamp}
         } else {
             resBlock = blocksData[lastBlockNumber]
@@ -1272,7 +1277,7 @@ async function init() {
         var tmpDate1 = convertTimestampToString(resBlock.timestamp * 1000 - 7 * 86400 * 1000, true)
 
         if (!blocksData[blockNumber]) {
-            resBlock = await web3s[0].eth.getBlock(blockNumber)
+            resBlock = await web3s[id ++].eth.getBlock(blockNumber)
             blocksData[blockNumber] = {timestamp: resBlock.timestamp}
         } else {
             resBlock = blocksData[blockNumber]
@@ -1293,6 +1298,8 @@ async function init() {
         }
     } catch (err) {
         myLogger.log(err)
+    } finally {
+        id ++
     }
 
     setTimeout(init, 1000)

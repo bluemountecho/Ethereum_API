@@ -120,7 +120,6 @@ router.get('/network_status', function(req, res, next) {
 
   etherMainnetFuncs.getNetworkStatus()
   .then((data) => {
-    console.log(data)
     res.send(JSON.stringify(data, null, 4))
   })
 });

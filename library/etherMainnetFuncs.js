@@ -1136,6 +1136,8 @@ module.exports.getNetworkStatus = async function getNetworkStatus() {
     var datas = []
 
     for (var i = 0; i < config.networks.length; i ++) {
+        console.log(knex(`${config.networks[i]}_live`).select(knex.raw('max(swapAt) as swapAt')).toSQL().toNative())
+
         var rows = await knex(`${config.networks[i]}_live`).select(knex.raw('max(swapAt) as swapAt'))
 
         datas[config.networks[i]] = rows

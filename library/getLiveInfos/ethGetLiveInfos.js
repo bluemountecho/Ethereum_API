@@ -747,7 +747,7 @@ async function init() {
                     id ++
                 }
     
-                if (id >= proxyCnt) id = 0
+                if (id >= proxyCnt) id = 1
 
                 await delay(50)
             }
@@ -791,7 +791,7 @@ async function init() {
         // myLogger.log('UNISWAP V3 POOL CREATED: ' + results[2].length)
         // myLogger.log('UNISWAP V3 SWAP        : ' + results[3].length)
 
-        for (var i = 0; i < results[0].length; i += proxyCnt) {
+        for (var i = 0; i < results[0].length; i += proxyCnt - 1) {
             async function getOneV2Pair(result, web3) {
                 try {
                     var token0Address = '0x' + result.topics[1].substr(26, 40).toLowerCase()
@@ -836,15 +836,15 @@ async function init() {
 
             var funcs = []
 
-            for (var k = 0; k < proxyCnt && i + k < results[0].length; k ++) {
-                funcs.push(getOneV2Pair(results[0][i + k], web3s[k]))
+            for (var k = 0; k < proxyCnt - 1 && i + k < results[0].length; k ++) {
+                funcs.push(getOneV2Pair(results[0][i + k], web3s[k + 1]))
             }
 
             await Promise.all(funcs)
             await delay(200)
         }
 
-        for (var i = 0; i < results[1].length; i += proxyCnt) {
+        for (var i = 0; i < results[1].length; i += proxyCnt - 1) {
             async function getOneV2Swap(result, web3) {
                 try {
                     var amt0 = Number.parseInt(hexToBn(result.data.substr(2, 64)))
@@ -1003,15 +1003,15 @@ async function init() {
 
             var funcs = []
 
-            for (var k = 0; k < proxyCnt && i + k < results[1].length; k ++) {
-                funcs.push(getOneV2Swap(results[1][i + k], web3s[k]))
+            for (var k = 0; k < proxyCnt - 1 && i + k < results[1].length; k ++) {
+                funcs.push(getOneV2Swap(results[1][i + k], web3s[k + 1]))
             }
 
             await Promise.all(funcs)
             await delay(200)
         }
 
-        for (var i = 0; i < results[2].length; i += proxyCnt) {
+        for (var i = 0; i < results[2].length; i += proxyCnt - 1) {
             async function getOneV3Pair(result, web3) {
                 try {
                     var token0Address = '0x' + result.topics[1].substr(26, 40).toLowerCase()
@@ -1056,15 +1056,15 @@ async function init() {
 
             var funcs = []
 
-            for (var k = 0; k < proxyCnt && i + k < results[2].length; k ++) {
-                funcs.push(getOneV3Pair(results[2][i + k], web3s[k]))
+            for (var k = 0; k < proxyCnt - 1 && i + k < results[2].length; k ++) {
+                funcs.push(getOneV3Pair(results[2][i + k], web3s[k + 1]))
             }
 
             await Promise.all(funcs)
             await delay(200)
         }
 
-        for (var i = 0; i < results[3].length; i += proxyCnt) {
+        for (var i = 0; i < results[3].length; i += proxyCnt - 1) {
             async function getOneV3Swap(result, web3) {
                 try {
                     var swap0 = Number.parseInt(hexToBn(result.data.substr(2, 64)))
@@ -1218,8 +1218,8 @@ async function init() {
 
             var funcs = []
 
-            for (var k = 0; k < proxyCnt && i + k < results[3].length; k ++) {
-                funcs.push(getOneV3Swap(results[3][i + k], web3s[k]))
+            for (var k = 0; k < proxyCnt - 1 && i + k < results[3].length; k ++) {
+                funcs.push(getOneV3Swap(results[3][i + k], web3s[k + 1]))
             }
 
             await Promise.all(funcs)
@@ -1243,7 +1243,7 @@ async function init() {
                 var resBlock
 
                 if (!blocksData[block]) {
-                    resBlock = await web3s[0].eth.getBlock(block)
+                    resBlock = await web3s[id ++].eth.getBlock(block)
                     blocksData[block] = {timestamp: resBlock.timestamp}
                 } else {
                     resBlock = blocksData[block]
@@ -1258,8 +1258,10 @@ async function init() {
                     swapAt: convertTimestampToString(resBlock.timestamp * 1000, true)
                 })
             } catch (err) {
-
+                id ++
             }
+    
+            if (id >= proxyCnt) id = 1
         }
 
         lastTransactionID = tmpLastTrans

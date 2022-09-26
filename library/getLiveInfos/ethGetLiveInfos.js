@@ -24,6 +24,8 @@ const ETH_ADDRESS1 = config[chainName].ETH_ADDRESS1
 const ETH_DECIMAL = config[chainName].ETH_DECIMAL
 const ETH_ID = config[chainName].ETH_ID
 
+const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
+
 var web3s = []
 
 if (config[chainName].endPointType == 1) {

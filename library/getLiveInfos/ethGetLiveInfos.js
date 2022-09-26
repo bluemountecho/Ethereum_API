@@ -749,7 +749,7 @@ async function init() {
     
                 if (id >= proxyCnt) id = 1
 
-                await delay(50)
+                await delay(200)
             }
         }
 
@@ -1223,6 +1223,7 @@ async function init() {
             }
 
             await Promise.all(funcs)
+            await delay(200)
         }
 
         for (var i = 0; i < results[4].length; i ++) {

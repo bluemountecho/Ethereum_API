@@ -63,7 +63,7 @@ if (config[chainName].endPointType == 1) {
             withCredentials: false,
             agent: {
                 // httpsAgent: new HttpsProxyAgent('https://' + config.PROXY[ii]),
-                baseUrl: 'http://' + config.PROXY[ii]
+                // baseUrl: 'http://' + config.PROXY[ii]
             }
         })))
     }

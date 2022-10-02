@@ -399,7 +399,7 @@ module.exports.optimism = {
 
 module.exports.avalanche = {
     'web3Providers': [
-        'https://avalanche-mainnet-rpc.allthatnode.com',
+        'curl https://avalanche-mainnet-rpc.allthatnode.com/ext/bc/C/rpc',
     ],
     'endPointType': 1,
     'FROMBLOCK': 0,

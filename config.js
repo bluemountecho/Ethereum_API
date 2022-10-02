@@ -459,7 +459,7 @@ module.exports.harmony = {
 
 module.exports.cronos = {
     'web3Providers': [
-        'https://evm.cronos.org',
+        'https://rpc.vvs.finance',
     ],
     'endPointType': 1,
     'FROMBLOCK': 0,

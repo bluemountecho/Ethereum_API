@@ -399,7 +399,7 @@ module.exports.optimism = {
 
 module.exports.avalanche = {
     'web3Providers': [
-        'https://api.avax.network/ext/bc/C/rpc',
+        'https://avalanche-mainnet-rpc.allthatnode.com',
     ],
     'endPointType': 1,
     'FROMBLOCK': 0,

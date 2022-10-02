@@ -668,11 +668,28 @@ async function writeTransactionHistoryFile(deleteDate, writeDate) {
 }
 
 async function getLastBlock() {
-    var rows = await knex(liveTableName).select('swapTransactionHash').orderBy('swapAt', 'desc').limit(1).offset(0)
-    var hash = rows[0].swapTransactionHash
-    var res = await web3s[0].eth.getTransaction(hash)
+    var id = 0
 
-    lastBlockNumber = res.blockNumber
+    while (true) {
+        try {
+            var rows = await knex(liveTableName).select('swapTransactionHash').orderBy('swapAt', 'desc').limit(1).offset(0)
+            var hash = rows[0].swapTransactionHash
+            var res = await web3s[id].eth.getTransaction(hash)
+
+            id ++
+
+            lastBlockNumber = res.blockNumber
+            break
+        } catch (err) {
+            myLogger.log(err)
+
+            id ++
+        }
+
+        if (id >= proxyCnt) id = 0
+
+        await delay(1000)
+    }
 }
 
 async function init() {

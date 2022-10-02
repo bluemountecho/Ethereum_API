@@ -459,7 +459,7 @@ module.exports.harmony = {
 
 module.exports.cronos = {
     'web3Providers': [
-        'https://grpc.cronos.org/',
+        'https://node.croswap.com/rpc',
     ],
     'endPointType': 1,
     'FROMBLOCK': 0,

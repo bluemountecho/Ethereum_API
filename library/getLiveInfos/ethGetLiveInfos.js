@@ -692,13 +692,15 @@ async function getLastBlock() {
     }
 }
 
+var blockRange = config[chainName].BLOCK_RANGE ? config[chainName].BLOCK_RANGE : 99
+
 async function init() {
     try {
         var blockNumber = await web3s[0].eth.getBlockNumber()
         var curBlock = blockNumber
 
-        if (curBlock > lastBlockNumber + 19) {
-            blockNumber = lastBlockNumber + 19
+        if (curBlock > lastBlockNumber + blockRange) {
+            blockNumber = lastBlockNumber + blockRange
         }
 
         var tmpLastTrans = lastTransactionID

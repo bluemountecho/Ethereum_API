@@ -866,7 +866,7 @@ async function init() {
             }
 
             await Promise.all(funcs)
-            await delay(200)
+            await delay(1000)
         }
 
         for (var i = 0; i < results[1].length; i += proxyCnt - 1) {
@@ -1033,7 +1033,7 @@ async function init() {
             }
 
             await Promise.all(funcs)
-            await delay(200)
+            await delay(1000)
         }
 
         for (var i = 0; i < results[2].length; i += proxyCnt - 1) {
@@ -1086,7 +1086,7 @@ async function init() {
             }
 
             await Promise.all(funcs)
-            await delay(200)
+            await delay(1000)
         }
 
         for (var i = 0; i < results[3].length; i += proxyCnt - 1) {
@@ -1248,7 +1248,7 @@ async function init() {
             }
 
             await Promise.all(funcs)
-            await delay(200)
+            await delay(1000)
         }
 
         for (var i = 0; i < results[4].length; i ++) {

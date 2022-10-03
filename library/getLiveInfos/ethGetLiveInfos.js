@@ -692,8 +692,8 @@ async function getLastBlock() {
     }
 }
 
-var blockRange = config[chainName].BLOCK_RANGE ? config[chainName].BLOCK_RANGE : 99
-// var blockRange = 99
+// var blockRange = config[chainName].BLOCK_RANGE ? config[chainName].BLOCK_RANGE : 99
+var blockRange = 99
 
 async function init() {
     try {
@@ -773,7 +773,7 @@ async function init() {
     
                 if (id >= proxyCnt) id = 1
 
-                await delay(200)
+                await delay(1000)
             }
         }
 
@@ -867,7 +867,7 @@ async function init() {
             }
 
             await Promise.all(funcs)
-            await delay(1000)
+            await delay(2000)
         }
 
         for (var i = 0; i < results[1].length; i += proxyCnt - 1) {
@@ -1034,7 +1034,7 @@ async function init() {
             }
 
             await Promise.all(funcs)
-            await delay(1000)
+            await delay(2000)
         }
 
         for (var i = 0; i < results[2].length; i += proxyCnt - 1) {
@@ -1087,7 +1087,7 @@ async function init() {
             }
 
             await Promise.all(funcs)
-            await delay(1000)
+            await delay(2000)
         }
 
         for (var i = 0; i < results[3].length; i += proxyCnt - 1) {
@@ -1249,7 +1249,7 @@ async function init() {
             }
 
             await Promise.all(funcs)
-            await delay(1000)
+            await delay(2000)
         }
 
         // for (var i = 0; i < results[4].length; i ++) {

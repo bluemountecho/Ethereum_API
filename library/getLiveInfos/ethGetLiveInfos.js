@@ -750,7 +750,7 @@ async function init() {
         //     }),
         // ])
 
-        for (var i = 0; i < 5; i ++) {
+        for (var i = 0; i < 1; i ++) {
             while (true) {
                 try {
                     results[i] = await web3s[id].eth.getPastLogs({

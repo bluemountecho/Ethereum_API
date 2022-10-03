@@ -1296,24 +1296,20 @@ async function init() {
         var resBlock
 
         if (!blocksData[lastBlockNumber]) {
-            resBlock = await web3s[id ++].eth.getBlock(lastBlockNumber)
+            resBlock = await web3s[0].eth.getBlock(lastBlockNumber)
             blocksData[lastBlockNumber] = {timestamp: resBlock.timestamp}
         } else {
             resBlock = blocksData[lastBlockNumber]
         }
 
-        id ++
-
         var tmpDate1 = convertTimestampToString(resBlock.timestamp * 1000 - 7 * 86400 * 1000, true)
 
         if (!blocksData[blockNumber]) {
-            resBlock = await web3s[id].eth.getBlock(blockNumber)
+            resBlock = await web3s[0].eth.getBlock(blockNumber)
             blocksData[blockNumber] = {timestamp: resBlock.timestamp}
         } else {
             resBlock = blocksData[blockNumber]
         }
-
-        id ++
 
         var tmpDate2 = convertTimestampToString(resBlock.timestamp * 1000 - 7 * 86400 * 1000, true)
 

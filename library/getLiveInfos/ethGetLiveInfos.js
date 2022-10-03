@@ -692,7 +692,8 @@ async function getLastBlock() {
     }
 }
 
-var blockRange = config[chainName].BLOCK_RANGE ? config[chainName].BLOCK_RANGE : 99
+// var blockRange = config[chainName].BLOCK_RANGE ? config[chainName].BLOCK_RANGE : 99
+var blockRange = 99
 
 async function init() {
     try {
@@ -866,7 +867,7 @@ async function init() {
             }
 
             await Promise.all(funcs)
-            await delay(1000)
+            await delay(200)
         }
 
         for (var i = 0; i < results[1].length; i += proxyCnt - 1) {
@@ -1033,7 +1034,7 @@ async function init() {
             }
 
             await Promise.all(funcs)
-            await delay(1000)
+            await delay(200)
         }
 
         for (var i = 0; i < results[2].length; i += proxyCnt - 1) {
@@ -1086,7 +1087,7 @@ async function init() {
             }
 
             await Promise.all(funcs)
-            await delay(1000)
+            await delay(200)
         }
 
         for (var i = 0; i < results[3].length; i += proxyCnt - 1) {
@@ -1248,7 +1249,7 @@ async function init() {
             }
 
             await Promise.all(funcs)
-            await delay(1000)
+            await delay(200)
         }
 
         for (var i = 0; i < results[4].length; i ++) {
@@ -1275,8 +1276,6 @@ async function init() {
                     resBlock = blocksData[block]
                 }
 
-                await delay(50)
-
                 await knex(tokenLiveTableName).insert({
                     tokenAddress: addr,
                     swapPrice: tokensData[addr].lastPrice * (0.9995 + Math.random() * 0.001),
@@ -1288,6 +1287,8 @@ async function init() {
             } catch (err) {
                 id ++
             }
+
+            await delay(50)
     
             if (id >= proxyCnt) id = 1
         }

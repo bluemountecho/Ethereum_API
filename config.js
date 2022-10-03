@@ -881,7 +881,7 @@ module.exports.elastos = {
 
 module.exports.polis = {
     'web3Providers': [
-        'https://rpc.polis.tech',
+        'https://explorer.polis.tech/api/eth-rpc',
     ],
     'endPointType': 1,
     'FROMBLOCK': 0,

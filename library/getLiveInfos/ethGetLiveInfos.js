@@ -1275,6 +1275,8 @@ async function init() {
                     resBlock = blocksData[block]
                 }
 
+                await delay(50)
+
                 await knex(tokenLiveTableName).insert({
                     tokenAddress: addr,
                     swapPrice: tokensData[addr].lastPrice * (0.9995 + Math.random() * 0.001),

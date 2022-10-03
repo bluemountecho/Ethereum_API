@@ -710,7 +710,7 @@ async function init() {
         var tmpLastBlock = lastestBlock
         var coinsFuncs = []
         var results = []
-        var id = 0
+        var id = 1
         const topics = [
             '0x0d3648bd0f6ba80134a33ba9275ac585d9d315f0ad8355cddefde31afa28d0e9',
             '0xd78ad95fa46c994b6551d0da85fc275fe613ce37657fb8d5e3d130840159d822',

@@ -703,6 +703,8 @@ async function init() {
             blockNumber = lastBlockNumber + blockRange
         }
 
+        console.log(lastBlockNumber)
+
         var tmpLastTrans = lastTransactionID
         var tmpLastBlock = lastestBlock
         var coinsFuncs = []
@@ -774,7 +776,7 @@ async function init() {
             }
         }
 
-        console.log(results[0])
+        console.log(results[4].length)
 
         // for (var i = lastBlockNumber; i < blockNumber + (curBlock > blockNumber ? 1 : 0); i ++) {
         //     coinsFuncs.push(web3s[(6 + i) % proxyCnt].eth.getBlock(i, true))

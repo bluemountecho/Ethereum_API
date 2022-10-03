@@ -668,7 +668,7 @@ async function writeTransactionHistoryFile(deleteDate, writeDate) {
 }
 
 async function getLastBlock() {
-    var id = 0
+    var id = 1
 
     while (true) {
         try {
@@ -686,7 +686,7 @@ async function getLastBlock() {
             id ++
         }
 
-        if (id >= proxyCnt) id = 0
+        if (id >= proxyCnt) id = 1
 
         await delay(1000)
     }

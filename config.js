@@ -781,7 +781,7 @@ module.exports.emerald = {
 
 module.exports.kardia = {
     'web3Providers': [
-        'https://rpc.kardiachain.io/',
+        'https://rpc.kardiachain.io',
     ],
     'endPointType': 1,
     'FROMBLOCK': 0,

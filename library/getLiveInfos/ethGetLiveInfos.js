@@ -1252,46 +1252,46 @@ async function init() {
             await delay(1000)
         }
 
-        // for (var i = 0; i < results[4].length; i ++) {
-        //     try {
-        //         var amt = Number.parseInt(hexToBn(results[4][i].data.substr(2, 64)))
-        //         var swapMaker = '0x' + results[4][i].topics[1].substr(26, 40).toLowerCase()
-        //         var addr = results[4][i].address.toLowerCase()
-        //         var hash = results[4][i].transactionHash.toLowerCase()
-        //         var block = results[4][i].blockNumber
-        //         var transactionID = results[4][i].logIndex
+        for (var i = 0; i < results[4].length; i ++) {
+            try {
+                var amt = Number.parseInt(hexToBn(results[4][i].data.substr(2, 64)))
+                var swapMaker = '0x' + results[4][i].topics[1].substr(26, 40).toLowerCase()
+                var addr = results[4][i].address.toLowerCase()
+                var hash = results[4][i].transactionHash.toLowerCase()
+                var block = results[4][i].blockNumber
+                var transactionID = results[4][i].logIndex
 
-        //         if (block < lastestBlock || (block == lastestBlock && transactionID <= lastTransactionID)) continue
-        //         if (block > tmpLastBlock || (block == tmpLastBlock && transactionID > tmpLastTrans)) {
-        //             tmpLastBlock = block
-        //             tmpLastTrans = transactionID
-        //         }
+                if (block < lastestBlock || (block == lastestBlock && transactionID <= lastTransactionID)) continue
+                if (block > tmpLastBlock || (block == tmpLastBlock && transactionID > tmpLastTrans)) {
+                    tmpLastBlock = block
+                    tmpLastTrans = transactionID
+                }
 
-        //         var resBlock
+                var resBlock
 
-        //         if (!blocksData[block]) {
-        //             resBlock = await web3s[id ++].eth.getBlock(block)
-        //             blocksData[block] = {timestamp: resBlock.timestamp}
-        //         } else {
-        //             resBlock = blocksData[block]
-        //         }
+                if (!blocksData[block]) {
+                    resBlock = await web3s[id ++].eth.getBlock(block)
+                    blocksData[block] = {timestamp: resBlock.timestamp}
+                } else {
+                    resBlock = blocksData[block]
+                }
 
-        //         await knex(tokenLiveTableName).insert({
-        //             tokenAddress: addr,
-        //             swapPrice: tokensData[addr].lastPrice * (0.9995 + Math.random() * 0.001),
-        //             swapAmount: amt / 10 ** tokensData[addr].tokenDecimals,
-        //             swapMaker: swapMaker,
-        //             swapTransactionHash: hash,
-        //             swapAt: convertTimestampToString(resBlock.timestamp * 1000, true)
-        //         })
-        //     } catch (err) {
-        //         id ++
-        //     }
+                await knex(tokenLiveTableName).insert({
+                    tokenAddress: addr,
+                    swapPrice: tokensData[addr].lastPrice * (0.9995 + Math.random() * 0.001),
+                    swapAmount: amt / 10 ** tokensData[addr].tokenDecimals,
+                    swapMaker: swapMaker,
+                    swapTransactionHash: hash,
+                    swapAt: convertTimestampToString(resBlock.timestamp * 1000, true)
+                })
+            } catch (err) {
+                id ++
+            }
 
-        //     await delay(50)
+            await delay(50)
     
-        //     if (id >= proxyCnt) id = 1
-        // }
+            if (id >= proxyCnt) id = 1
+        }
 
         lastTransactionID = tmpLastTrans
         lastestBlock = tmpLastBlock

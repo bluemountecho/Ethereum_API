@@ -1207,7 +1207,7 @@ async function init() {
 
                     if (tmpToken == USD_ADDRESS) tmpPrice = 1
 
-                    if (tmpToken == ETH_ADDRESS) {
+                    if (tmpToken == ETH_ADDRESS || tmpToken == "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599") {
                         console.log(maxPairs[tmpToken])
                         console.log(pairAddress, tmpPrice)
                     }

@@ -1435,7 +1435,7 @@ async function getMaxPairs() {
             var liquidity = tokensData[rows[i].token0Address].lastPrice * rows[i].liquidity
 
             if (rows[i].token0Address == "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599") {
-                console.log(rows[i].pairAddress, liquidity)
+                myLogger.log(rows[i].pairAddress, liquidity)
             }
 
             if (!maxPairs[rows[i].token0Address] || liquidity > maxPairs[rows[i].token0Address].liquidity) {

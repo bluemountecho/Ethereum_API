@@ -1427,7 +1427,7 @@ async function getMaxPairs() {
             
             var flag = true
 
-            if (rows[i].token0Address == ETH_ADDRESS && rows[i].token1Address == ETH_ADDRESS) flag = false
+            if (rows[i].token0Address == ETH_ADDRESS || rows[i].token1Address == ETH_ADDRESS) flag = false
             else if (rows[i].token0Address == USD_ADDRESS || rows[i].token1Address == USD_ADDRESS) flag = false
 
             if (flag) continue

@@ -1434,10 +1434,6 @@ async function getMaxPairs() {
 
             var liquidity = tokensData[rows[i].token0Address].lastPrice * rows[i].liquidity
 
-            if (rows[i].token0Address == USD_ADDRESS && rows[i].token1Address == ETH_ADDRESS) {
-                myLogger.log(rows[i].pairAddress, liquidity)
-            }
-
             if (!maxPairs[rows[i].token0Address] || liquidity > maxPairs[rows[i].token0Address].liquidity) {
                 maxPairs[rows[i].token0Address] = {
                     pairAddress: rows[i].pairAddress,
@@ -1455,6 +1451,9 @@ async function getMaxPairs() {
     } catch (err) {
         myLogger.log(err)
     }
+
+    console.log(maxPairs['0x2260fac5e5542a773aa44fbcfedf7c193bc2c599'])
+    console.log(maxPairs['0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'])
 
     setTimeout(getMaxPairs, 4 * 3600 * 1000)
 }

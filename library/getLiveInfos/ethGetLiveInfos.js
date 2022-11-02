@@ -1421,7 +1421,7 @@ async function updatePriceChanges() {
 async function getMaxPairs() {
     try {
         var transs = []
-        var rows = await knex(liveTableName).select(knex.raw('count(token0Address) as trans, pairAddress')).groupBy('pairAddress')
+        var rows = await knex(liveTableName).select(knex.raw('count(tokenAddress) as trans, pairAddress')).groupBy('pairAddress')
 
         for (var i = 0; i < rows.length; i ++) {
             transs[rows[i].pairAddress] = rows[i].trans
@@ -1430,7 +1430,7 @@ async function getMaxPairs() {
         rows = await knex(pairsTableName).select('*')
 
         for (var i = 0; i < rows.length; i ++) {
-            if (rows[i].liquidity == 0) continue
+            if (rows[i].liquidity == 0 || !transs[rows[i].pairAddress]) continue
             
             var flag = true
 
@@ -1439,7 +1439,7 @@ async function getMaxPairs() {
 
             if (flag) continue
 
-            var liquidity = tokensData[rows[i].token0Address].lastPrice * rows[i].liquidity * (transs[rows[i].pairAddress] ? transs[rows[i].pairAddress] : 0)
+            var liquidity = tokensData[rows[i].token0Address].lastPrice * rows[i].liquidity * transs[rows[i].pairAddress]
 
             if (!maxPairs[rows[i].token0Address] || liquidity > maxPairs[rows[i].token0Address].liquidity) {
                 if (rows[i].token0Address != ETH_ADDRESS || (rows[i].token0Address == ETH_ADDRESS && rows[i].token1Address == USD_ADDRESS)) {

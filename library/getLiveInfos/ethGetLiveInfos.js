@@ -1435,16 +1435,20 @@ async function getMaxPairs() {
             var liquidity = tokensData[rows[i].token0Address].lastPrice * rows[i].liquidity
 
             if (!maxPairs[rows[i].token0Address] || liquidity > maxPairs[rows[i].token0Address].liquidity) {
-                maxPairs[rows[i].token0Address] = {
-                    pairAddress: rows[i].pairAddress,
-                    liquidity: liquidity
+                if (rows[i].token0Address != ETH_ADDRESS || (rows[i].token0Address == ETH_ADDRESS && rows[i].token1Address == USD_ADDRESS)) {
+                    maxPairs[rows[i].token0Address] = {
+                        pairAddress: rows[i].pairAddress,
+                        liquidity: liquidity
+                    }
                 }
             }
 
             if (!maxPairs[rows[i].token1Address] || liquidity > maxPairs[rows[i].token1Address].liquidity) {
-                maxPairs[rows[i].token1Address] = {
-                    pairAddress: rows[i].pairAddress,
-                    liquidity: liquidity
+                if (rows[i].token1Address != ETH_ADDRESS || (rows[i].token1Address == ETH_ADDRESS && rows[i].token0Address == USD_ADDRESS)) {
+                    maxPairs[rows[i].token1Address] = {
+                        pairAddress: rows[i].pairAddress,
+                        liquidity: liquidity
+                    }
                 }
             }
         }

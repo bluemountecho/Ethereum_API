@@ -18,9 +18,9 @@ const tokenLiveTableName = chainName + '_token_live'
 const changesTableName = chainName + '_changes'
 const proxyCnt = config[chainName].PROXYCOUNT
 const Web3 = require('web3')
-const USD_ADDRESS = config[chainName].USD_ADDRESS
-const ETH_ADDRESS = config[chainName].ETH_ADDRESS
-const ETH_ADDRESS1 = config[chainName].ETH_ADDRESS1
+const USD_ADDRESS = config[chainName].USD_ADDRESS.toLowerCase()
+const ETH_ADDRESS = config[chainName].ETH_ADDRESS.toLowerCase()
+const ETH_ADDRESS1 = config[chainName].ETH_ADDRESS1.toLowerCase()
 const ETH_DECIMAL = config[chainName].ETH_DECIMAL
 const ETH_ID = config[chainName].ETH_ID
 
@@ -1427,7 +1427,7 @@ async function getMaxPairs() {
             
             var flag = true
 
-            if (rows[i].token0Address != ETH_ADDRESS && rows[i].token1Address != ETH_ADDRESS) flag = false
+            if (rows[i].token0Address == ETH_ADDRESS && rows[i].token1Address == ETH_ADDRESS) flag = false
             else if (rows[i].token0Address == USD_ADDRESS || rows[i].token1Address == USD_ADDRESS) flag = false
 
             if (flag) continue

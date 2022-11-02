@@ -1434,7 +1434,7 @@ async function getMaxPairs() {
 
             var liquidity = tokensData[rows[i].token0Address].lastPrice * rows[i].liquidity
 
-            if (rows[i].token0Address == "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599") {
+            if (rows[i].token0Address == USD_ADDRESS && rows[i].token1Address == ETH_ADDRESS) {
                 myLogger.log(rows[i].pairAddress, liquidity)
             }
 

@@ -475,7 +475,7 @@ module.exports.cronos = {
     'ETH_DECIMAL': 18,
     'ETH_ID': 9,
     'ExplorerSite': 'https://cronoscan.com',
-    'BLOCK_RANGE': 5,
+    'BLOCK_RANGE': 1,
 }
 
 module.exports.aurora = {

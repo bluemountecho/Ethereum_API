@@ -731,7 +731,7 @@ async function init() {
     
                     break
                 } catch (err) {
-                    console.log(err.err)
+                    console.log(err)
                     console.log('ERROR(MAIN): ' + id)
                     id ++
                 }

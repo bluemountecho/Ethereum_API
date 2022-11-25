@@ -731,10 +731,12 @@ async function init() {
     
                     break
                 } catch (err) {
+                    if (i == 4) {
+                        results[4] = []
+                        break;
+                    }
                     console.log('ERROR(MAIN): ' + id)
                     id ++
-                    results[4] = []
-                    break;
                 }
     
                 if (id >= proxyCnt) id = 1

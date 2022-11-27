@@ -731,6 +731,7 @@ async function init() {
     
                     break
                 } catch (err) {
+                    myLogger.log(err)
                     if (i == 4) {
                         results[4] = []
                         break;

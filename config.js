@@ -231,7 +231,6 @@ module.exports.bsc = {
     'ETH_DECIMAL': 18,
     'ETH_ID': 2,
     'ExplorerSite': 'https://bscscan.com',
-    'BLOCK_RANGE': 0,
 }
 
 module.exports.eth = {

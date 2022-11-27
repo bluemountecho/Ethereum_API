@@ -1430,9 +1430,6 @@ async function startFunc() {
     await getTokenAndPairData()
     getMaxPairs()
     await getLastBlock()
-
-    lastBlockNumber += 100
-
     await init()
     updatePriceChanges()
 }

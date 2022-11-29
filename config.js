@@ -11,7 +11,6 @@ module.exports.PROXY = [
     // "185.200.176.207:8800",
 
     "198.100.159.181:3128",
-    "66.94.111.80:9999",
     "198.100.159.102:3128",
     "158.69.205.28:3128",
     "158.69.134.188:3128",
@@ -233,7 +232,7 @@ module.exports.bsc = {
     'ETH_DECIMAL': 18,
     'ETH_ID': 2,
     'ExplorerSite': 'https://bscscan.com',
-    // 'BLOCK_RANGE': 0,
+    'BLOCK_RANGE': 0,
 }
 
 module.exports.eth = {

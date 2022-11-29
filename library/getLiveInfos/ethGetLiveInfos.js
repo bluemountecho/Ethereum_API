@@ -704,7 +704,7 @@ async function init() {
             blockNumber = lastBlockNumber + blockRange
         }
 
-        console.log(lastBlockNumber)
+        console.log(lastBlockNumber, blockNumber)
 
         var tmpLastTrans = lastTransactionID
         var tmpLastBlock = lastestBlock

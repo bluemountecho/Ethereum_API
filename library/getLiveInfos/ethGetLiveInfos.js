@@ -740,6 +740,8 @@ async function init() {
                     results[i] = []
                     console.log('ERROR(MAIN): ' + id)
                     id ++
+
+                    break
                 }
     
                 if (id >= proxyCnt) id = 1

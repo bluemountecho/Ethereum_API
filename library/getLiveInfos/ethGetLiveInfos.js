@@ -731,17 +731,14 @@ async function init() {
     
                     break
                 } catch (err) {
-                    // myLogger.log(err)
-                    // if (i == 4) {
-                    //     results[4] = []
-                    //     break;
-                    // }
+                    myLogger.log(err)
+                    if (i == 4) {
+                        results[4] = []
+                        break;
+                    }
 
-                    results[i] = []
                     console.log('ERROR(MAIN): ' + id)
                     id ++
-
-                    break
                 }
     
                 if (id >= proxyCnt) id = 1
